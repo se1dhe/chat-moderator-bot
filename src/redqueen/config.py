@@ -27,7 +27,7 @@ class Settings(BaseSettings):
 
     # AI
     ollama_url: str = Field(default="http://localhost:11434", alias="OLLAMA_URL")
-    ollama_model: str = Field(default="qwen3.5:4b", alias="OLLAMA_MODEL")
+    ollama_model: str = Field(default="qwen3:4b", alias="OLLAMA_MODEL")
     ai_enabled: bool = Field(default=False, alias="AI_ENABLED")
     ai_max_concurrency: int = Field(default=2, alias="AI_MAX_CONCURRENCY")
     # Pull OLLAMA_MODEL automatically on startup if it isn't present yet (backend

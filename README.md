@@ -78,10 +78,10 @@ On Apple Silicon, run Ollama natively for GPU acceleration:
 ```sh
 brew install ollama
 ollama serve
-ollama pull qwen3.5:4b     # 9b/27b for higher quality if you have the RAM
+ollama pull qwen3:4b       # or qwen3:8b/14b for higher quality (more RAM)
 ```
 
-Then in `.env` set `AI_ENABLED=true` and `OLLAMA_MODEL=qwen3.5:4b`, restart the bot,
+Then in `.env` set `AI_ENABLED=true` and `OLLAMA_MODEL=qwen3:4b`, restart the bot,
 and per chat run `/aimode quarantine`. On Linux servers use the `ai` compose profile:
 `docker compose --profile ai up -d ollama`.
 

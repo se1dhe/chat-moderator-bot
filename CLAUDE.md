@@ -88,7 +88,7 @@ uv run alembic revision --autogenerate -m "msg"   # new migration
 uv run alembic upgrade head              # apply migrations
 ```
 
-AI: on Apple Silicon run Ollama natively (`ollama serve`, `ollama pull qwen3.5:4b`),
+AI: on Apple Silicon run Ollama natively (`ollama serve`, `ollama pull qwen3:4b`),
 set `AI_ENABLED=true`, then per chat `/aimode quarantine`.
 
 Mini App (dev): `cd webapp && npm install && npm run build` (aiohttp then serves it at
