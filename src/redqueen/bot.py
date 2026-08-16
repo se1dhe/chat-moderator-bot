@@ -15,7 +15,10 @@ from .middlewares import DbSessionMiddleware, LangMiddleware
 from .services.ai import AIProvider, build_provider
 
 # Update types whose handlers need a DB session / resolved chat language.
-_DB_SCOPED_OBSERVERS = ("message", "callback_query", "chat_member", "chat_join_request", "my_chat_member")
+_DB_SCOPED_OBSERVERS = (
+    "message", "edited_message", "callback_query",
+    "chat_member", "chat_join_request", "my_chat_member",
+)
 
 
 def create_bot(settings: Settings) -> Bot:

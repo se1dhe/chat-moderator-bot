@@ -226,10 +226,25 @@ CHANGELOG + ручная проверка в тестовом чате.
 - **DoD:** ✅ AI-карантин работает end-to-end (карантин/autoban/rule); raid-лок
   срабатывает на симуляции наплыва join'ов; 40 pytest-тестов.
 
-### M4 — Монетизация и Mini App
-- Telegram Stars: Pro-подписка на чат, `Payment` ledger, возвраты, гейтинг фич.
-- Mini App: правила, AI-очередь, роли, аналитика; EN/RU/UK.
-- **DoD:** оплата Stars включает Pro в чате; Mini App показывает очередь и настройки.
+### M4 — Mini App (TMA-first) и монетизация  ← в работе
+> **Разворот приоритетов (2026-08-16):** управление становится **TMA-first** — Mini App
+> это основная поверхность, а не команды. Всё максимально настраиваемо в TMA, качество
+> премиальное; монетизация — поверх уже доставленной ценности (сначала ценность, потом
+> Stars). Дизайн адаптирован с соседнего проекта **CP-helper** (тёмно-красная тема).
+
+- ✅ **Backend API** (`src/redqueen/api/`, aiohttp): работает в polling и webhook; авторизация
+  Telegram `initData` (HMAC) + гейт «админ чата»; эндпоинты — список чатов, чтение/запись
+  всех настроек (`config.full_view`/`apply_patch`), аудит, очередь карантина, статистика;
+  раздача собранного TMA с того же origin (`/app`).
+- ✅ **Mini App** (`webapp/`, React 19 + Vite): дашборд + все настройки редактируемо
+  (captcha, antiflood, filters, modes, AI incl. per-category пороги, raid, warns,
+  exemptions), очередь карантина (Approve/Ban/Rule), аудит, статистика; EN/RU/UK;
+  подключение через menu button / `/panel`.
+- ✅ **AI-эффективность**: контекст reply-to + language-aware few-shot промпт, Redis-кэш
+  вердиктов, per-category пороги с поправкой на trust-score, ре-скан правок.
+- ⏳ **Монетизация**: Telegram Stars — Pro-подписка на чат, `Payment` ledger, возвраты,
+  гейтинг Pro-фич (AI autoban, raid shield, аналитика).
+- **DoD:** ✅ TMA управляет всеми настройками end-to-end; ⏳ оплата Stars включает Pro.
 
 ### M5 — Мультимодальность, масштаб, white-label
 - Vision (картинки/GIF), ключевые кадры видео, ASR голосовых, document extractor.

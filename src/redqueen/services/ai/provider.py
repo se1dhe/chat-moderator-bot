@@ -24,7 +24,9 @@ class AIProvider(ABC):
     name: str = "abstract"
 
     @abstractmethod
-    async def classify_text(self, text: str, *, context: str | None = None) -> Verdict:
+    async def classify_text(
+        self, text: str, *, context: str | None = None, lang: str | None = None
+    ) -> Verdict:
         ...
 
     async def health(self) -> bool:

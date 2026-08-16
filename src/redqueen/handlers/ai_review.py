@@ -16,7 +16,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from ..db import repo
 from ..db.models import AIVerdict
-from ..services import ai_budget, quarantine
+from ..services import ai_budget, ai_cache, quarantine, trust
 from ..services.ai import AIProvider
 from ..services.config import get_config
 
@@ -53,19 +53,35 @@ def _decision_kb(verdict_id: int, t: Callable[..., str]) -> InlineKeyboardBuilde
 @router.message(F.chat.type.in_({"group", "supergroup"}) & F.text)
 async def scan_message(
     message: Message, bot: Bot, session: AsyncSession, redis: Redis, ai_provider: AIProvider,
-    ai_semaphore: asyncio.Semaphore, t: Callable[..., str],
+    ai_semaphore: asyncio.Semaphore, t: Callable[..., str], lang: str,
 ) -> None:
     settings = await repo.get_settings(session, message.chat.id)
     if settings.ai_mode == "off" or message.from_user is None or message.from_user.is_bot:
         raise SkipHandler
 
+    text = message.text or ""
     ai_cfg = get_config(settings)["ai"]
-    if not await ai_budget.allow(redis, chat_id=message.chat.id, limit=ai_cfg["max_per_minute"]):
+
+    # Cache first: raids repeat identical text, so classify each distinct message once
+    # per window instead of paying for the model (and a queue slot) every time.
+    verdict = await ai_cache.get(redis, message.chat.id, text)
+    if verdict is None:
+        if not await ai_budget.allow(redis, chat_id=message.chat.id, limit=ai_cfg["max_per_minute"]):
+            raise SkipHandler
+        context = message.reply_to_message.text if message.reply_to_message else None
+        async with ai_semaphore:
+            verdict = await ai_provider.classify_text(text, context=context, lang=lang)
+        await ai_cache.put(redis, message.chat.id, text, verdict)
+
+    if not verdict.is_violation:
         raise SkipHandler
 
-    async with ai_semaphore:
-        verdict = await ai_provider.classify_text(message.text or "")
-    if not verdict.is_violation or verdict.score < settings.ai_threshold:
+    # Per-category threshold (falls back to the chat default), then nudged by the
+    # author's trust score: suspicious members are flagged more readily.
+    base = ai_cfg["thresholds"].get(verdict.category, settings.ai_threshold)
+    score_now = await trust.get_score(session, message.from_user.id)
+    threshold = trust.effective_threshold(base, score_now)
+    if verdict.score < threshold:
         raise SkipHandler
 
     row = AIVerdict(
@@ -134,3 +150,7 @@ async def on_decision(
     if query.message:
         await query.message.edit_text(text)
     await query.answer()
+
+
+# Re-scan edits: a common evasion is to post clean text, then edit in a scam/insult.
+router.edited_message.register(scan_message, F.chat.type.in_({"group", "supergroup"}) & F.text)

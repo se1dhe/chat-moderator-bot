@@ -6,10 +6,24 @@ Persona: the "Red Queen" defense system from *Resident Evil*.
 
 See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) and [docs/ROADMAP.md](docs/ROADMAP.md).
 
-## Status — M3 (AI moderation, raid shield, trust score)
+## Status — M4 in progress · TMA-first management console
 
-Working: everything from M1+M2 (moderation commands, warn limits, per-chat settings,
-full audit log, i18n, captcha, antiflood, content filters, modes, onboarding) plus:
+The **Telegram Mini App is now the primary way to manage RedQueen** — a premium
+dark-red console (React + Vite, served by the bot) where admins configure every feature,
+review the AI quarantine queue, and read the audit log and stats. Slash commands remain
+as a fallback. See [Mini App](#mini-app-management-console) below.
+
+Working: everything from M1+M2+M3 (moderation commands, warn limits, per-chat settings,
+full audit log, i18n, captcha, antiflood, content filters, modes, onboarding, AI
+moderation queue with explainable quarantine, raid shield, trust score) plus:
+
+- **Mini App** — authenticated by Telegram `initData`, admin-gated per chat; edits all
+  settings live and reviews quarantine/audit/stats.
+- **Sharper AI** — reply-to context + language-aware few-shot prompt, a Redis verdict
+  cache (identical raid spam is classified once per window), per-category confidence
+  thresholds nudged by the author's trust score, and edited-message re-scan.
+
+Earlier milestone highlights:
 
 - **AI moderation queue** — classification calls are bounded by a global
   `asyncio.Semaphore` (`AI_MAX_CONCURRENCY`) and a per-chat Redis rate limit, so AI is
@@ -74,6 +88,40 @@ and per chat run `/aimode quarantine`. On Linux servers use the `ai` compose pro
 `AI_MAX_CONCURRENCY` (default 2) caps concurrent Ollama calls across all chats; each
 chat additionally gets its own Redis-backed budget (`config.ai.max_per_minute`,
 default 20/min) so one busy chat can't starve the rest.
+
+## Mini App (management console)
+
+The bot always runs an HTTP API (aiohttp) and serves the built Mini App at `/app`.
+
+Build and serve from the bot:
+
+```sh
+cd webapp && npm install && npm run build
+```
+
+Then start the bot (`uv run redqueen`) and the console is at `http://localhost:8080/app`
+(API under `/api`). For hot-reload development, run the frontend separately — it proxies
+`/api` to the running bot:
+
+```sh
+cd webapp && npm run dev
+```
+
+To use it inside Telegram it must be reachable over **HTTPS**. In dev, tunnel port 8080
+with ngrok and point the bot and BotFather at it:
+
+```sh
+ngrok http 8080
+```
+
+- Set `WEBAPP_URL=https://<your-ngrok-domain>/app` in `.env` and restart — the bot wires
+  it to the private-chat **menu button** and the `/panel` command.
+- In [@BotFather](https://t.me/BotFather): set the bot's **Menu Button** (or **Main Mini
+  App**) URL to the same `https://<domain>/app`.
+- Open the bot in Telegram → menu button, or send `/panel` in a managed group.
+
+Auth is entirely via Telegram `initData` (HMAC-validated server-side); each request is
+gated to administrators of the target chat. No separate login.
 
 ## Webhook / ngrok (optional)
 

@@ -44,6 +44,9 @@ class Settings(BaseSettings):
     api_host: str = Field(default="0.0.0.0", alias="API_HOST")
     api_port: int = Field(default=8080, alias="API_PORT")
     webapp_dist: str = Field(default="webapp/dist", alias="WEBAPP_DIST")
+    # Public HTTPS URL of the served Mini App (e.g. https://<domain>/app). When set,
+    # the bot wires it to the chat menu button and the /panel command.
+    webapp_url: str = Field(default="", alias="WEBAPP_URL")
 
     default_lang: str = Field(default="en", alias="DEFAULT_LANG")
     log_level: str = Field(default="INFO", alias="LOG_LEVEL")

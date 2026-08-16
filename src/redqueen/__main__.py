@@ -50,6 +50,11 @@ async def run() -> None:
         bot=bot, settings=settings, sessionmaker=get_sessionmaker(), redis=redis
     )
 
+    me = await bot.get_me()
+    dp["bot_username"] = me.username
+    log.info("Authorized as @%s", me.username)
+    await _setup_menu_button(bot, settings)
+
     sweeper = asyncio.create_task(_captcha_sweeper(bot))
     runner: web.AppRunner | None = None
     try:
@@ -71,6 +76,20 @@ async def run() -> None:
         await redis.aclose()
         await bot.session.close()
         await dispose_engine()
+
+
+async def _setup_menu_button(bot, settings) -> None:
+    """Point the private-chat menu button at the Mini App when a public URL is set."""
+    if not settings.webapp_url.startswith("https://"):
+        return
+    from aiogram.types import MenuButtonWebApp, WebAppInfo
+    try:
+        await bot.set_chat_menu_button(
+            menu_button=MenuButtonWebApp(text="RedQueen", web_app=WebAppInfo(url=settings.webapp_url))
+        )
+        log.info("Menu button wired to Mini App at %s", settings.webapp_url)
+    except Exception as exc:  # noqa: BLE001
+        log.warning("Could not set menu button: %s", exc)
 
 
 async def _serve_api(app: web.Application, settings) -> web.AppRunner:

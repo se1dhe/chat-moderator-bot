@@ -52,6 +52,10 @@ async def check_content(
     )
 
 
+# Re-check edits too: a member may post clean text then edit in a banned word/link.
+router.edited_message.register(check_content, F.chat.type.in_({"group", "supergroup"}))
+
+
 @router.message(Command("bannedwords"), IsChatAdmin())
 async def cmd_bannedwords(
     message: Message, command: CommandObject, session: AsyncSession, t: Callable[..., str]

@@ -34,24 +34,30 @@ Redis · pydantic-settings · aiohttp · Ollama/Qwen · Docker Compose · ngrok 
 ```
 src/redqueen/
   config.py            pydantic-settings (.env)
-  bot.py               Bot + Dispatcher factory (wires middlewares, AI provider+semaphore, redis, routers)
-  __main__.py          entry point (polling / webhook) + captcha timeout sweeper task
+  bot.py               Bot + Dispatcher factory (middlewares, AI provider+semaphore, redis, routers)
+  __main__.py          entry point: always runs the aiohttp API; polling or webhook; menu button; captcha sweeper
   i18n.py              t(lang, key, **kw) locale lookup, resolve_lang(), SUPPORTED_LANGS
   locales/             en.py (canonical) · ru.py · uk.py — persona strings per language
   db/                  base (async engine/session), models, repo helpers
-  middlewares/         DbSessionMiddleware · LangMiddleware (resolves Chat.lang / language_code)
+  middlewares/         DbSessionMiddleware · LangMiddleware (Chat.lang / language_code)
   filters/             IsChatAdmin (ACL)
-  handlers/            common · onboarding · moderation · settings · captcha · raid ·
+  handlers/            common(+/panel) · onboarding · moderation · settings · captcha · raid ·
                        antiflood · content_filters · modes · ai_review (+ future: payments)
-                       Join-watch (chat_member) and message-scan pipelines both use
-                       SkipHandler so independent routers can each observe the same
-                       event: captcha → raid (joins); antiflood → content_filters →
-                       modes → ai_review (messages, ai_review is the final catch-all).
-  services/            moderation, warns, trust (adaptive trust score scaffold), config
-                       (ChatSettings.data JSONB view), roles (exemptions/admin cache),
-                       antiflood, ai_budget (per-chat AI rate limit), filters, captcha,
-                       ai/ (provider abstraction: ollama + rules)
+                       Join-watch (chat_member) and message-scan pipelines use SkipHandler so
+                       independent routers each observe the same event: captcha → raid (joins);
+                       antiflood → content_filters → modes → ai_review (messages, ai_review last).
+                       content_filters + ai_review also register on edited_message (re-scan edits).
+  api/                 Mini App backend (aiohttp): app factory (CORS, serves webapp/dist at /app),
+                       auth (initData → user → chat-admin gate), routes (me, settings, audit,
+                       quarantine, stats)
+  services/            moderation, warns, trust (score + effective_threshold), quarantine
+                       (shared approve/ban/rule), config (ChatSettings.data JSONB view + full_view/
+                       apply_patch — the Mini App contract), roles (exemptions/admin cache),
+                       antiflood, ai_budget (per-chat AI rate limit), ai_cache (Redis verdict cache),
+                       filters, captcha, webapp_auth (initData HMAC), ai/ (ollama + rules)
   utils/               duration parsing, target resolution
+webapp/                Mini App frontend — React 19 + Vite (design adapted from CP-helper), built
+                       to webapp/dist and served by aiohttp at /app. Auth = Telegram initData.
 docs/                  PROJECT_PLAN.md (master), ARCHITECTURE.md, ROADMAP.md
 migrations/            Alembic (env.py wired to app settings/metadata) — authoritative from M2
 tests/                 pytest (framework-agnostic logic; fake_redis fixture in conftest.py)
@@ -85,20 +91,28 @@ uv run alembic upgrade head              # apply migrations
 AI: on Apple Silicon run Ollama natively (`ollama serve`, `ollama pull qwen3.5:4b`),
 set `AI_ENABLED=true`, then per chat `/aimode quarantine`.
 
+Mini App (dev): `cd webapp && npm install && npm run build` (aiohttp then serves it at
+`/app`), or `npm run dev` for hot-reload (proxies `/api` to the running bot). Expose the
+bot's port 8080 over HTTPS (ngrok) and set `WEBAPP_URL=https://<host>/app` so the menu
+button + `/panel` open it. In BotFather, set the bot's Menu Button / Main Mini App URL
+to the same URL. **The Mini App is the primary management surface; slash commands are a
+fallback.** The TMA auths every request with Telegram `initData` (validated server-side)
+and is admin-gated per chat.
+
 ## Current status & next step
 
-**M1, M2, and M3 are done.** M3 added: bounded AI classification (global
-`asyncio.Semaphore` via `AI_MAX_CONCURRENCY` + per-chat Redis rate limit,
-`config.ai.max_per_minute`), a third quarantine-card action ("Rule" — promotes the
-flagged text to `filters.banned_words` so future matches skip AI entirely), **Raid
-shield** (Redis join-rate window per chat → auto-lock with cooldown, `RaidEvent` audit
-row, `/raidshield` `/raidconfig` `/unlock`), and an **Adaptive trust score scaffold**
-(`services/trust.py` — ban/kick/mute/warn penalties, captcha-pass/AI-false-positive
-bonuses feed `User.trust_score`; `/trust` to view. Accumulation only — using the score
-to change moderation strictness is a later milestone). Three Alembic revisions exist
-(initial schema, `CaptchaSession`, `RaidEvent`).
-**Next: M4** — Telegram Stars monetization (`Payment` ledger, Pro gating) + Mini App
-(rules, AI queue, roles, analytics). See PROJECT_PLAN §12.
+**M1–M3 done. M4 in progress — TMA-first pivot (see the `redqueen-tma-pivot` memory).**
+The Mini App is now the primary console: an always-on aiohttp API (`src/redqueen/api/`,
+runs in both polling and webhook modes) validated by Telegram `initData`, and a premium
+React/Vite frontend (`webapp/`, dark-red design adapted from CP-helper) covering every
+setting (captcha, antiflood, filters, modes, AI incl. per-category thresholds, raid,
+warns, exemptions) plus quarantine review, audit, and stats — all editable live.
+AI effectiveness was overhauled: reply-to context + language-aware few-shot prompt,
+Redis verdict cache (`ai_cache`), per-category thresholds tuned by the author's
+trust score (`trust.effective_threshold`), and edited-message re-scan.
+Alembic revisions: initial, `CaptchaSession`, `RaidEvent`, `ai_verdicts.text`.
+**Remaining for M4:** Telegram Stars monetization (`Payment` ledger, Pro gating) — to
+be built on top of the delivered value. See PROJECT_PLAN §12.
 
 ## Notes
 

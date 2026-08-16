@@ -16,11 +16,33 @@ from .provider import CATEGORIES, AIProvider, Verdict
 log = logging.getLogger(__name__)
 
 _SYSTEM_PROMPT = (
-    "You are RedQueen, a chat-moderation classifier. Classify the user message into "
-    "exactly one category from this list: ok, spam, scam, toxicity, nsfw, flood. "
-    "Return ONLY a compact JSON object with keys: category (string), score (integer "
-    "0-100 confidence), explanation (short reason, max 20 words). No prose."
+    "You are RedQueen, a precise chat-moderation classifier for a multilingual "
+    "(English/Russian/Ukrainian) Telegram community. Classify the LAST user message "
+    "into exactly one category: ok, spam, scam, toxicity, nsfw, flood.\n"
+    "Guidance:\n"
+    "- scam: crypto/giveaway/investment lures, 'earn $X/day', paid-DM bait, phishing "
+    "or invite links to external channels for profit.\n"
+    "- spam: unsolicited ads, repeated promos, link dumps.\n"
+    "- toxicity: insults, harassment, hate directed at people.\n"
+    "- nsfw: sexual or explicit content.\n"
+    "- flood: content-free noise, char spam, repetition.\n"
+    "- ok: normal conversation, jokes, criticism of ideas (not people).\n"
+    "Judge meaning across languages; do not flag a message merely for being non-English. "
+    "Use the provided context only to disambiguate. Be calibrated: reserve scores above "
+    "85 for clear violations.\n"
+    "Return ONLY compact JSON: {\"category\": string, \"score\": integer 0-100, "
+    "\"explanation\": short reason <= 20 words}. No prose."
 )
+
+# A couple of few-shot exchanges to anchor calibration and the JSON shape.
+_FEWSHOT = [
+    {"role": "user", "content": "Message: \"🚀 Free crypto airdrop! join t.me/xdrop and 10x your ETH today\""},
+    {"role": "assistant", "content": '{"category": "scam", "score": 93, "explanation": "Crypto giveaway lure with external invite link"}'},
+    {"role": "user", "content": "Message: \"доброе утро всем, как дела?\""},
+    {"role": "assistant", "content": '{"category": "ok", "score": 96, "explanation": "Normal friendly greeting"}'},
+    {"role": "user", "content": "Message: \"ты тупой идиот и ничего не понимаешь\""},
+    {"role": "assistant", "content": '{"category": "toxicity", "score": 88, "explanation": "Direct personal insult"}'},
+]
 
 
 class OllamaProvider(AIProvider):
@@ -46,7 +68,17 @@ class OllamaProvider(AIProvider):
             log.warning("Ollama health check failed: %s", exc)
             return False
 
-    async def classify_text(self, text: str, *, context: str | None = None) -> Verdict:
+    async def classify_text(
+        self, text: str, *, context: str | None = None, lang: str | None = None
+    ) -> Verdict:
+        parts = []
+        if lang:
+            parts.append(f"Chat language: {lang}.")
+        if context:
+            parts.append(f"Context (message being replied to): \"{context[:500]}\"")
+        parts.append(f"Message: \"{text[:4000]}\"")
+        user_content = "\n".join(parts)
+
         payload = {
             "model": self.model,
             "format": "json",
@@ -54,7 +86,8 @@ class OllamaProvider(AIProvider):
             "options": {"temperature": 0},
             "messages": [
                 {"role": "system", "content": _SYSTEM_PROMPT},
-                {"role": "user", "content": text[:4000]},
+                *_FEWSHOT,
+                {"role": "user", "content": user_content},
             ],
         }
         try:
@@ -69,7 +102,7 @@ class OllamaProvider(AIProvider):
             return self._to_verdict(parsed)
         except Exception as exc:  # noqa: BLE001
             log.warning("Ollama classify failed, using fallback: %s", exc)
-            return await self.fallback.classify_text(text, context=context)
+            return await self.fallback.classify_text(text, context=context, lang=lang)
 
     @staticmethod
     def _to_verdict(parsed: dict) -> Verdict:

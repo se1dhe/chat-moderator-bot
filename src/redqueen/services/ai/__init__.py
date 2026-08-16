@@ -5,7 +5,7 @@ from ...config import Settings
 from .provider import AIProvider, Verdict
 from .rules import RuleProvider
 
-__all__ = ["AIProvider", "Verdict", "RuleProvider", "build_provider"]
+__all__ = ["AIProvider", "RuleProvider", "Verdict", "build_provider"]
 
 
 def build_provider(settings: Settings) -> AIProvider:

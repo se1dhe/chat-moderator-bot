@@ -34,6 +34,10 @@ HELP = (
     "Grant me admin rights and disable Privacy Mode so I can see the threat surface."
 )
 
+PANEL_BUTTON = "🛡 Open control panel"
+PANEL_PROMPT = "Open the RedQueen console to manage this hive:"
+PANEL_UNCONFIGURED = "The control panel URL is not configured yet. Set WEBAPP_URL to enable it."
+
 NOT_ADMIN = "⛔ You are not authorized. This protocol requires administrator clearance."
 BOT_NOT_ADMIN = (
     "⚠️ I lack administrator rights in this chat. Promote me so I can enforce protocols."
