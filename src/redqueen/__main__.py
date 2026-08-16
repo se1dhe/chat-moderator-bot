@@ -4,11 +4,24 @@ from __future__ import annotations
 import asyncio
 import logging
 
-from .bot import create_bot, create_dispatcher
+from .bot import create_bot, create_dispatcher, create_redis
 from .config import get_settings
-from .db.base import create_all, dispose_engine, init_engine
+from .db.base import dispose_engine, get_sessionmaker, init_engine
+from .services.captcha import sweep_expired
 
 log = logging.getLogger("redqueen")
+
+_CAPTCHA_SWEEP_INTERVAL = 15  # seconds
+
+
+async def _captcha_sweeper(bot) -> None:
+    sessionmaker = get_sessionmaker()
+    while True:
+        await asyncio.sleep(_CAPTCHA_SWEEP_INTERVAL)
+        try:
+            await sweep_expired(bot, sessionmaker)
+        except Exception:
+            log.exception("captcha sweep failed")
 
 
 async def run() -> None:
@@ -21,11 +34,12 @@ async def run() -> None:
         raise SystemExit("BOT_TOKEN is not set. Copy .env.example to .env and fill it in.")
 
     init_engine(settings.sqlalchemy_dsn)
-    await create_all()  # dev bootstrap; use Alembic migrations in production
 
     bot = create_bot(settings)
-    dp = create_dispatcher(settings)
+    redis = create_redis(settings)
+    dp = create_dispatcher(settings, redis)
 
+    sweeper = asyncio.create_task(_captcha_sweeper(bot))
     try:
         if settings.run_mode == "webhook":
             await _run_webhook(bot, dp, settings)
@@ -34,16 +48,18 @@ async def run() -> None:
             await bot.delete_webhook(drop_pending_updates=True)
             await dp.start_polling(bot)
     finally:
+        sweeper.cancel()
         provider = dp.get("ai_provider")
         if provider is not None:
             await provider.close()
+        await redis.aclose()
         await bot.session.close()
         await dispose_engine()
 
 
 async def _run_webhook(bot, dp, settings) -> None:
-    from aiohttp import web
     from aiogram.webhook.aiohttp_server import SimpleRequestHandler, setup_application
+    from aiohttp import web
 
     url = f"{settings.webhook_base_url}{settings.webhook_path}"
     await bot.set_webhook(

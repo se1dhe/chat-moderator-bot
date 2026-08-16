@@ -122,3 +122,20 @@ class Subscription(TimestampMixin, Base):
     chat_telegram_id: Mapped[int] = mapped_column(BigInteger, unique=True, index=True)
     plan: Mapped[str] = mapped_column(String(16), default="free")  # free|pro
     active_until: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+
+
+class CaptchaSession(TimestampMixin, Base):
+    """A pending/resolved join-verification challenge for one user in one chat."""
+
+    __tablename__ = "captcha_sessions"
+    __table_args__ = (Index("ix_captcha_chat_user", "chat_telegram_id", "user_telegram_id"),)
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    chat_telegram_id: Mapped[int] = mapped_column(BigInteger)
+    user_telegram_id: Mapped[int] = mapped_column(BigInteger)
+    kind: Mapped[str] = mapped_column(String(16))  # button|math
+    answer: Mapped[int] = mapped_column(Integer, default=1)  # correct choice value
+    is_join_request: Mapped[bool] = mapped_column(Boolean, default=False)
+    prompt_message_id: Mapped[int | None] = mapped_column(BigInteger)
+    status: Mapped[str] = mapped_column(String(16), default="pending")  # pending|passed|failed|expired
+    expires_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))

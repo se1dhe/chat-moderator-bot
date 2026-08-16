@@ -6,12 +6,26 @@ Persona: the "Red Queen" defense system from *Resident Evil*.
 
 See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) and [docs/ROADMAP.md](docs/ROADMAP.md).
 
-## Status — M1 (foundation)
+## Status — M2 (entry defense, antispam, i18n)
 
-Working: `/start`, `/help`, admin-gated `ban / kick / mute / unmute / warn / unwarn /
-unban / purge`, warn limits with auto-action, per-chat settings, full audit log, and an
-AI moderation listener with an explainable **quarantine decision card** (rule fallback
-today, Qwen via Ollama when enabled).
+Working: everything from M1 (`ban / kick / mute / unmute / warn / unwarn / unban /
+purge`, warn limits, per-chat settings, full audit log, AI quarantine card) plus:
+
+- **i18n** — EN/RU/UK persona strings, resolved from `Chat.lang` (`/lang en|ru|uk`) with
+  a `DEFAULT_LANG` fallback for private chats.
+- **Captcha** — button/math verification on join (`/captcha`, `/captchamode`,
+  `/captchatimeout`), mutes newcomers until solved, handles join requests via DM, and
+  auto-kicks/declines on timeout via a DB-driven sweeper (survives restarts).
+- **Antiflood** — Redis fixed-window message-rate limiting with configurable
+  mute/kick/ban (`/antiflood`, `/antifloodaction`).
+- **Content filters** — banned words, link/forward/mention blocking, blocked media types
+  (`/bannedwords`, `/blocklinks`, `/blockforwards`, `/blockmentions`, `/blockmedia`).
+- **Modes** — night mode, silent mode, slow mode, and role exemptions (`/nightmode`,
+  `/silentmode`, `/slowmode`, `/exempt`).
+- **Onboarding** — greets on add/promote, verifies admin rights, `/checksetup`.
+
+Schema is managed by **Alembic** from this release on (`create_all` dev bootstrap was
+removed) — see Quick start below.
 
 ## Quick start (local, polling)
 
@@ -35,6 +49,7 @@ today, Qwen via Ollama when enabled).
    ```sh
    uv sync --extra dev
    docker compose up -d postgres redis
+   uv run alembic upgrade head
    uv run redqueen
    ```
 
@@ -70,8 +85,9 @@ In `.env`: `RUN_MODE=webhook`, `WEBHOOK_BASE_URL=https://<your-ngrok-domain>`,
 
 Never commit real tokens. `.env` is git-ignored. If a token was ever pasted somewhere
 public, rotate it: bot token via `@BotFather → /revoke`, ngrok token in the ngrok
-dashboard. The database schema is created automatically in dev; use Alembic migrations
-(`migrations/`) for production.
+dashboard. Schema changes go through Alembic (`migrations/`) in every environment —
+run `uv run alembic upgrade head` (or let the Docker image's entrypoint do it) before
+starting the bot.
 
 ## Tests
 

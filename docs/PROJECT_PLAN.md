@@ -194,12 +194,21 @@ CHANGELOG + ручная проверка в тестовом чате.
 чата, аудит-лог, AI-listener с карточкой карантина (rule-fallback), Docker/Alembic.
 **DoD:** ✅ команды работают, логика покрыта smoke-тестами, всё компилируется.
 
-### M2 — Защита входа, антиспам, i18n
-- Captcha (кнопка/математика/эмодзи), карантин новичков, авто-кик по таймауту, join-заявки.
-- Антифлуд на Redis, лимиты медиа, блок ссылок/форвардов/упоминаний.
-- Banned words (regex + списки), night/silent/slow mode, exemptions по ролям.
-- i18n-каркас (EN/RU/UK), онбординг с проверкой прав и Privacy Mode.
-- **DoD:** новичок проходит captcha; флуд/ссылки блокируются; тексты на 3 языках.
+### M2 — Защита входа, антиспам, i18n ✅ (сделано)
+- Captcha (кнопка/математика), карантин новичков, авто-кик по таймауту (DB-driven
+  sweeper, переживает рестарт), join-заявки через ЛС.
+- Антифлуд на Redis (фиксированные окна), блок ссылок/форвардов/упоминаний, блок медиа
+  по типу (sticker/animation/voice/video_note).
+- Banned words (список), night/silent/slow mode, exemptions по ролям (whitelist +
+  кэш админов чата в Redis).
+- i18n-каркас (EN/RU/UK) — `locales/` + `t(lang, key, **kw)`, `LangMiddleware`
+  резолвит `Chat.lang` / `language_code`, команда `/lang`.
+- Онбординг: приветствие при добавлении/повышении, проверка прав, `/checksetup`
+  (Privacy Mode — только инструкция, Bot API не даёт способа проверить статус).
+- Alembic — первая ревизия под схему M1 + ревизия под `CaptchaSession`; `create_all`
+  убран из `__main__.py`.
+- **DoD:** ✅ новичок проходит captcha; флуд/ссылки блокируются; тексты на 3 языках;
+  32 pytest-теста на сервисный слой (i18n, config, filters, antiflood, modes, captcha).
 
 ### M3 — AI-модерация (killer P0)
 - Ollama+Qwen, очередь анализа, пороги на чат, режимы off/quarantine/autoban.
@@ -251,5 +260,7 @@ prod), pytest на сервисный слой и фильтры, `Dispatcher.fe
 
 ## 16. Следующий шаг
 
-Начинать **M2** (captcha + антифлуд + i18n-каркас). Разработка продолжается в Claude Code —
-контекст репозитория и команды см. в [`CLAUDE.md`](../CLAUDE.md).
+Начинать **M3** (AI-модерация): очередь анализа на Ollama+Qwen, пороги на чат, режимы
+off/quarantine/autoban до прод-качества, Raid shield, каркас Adaptive trust score.
+Разработка продолжается в Claude Code — контекст репозитория и команды см. в
+[`CLAUDE.md`](../CLAUDE.md).

@@ -1,20 +1,20 @@
 """Common commands: /start, /help."""
 from __future__ import annotations
 
+from collections.abc import Callable
+
 from aiogram import Router
 from aiogram.filters import Command, CommandStart
 from aiogram.types import Message
-
-from .. import texts
 
 router = Router(name="common")
 
 
 @router.message(CommandStart())
-async def cmd_start(message: Message) -> None:
-    await message.answer(texts.START)
+async def cmd_start(message: Message, t: Callable[..., str]) -> None:
+    await message.answer(t("START"))
 
 
 @router.message(Command("help"))
-async def cmd_help(message: Message) -> None:
-    await message.answer(texts.HELP)
+async def cmd_help(message: Message, t: Callable[..., str]) -> None:
+    await message.answer(t("HELP"))

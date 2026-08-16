@@ -2,15 +2,16 @@
 from __future__ import annotations
 
 import logging
+from collections.abc import Callable
 
 from aiogram import Bot, F, Router
+from aiogram.dispatcher.event.bases import SkipHandler
 from aiogram.filters.callback_data import CallbackData
 from aiogram.types import CallbackQuery, InlineKeyboardButton, Message
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from .. import texts
 from ..db import repo
 from ..db.models import AIVerdict
 from ..services import moderation
@@ -42,15 +43,15 @@ def _decision_kb(verdict_id: int) -> InlineKeyboardBuilder:
 
 @router.message(F.chat.type.in_({"group", "supergroup"}) & F.text)
 async def scan_message(
-    message: Message, bot: Bot, session: AsyncSession, ai_provider: AIProvider
+    message: Message, bot: Bot, session: AsyncSession, ai_provider: AIProvider, t: Callable[..., str]
 ) -> None:
     settings = await repo.get_settings(session, message.chat.id)
     if settings.ai_mode == "off" or message.from_user is None or message.from_user.is_bot:
-        return
+        raise SkipHandler
 
     verdict = await ai_provider.classify_text(message.text or "")
     if not verdict.is_violation or verdict.score < settings.ai_threshold:
-        return
+        raise SkipHandler
 
     row = AIVerdict(
         chat_telegram_id=message.chat.id,
@@ -82,7 +83,8 @@ async def scan_message(
         return
 
     # quarantine: hold the message for admin decision
-    card = texts.AI_QUARANTINE_CARD.format(
+    card = t(
+        "AI_QUARANTINE_CARD",
         name=message.from_user.full_name,
         category=verdict.category,
         score=verdict.score / 100,
@@ -93,19 +95,19 @@ async def scan_message(
 
 @router.callback_query(ReviewCB.filter())
 async def on_decision(
-    query: CallbackQuery, callback_data: ReviewCB, bot: Bot, session: AsyncSession
+    query: CallbackQuery, callback_data: ReviewCB, bot: Bot, session: AsyncSession, t: Callable[..., str]
 ) -> None:
     verdict = await session.scalar(
         select(AIVerdict).where(AIVerdict.id == callback_data.verdict_id)
     )
     if verdict is None:
-        await query.answer("Verdict not found.", show_alert=True)
+        await query.answer(t("AI_VERDICT_NOT_FOUND"), show_alert=True)
         return
 
     # Only admins may decide.
     member = await bot.get_chat_member(verdict.chat_telegram_id, query.from_user.id)
     if member.status not in {"administrator", "creator"}:
-        await query.answer("Administrator clearance required.", show_alert=True)
+        await query.answer(t("AI_ADMIN_REQUIRED"), show_alert=True)
         return
 
     if callback_data.action == "ban":
@@ -119,11 +121,11 @@ async def on_decision(
                 await bot.delete_message(verdict.chat_telegram_id, verdict.message_id)
             except Exception:  # noqa: BLE001
                 pass
-        text = "\U0001F534 Confirmed. Member banned."
+        text = t("AI_CONFIRMED_BAN")
     else:
         verdict.status = "approved"
         verdict.decided_by = query.from_user.id
-        text = "✅ Approved. No action taken."
+        text = t("AI_APPROVED")
 
     if query.message:
         await query.message.edit_text(text)

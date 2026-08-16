@@ -34,18 +34,24 @@ Redis · pydantic-settings · aiohttp · Ollama/Qwen · Docker Compose · ngrok 
 ```
 src/redqueen/
   config.py            pydantic-settings (.env)
-  bot.py               Bot + Dispatcher factory (wires middlewares, AI provider, routers)
-  __main__.py          entry point (polling / webhook)
-  texts.py             RedQueen persona strings (migrate to per-locale in M4)
+  bot.py               Bot + Dispatcher factory (wires middlewares, AI provider, redis, routers)
+  __main__.py          entry point (polling / webhook) + captcha timeout sweeper task
+  i18n.py              t(lang, key, **kw) locale lookup, resolve_lang(), SUPPORTED_LANGS
+  locales/             en.py (canonical) · ru.py · uk.py — persona strings per language
   db/                  base (async engine/session), models, repo helpers
-  middlewares/         DbSessionMiddleware (per-update session + commit/rollback)
+  middlewares/         DbSessionMiddleware · LangMiddleware (resolves Chat.lang / language_code)
   filters/             IsChatAdmin (ACL)
-  handlers/            common · moderation · settings · ai_review (+ future: payments)
-  services/            moderation, warns, ai/ (provider abstraction: ollama + rules)
+  handlers/            common · onboarding · moderation · settings · captcha ·
+                       antiflood · content_filters · modes · ai_review (+ future: payments)
+                       Message-scan pipeline order: antiflood → content_filters → modes →
+                       ai_review, each raising SkipHandler to fall through when it doesn't apply.
+  services/            moderation, warns, config (ChatSettings.data JSONB view), roles
+                       (exemptions/admin cache), antiflood, filters, captcha,
+                       ai/ (provider abstraction: ollama + rules)
   utils/               duration parsing, target resolution
 docs/                  PROJECT_PLAN.md (master), ARCHITECTURE.md, ROADMAP.md
-migrations/            Alembic (env.py wired to app settings/metadata)
-tests/                 pytest (framework-agnostic logic)
+migrations/            Alembic (env.py wired to app settings/metadata) — authoritative from M2
+tests/                 pytest (framework-agnostic logic; fake_redis fixture in conftest.py)
 ```
 
 ## Conventions
@@ -78,12 +84,18 @@ set `AI_ENABLED=true`, then per chat `/aimode quarantine`.
 
 ## Current status & next step
 
-**M1 is done** (foundation + core moderation + AI quarantine card with rule fallback).
-**Next: M2** — captcha + join-quarantine, Redis antiflood, banned words / link filters,
-night/silent/slow mode, and the i18n scaffold (EN/RU/UK). See PROJECT_PLAN §12.
+**M1 and M2 are done.** M2 added: i18n scaffold (`locales/` + `t(lang, key, **kw)` +
+`LangMiddleware`, `/lang`), join captcha (button/math, DB-driven timeout sweeper, join
+requests via DM), Redis antiflood, content filters (banned words / links / forwards /
+mentions / media), night/silent/slow mode + role exemptions, and onboarding
+(admin-rights check, `/checksetup`). Alembic is now authoritative (`create_all` removed
+from `__main__.py`); two revisions exist (initial schema, `CaptchaSession`).
+**Next: M3** — AI-moderation to prod quality (Ollama+Qwen queue, off/quarantine/autoban
+modes), Raid shield, Adaptive trust score scaffold. See PROJECT_PLAN §12.
 
 ## Notes
 
 - The user pasted a live bot token and ngrok token in chat once; both must be rotated.
   Never store or reuse those values.
-- Bot commands and persona should be authored in the RedQueen voice (see `texts.py`).
+- Bot commands and persona should be authored in the RedQueen voice (see `locales/en.py`,
+  the canonical source; keep `ru.py`/`uk.py` in sync when adding new strings).

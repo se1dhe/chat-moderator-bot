@@ -1,0 +1,60 @@
+"""Onboarding: greet on add/promote, verify admin rights, remind about Privacy Mode."""
+from __future__ import annotations
+
+from collections.abc import Callable
+
+from aiogram import Bot, F, Router
+from aiogram.filters import Command
+from aiogram.types import ChatMemberUpdated, Message
+
+from ..filters import IsChatAdmin
+
+router = Router(name="onboarding")
+
+_CHAT_SCOPED_TYPES = {"group", "supergroup", "channel"}
+_GREET_STATUSES = {"member", "administrator"}
+_REQUIRED_RIGHTS = {
+    "can_restrict_members": "restrict members",
+    "can_delete_messages": "delete messages",
+}
+
+
+def _missing_rights(member) -> list[str]:
+    return [label for field, label in _REQUIRED_RIGHTS.items() if not getattr(member, field, False)]
+
+
+@router.my_chat_member()
+async def on_bot_membership_changed(event: ChatMemberUpdated, bot: Bot, t: Callable[..., str]) -> None:
+    if event.chat.type not in _CHAT_SCOPED_TYPES:
+        return
+    old_status, new_status = event.old_chat_member.status, event.new_chat_member.status
+    if new_status not in _GREET_STATUSES or old_status == new_status:
+        return
+
+    chat_name = event.chat.title or str(event.chat.id)
+    if new_status != "administrator":
+        await bot.send_message(
+            event.chat.id, t("ONBOARDING_MISSING_RIGHTS", chat=chat_name, missing="administrator")
+        )
+        return
+
+    missing = _missing_rights(event.new_chat_member)
+    if missing:
+        await bot.send_message(
+            event.chat.id, t("ONBOARDING_MISSING_RIGHTS", chat=chat_name, missing=", ".join(missing))
+        )
+    else:
+        await bot.send_message(event.chat.id, t("ONBOARDING_WELCOME", chat=chat_name))
+
+
+@router.message(Command("checksetup"), F.chat.type.in_(_CHAT_SCOPED_TYPES), IsChatAdmin())
+async def cmd_checksetup(message: Message, bot: Bot, t: Callable[..., str]) -> None:
+    member = await bot.get_chat_member(message.chat.id, bot.id)
+    if member.status != "administrator":
+        await message.reply(t("CHECKSETUP_MISSING_RIGHTS", missing="administrator"))
+        return
+    missing = _missing_rights(member)
+    if missing:
+        await message.reply(t("CHECKSETUP_MISSING_RIGHTS", missing=", ".join(missing)))
+        return
+    await message.reply(t("CHECKSETUP_OK"))

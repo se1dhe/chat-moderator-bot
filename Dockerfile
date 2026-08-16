@@ -6,9 +6,10 @@ ENV PYTHONUNBUFFERED=1 \
 
 WORKDIR /app
 
-COPY pyproject.toml README.md ./
+COPY pyproject.toml README.md alembic.ini ./
 COPY src ./src
+COPY migrations ./migrations
 
 RUN pip install --upgrade pip && pip install .
 
-CMD ["redqueen"]
+CMD ["sh", "-c", "alembic upgrade head && redqueen"]
