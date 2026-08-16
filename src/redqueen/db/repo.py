@@ -3,6 +3,7 @@ from __future__ import annotations
 
 from sqlalchemy import func, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import selectinload
 
 from .models import AIVerdict, Chat, ChatSettings, ModAction, User, Warn
 
@@ -10,7 +11,11 @@ from .models import AIVerdict, Chat, ChatSettings, ModAction, User, Warn
 async def get_or_create_chat(
     session: AsyncSession, telegram_id: int, *, type_: str = "group", title: str | None = None
 ) -> Chat:
-    chat = await session.scalar(select(Chat).where(Chat.telegram_id == telegram_id))
+    # Eager-load settings: async sessions cannot lazy-load a relationship on access,
+    # so a pre-existing chat's `.settings` must be fetched up front.
+    chat = await session.scalar(
+        select(Chat).where(Chat.telegram_id == telegram_id).options(selectinload(Chat.settings))
+    )
     if chat is None:
         chat = Chat(telegram_id=telegram_id, type=type_, title=title)
         chat.settings = ChatSettings()
