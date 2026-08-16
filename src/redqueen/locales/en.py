@@ -73,6 +73,7 @@ UNWARNED = "<b>{name}</b> — one warning cleared ({count} left)."
 NO_WARNS = "<b>{name}</b> has no active warnings."
 PURGE_NEED_REPLY = "Reply to the first message you want to purge from."
 PURGED = "\U0001F534 Purged {count} messages."
+TRUST_SCORE = "<b>{name}</b> trust score: <b>{score}</b>/100"
 
 # --- AI review -----------------------------------------------------------
 AI_QUARANTINE_CARD = (
@@ -84,6 +85,8 @@ AI_QUARANTINE_CARD = (
 )
 AI_CONFIRMED_BAN = "\U0001F534 Confirmed. Member banned."
 AI_APPROVED = "✅ Approved. No action taken."
+AI_RULE_BUTTON = "\U0001F4CF Rule"
+AI_RULE_CREATED = "\U0001F4CF Rule created — future matches will be caught automatically."
 AI_VERDICT_NOT_FOUND = "Verdict not found."
 AI_ADMIN_REQUIRED = "Administrator clearance required."
 
@@ -95,6 +98,7 @@ SETTINGS_CARD = (
     "• AI mode: <b>{ai_mode}</b> (threshold {ai_threshold}%)\n"
     "• Captcha: <b>{captcha}</b>\n"
     "• Antiflood: <b>{antiflood}</b>\n"
+    "• Raid shield: <b>{raid_shield}</b>\n"
     "• Banned words: <b>{banned_words_count}</b>\n"
     "• Block links/forwards/mentions: <b>{block_links}/{block_forwards}/{block_mentions}</b>\n"
     "• Night / silent / slow mode: <b>{night_mode}/{silent_mode}/{slow_mode}</b>\n\n"
@@ -144,6 +148,18 @@ ANTIFLOOD_SET = "Antiflood set to <b>{limit} msgs / {window}s</b>, action <b>{ac
 ANTIFLOOD_ENABLED = "Antiflood <b>enabled</b>."
 ANTIFLOOD_DISABLED = "Antiflood <b>disabled</b>."
 ANTIFLOOD_TRIGGERED = "\U0001F534 <b>{name}</b> exceeded the flood threshold and has been {action}."
+
+# --- Raid shield -----------------------------------------------------------------
+RAIDSHIELD_USAGE = "Usage: /raidshield on|off"
+RAIDSHIELD_ENABLED = "Raid shield <b>enabled</b>."
+RAIDSHIELD_DISABLED = "Raid shield <b>disabled</b>."
+RAIDCONFIG_USAGE = "Usage: /raidconfig THRESHOLD WINDOW_SECONDS (e.g. /raidconfig 5 30)"
+RAIDCONFIG_SET = "Raid shield: <b>{threshold} joins / {window}s</b> triggers a lock."
+RAID_LOCKED = (
+    "\U0001F6A8 <b>Raid detected.</b> {count} joins in a short window — chat locked "
+    "for <b>{minutes} min</b>. Non-admin messages will be removed. /unlock to lift early."
+)
+RAID_UNLOCKED = "\U0001F513 Chat unlocked."
 
 # --- Content filters -----------------------------------------------------------
 BANNEDWORDS_USAGE = "Usage: /bannedwords add|remove|list <word>"

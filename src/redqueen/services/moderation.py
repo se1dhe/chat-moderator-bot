@@ -8,6 +8,7 @@ from aiogram.types import ChatPermissions
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from ..db import repo
+from . import trust
 
 _MUTED_PERMISSIONS = ChatPermissions(
     can_send_messages=False,
@@ -43,6 +44,7 @@ async def ban(
         session, chat_telegram_id=chat_id, user_telegram_id=user_id, actor_id=actor_id,
         action="ban", reason=reason,
     )
+    await trust.adjust(session, user_id, trust.BAN)
 
 
 async def unban(
@@ -65,6 +67,7 @@ async def kick(
         session, chat_telegram_id=chat_id, user_telegram_id=user_id, actor_id=actor_id,
         action="kick", reason=reason,
     )
+    await trust.adjust(session, user_id, trust.KICK)
 
 
 async def mute(
@@ -79,6 +82,8 @@ async def mute(
         action="mute", reason=reason,
         meta={"until": until.isoformat()} if until else {},
     )
+    if reason != "captcha_pending":  # procedural quarantine, not a behavioral penalty
+        await trust.adjust(session, user_id, trust.MUTE)
 
 
 async def unmute(

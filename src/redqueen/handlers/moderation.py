@@ -159,3 +159,15 @@ async def cmd_purge(message: Message, bot: Bot, t: Callable[..., str]) -> None:
         except Exception:  # noqa: BLE001
             pass
     await message.answer(t("PURGED", count=deleted))
+
+
+@router.message(Command("trust"), IsChatAdmin())
+async def cmd_trust(
+    message: Message, command: CommandObject, session: AsyncSession, t: Callable[..., str]
+) -> None:
+    target = resolve_target(message, command.args)
+    if target is None:
+        await message.reply(t("REPLY_OR_TARGET_REQUIRED"))
+        return
+    user = await repo.upsert_user(session, target.user_id)
+    await message.reply(t("TRUST_SCORE", name=target.name, score=user.trust_score))

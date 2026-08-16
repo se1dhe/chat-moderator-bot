@@ -12,6 +12,7 @@ from . import (
     moderation,
     modes,
     onboarding,
+    raid,
     settings,
 )
 
@@ -21,9 +22,13 @@ def setup_routers(dp: Dispatcher) -> None:
     dp.include_router(onboarding.router)
     dp.include_router(moderation.router)
     dp.include_router(settings.router)
+    # Join-watching (chat_member) and message-scanning pipelines: each stage raises
+    # SkipHandler to fall through to the next one when it doesn't apply — this lets
+    # captcha and raid both observe the same join event, and antiflood/content_filters/
+    # modes/ai_review all observe the same message in turn (ai_review is the last,
+    # catch-all stage).
     dp.include_router(captcha.router)
-    # Message-scanning pipeline: each stage raises SkipHandler to fall through to the
-    # next one when it doesn't apply. AI review is the final, catch-all stage.
+    dp.include_router(raid.router)
     dp.include_router(antiflood.router)
     dp.include_router(content_filters.router)
     dp.include_router(modes.router)

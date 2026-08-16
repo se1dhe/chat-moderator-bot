@@ -1,6 +1,7 @@
 """AI moderation listener + explainable quarantine decision cards."""
 from __future__ import annotations
 
+import asyncio
 import logging
 from collections.abc import Callable
 
@@ -9,13 +10,15 @@ from aiogram.dispatcher.event.bases import SkipHandler
 from aiogram.filters.callback_data import CallbackData
 from aiogram.types import CallbackQuery, InlineKeyboardButton, Message
 from aiogram.utils.keyboard import InlineKeyboardBuilder
+from redis.asyncio import Redis
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from ..db import repo
 from ..db.models import AIVerdict
-from ..services import moderation
+from ..services import ai_budget, moderation, trust
 from ..services.ai import AIProvider
+from ..services.config import get_config, save_section
 
 log = logging.getLogger(__name__)
 
@@ -23,11 +26,11 @@ router = Router(name="ai_review")
 
 
 class ReviewCB(CallbackData, prefix="rq"):
-    action: str  # ban | approve
+    action: str  # ban | approve | rule
     verdict_id: int
 
 
-def _decision_kb(verdict_id: int) -> InlineKeyboardBuilder:
+def _decision_kb(verdict_id: int, t: Callable[..., str]) -> InlineKeyboardBuilder:
     kb = InlineKeyboardBuilder()
     kb.row(
         InlineKeyboardButton(
@@ -38,18 +41,30 @@ def _decision_kb(verdict_id: int) -> InlineKeyboardBuilder:
             callback_data=ReviewCB(action="approve", verdict_id=verdict_id).pack(),
         ),
     )
+    kb.row(
+        InlineKeyboardButton(
+            text=t("AI_RULE_BUTTON"),
+            callback_data=ReviewCB(action="rule", verdict_id=verdict_id).pack(),
+        ),
+    )
     return kb
 
 
 @router.message(F.chat.type.in_({"group", "supergroup"}) & F.text)
 async def scan_message(
-    message: Message, bot: Bot, session: AsyncSession, ai_provider: AIProvider, t: Callable[..., str]
+    message: Message, bot: Bot, session: AsyncSession, redis: Redis, ai_provider: AIProvider,
+    ai_semaphore: asyncio.Semaphore, t: Callable[..., str],
 ) -> None:
     settings = await repo.get_settings(session, message.chat.id)
     if settings.ai_mode == "off" or message.from_user is None or message.from_user.is_bot:
         raise SkipHandler
 
-    verdict = await ai_provider.classify_text(message.text or "")
+    ai_cfg = get_config(settings)["ai"]
+    if not await ai_budget.allow(redis, chat_id=message.chat.id, limit=ai_cfg["max_per_minute"]):
+        raise SkipHandler
+
+    async with ai_semaphore:
+        verdict = await ai_provider.classify_text(message.text or "")
     if not verdict.is_violation or verdict.score < settings.ai_threshold:
         raise SkipHandler
 
@@ -90,7 +105,7 @@ async def scan_message(
         score=verdict.score / 100,
         reason=verdict.explanation,
     )
-    await message.reply(card, reply_markup=_decision_kb(row.id).as_markup())
+    await message.reply(card, reply_markup=_decision_kb(row.id, t).as_markup())
 
 
 @router.callback_query(ReviewCB.filter())
@@ -122,9 +137,32 @@ async def on_decision(
             except Exception:  # noqa: BLE001
                 pass
         text = t("AI_CONFIRMED_BAN")
+    elif callback_data.action == "rule":
+        flagged_text = None
+        if query.message and query.message.reply_to_message:
+            flagged_text = query.message.reply_to_message.text or query.message.reply_to_message.caption
+        if flagged_text:
+            chat_settings = await repo.get_settings(session, verdict.chat_telegram_id)
+            words = get_config(chat_settings)["filters"]["banned_words"]
+            snippet = flagged_text.strip().lower()[:60]
+            if snippet and snippet not in words:
+                words.append(snippet)
+                save_section(chat_settings, "filters", {"banned_words": words})
+        await moderation.ban(bot, session, chat_id=verdict.chat_telegram_id,
+                             user_id=verdict.user_telegram_id, actor_id=query.from_user.id,
+                             reason=f"AI:{verdict.category}")
+        verdict.status = "rejected"
+        verdict.decided_by = query.from_user.id
+        if verdict.message_id:
+            try:
+                await bot.delete_message(verdict.chat_telegram_id, verdict.message_id)
+            except Exception:  # noqa: BLE001
+                pass
+        text = t("AI_RULE_CREATED")
     else:
         verdict.status = "approved"
         verdict.decided_by = query.from_user.id
+        await trust.adjust(session, verdict.user_telegram_id, trust.AI_FALSE_POSITIVE)
         text = t("AI_APPROVED")
 
     if query.message:

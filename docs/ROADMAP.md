@@ -20,7 +20,7 @@ sticker/GIF, массовые действия (ban/kick/mute/warn/unban + purge
 - Настройки чата (JSON) + аудит-лог всех действий.
 - Docker Compose (postgres, redis, ollama, bot), запуск в polling локально.
 
-## M2 — Защита входа и антиспам ✅  ← текущий этап
+## M2 — Защита входа и антиспам ✅
 - Captcha (кнопка/математика), карантин новичков, авто-кик по таймауту (DB-driven
   sweeper), join-заявки через ЛС.
 - Антифлуд (Redis fixed-window), блокировка ссылок/форвардов/упоминаний, блок медиа
@@ -28,12 +28,14 @@ sticker/GIF, массовые действия (ban/kick/mute/warn/unban + purge
 - Banned words (список), night/silent/slow mode, exemptions по ролям.
 - i18n-каркас (EN/RU/UK), онбординг с проверкой прав, `/checksetup`.
 
-## M3 — AI-модерация (киллер-фича)  ← следующий этап
-- Ollama+Qwen3.5, очередь анализа, карантин с карточкой решения для админа.
-- Категории spam/scam/toxicity/nsfw/flood, порог уверенности на чат.
-- Режимы off / quarantine / autoban(Pro). Explainable-логи вердиктов.
+## M3 — AI-модерация (киллер-фича) ✅  ← текущий этап
+- Ollama+Qwen, AI-очередь (`asyncio.Semaphore` + Redis-лимит на чат), карантин с
+  карточкой решения для админа (кнопки Ban / Approve / **Rule**).
+- Режимы off / quarantine / autoban. Explainable-логи вердиктов.
+- **Raid shield**: детект наплыва по Redis-окну join'ов, авто-лок чата, `RaidEvent`.
+- Каркас **Adaptive trust score** (`services/trust.py`, команда `/trust`).
 
-## M4 — Монетизация и Mini App
+## M4 — Монетизация и Mini App  ← следующий этап
 - Telegram Stars: Pro-подписка на чат, ledger платежей, возвраты.
 - Mini App: правила, AI-очередь, роли, аналитика; языки EN/RU/UK.
 - Freemium-гейтинг фич на уровне чата.

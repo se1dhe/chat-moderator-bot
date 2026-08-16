@@ -38,7 +38,7 @@ class Chat(TimestampMixin, Base):
     lang: Mapped[str] = mapped_column(String(8), default="en")
     is_active: Mapped[bool] = mapped_column(Boolean, default=True)
 
-    settings: Mapped["ChatSettings"] = relationship(
+    settings: Mapped[ChatSettings] = relationship(
         back_populates="chat", uselist=False, cascade="all, delete-orphan"
     )
 
@@ -139,3 +139,17 @@ class CaptchaSession(TimestampMixin, Base):
     prompt_message_id: Mapped[int | None] = mapped_column(BigInteger)
     status: Mapped[str] = mapped_column(String(16), default="pending")  # pending|passed|failed|expired
     expires_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+
+
+class RaidEvent(TimestampMixin, Base):
+    """Audit record of a raid-shield auto-lock (coordinated join surge)."""
+
+    __tablename__ = "raid_events"
+    __table_args__ = (Index("ix_raid_events_chat", "chat_telegram_id", "created_at"),)
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    chat_telegram_id: Mapped[int] = mapped_column(BigInteger)
+    join_count: Mapped[int] = mapped_column(Integer)
+    window_seconds: Mapped[int] = mapped_column(Integer)
+    locked_until: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+    resolved_by: Mapped[int | None] = mapped_column(BigInteger)  # admin who ran /unlock early, if any

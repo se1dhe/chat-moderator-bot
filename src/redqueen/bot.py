@@ -1,6 +1,8 @@
 """Bot and Dispatcher factory."""
 from __future__ import annotations
 
+import asyncio
+
 from aiogram import Bot, Dispatcher
 from aiogram.client.default import DefaultBotProperties
 from aiogram.enums import ParseMode
@@ -34,6 +36,7 @@ def create_dispatcher(settings: Settings, redis: Redis) -> Dispatcher:
     dp["ai_provider"] = provider
     dp["settings"] = settings
     dp["redis"] = redis
+    dp["ai_semaphore"] = asyncio.Semaphore(settings.ai_max_concurrency)
 
     session_mw = DbSessionMiddleware(get_sessionmaker())
     lang_mw = LangMiddleware(settings.default_lang)

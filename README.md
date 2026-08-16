@@ -6,26 +6,27 @@ Persona: the "Red Queen" defense system from *Resident Evil*.
 
 See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) and [docs/ROADMAP.md](docs/ROADMAP.md).
 
-## Status — M2 (entry defense, antispam, i18n)
+## Status — M3 (AI moderation, raid shield, trust score)
 
-Working: everything from M1 (`ban / kick / mute / unmute / warn / unwarn / unban /
-purge`, warn limits, per-chat settings, full audit log, AI quarantine card) plus:
+Working: everything from M1+M2 (moderation commands, warn limits, per-chat settings,
+full audit log, i18n, captcha, antiflood, content filters, modes, onboarding) plus:
 
-- **i18n** — EN/RU/UK persona strings, resolved from `Chat.lang` (`/lang en|ru|uk`) with
-  a `DEFAULT_LANG` fallback for private chats.
-- **Captcha** — button/math verification on join (`/captcha`, `/captchamode`,
-  `/captchatimeout`), mutes newcomers until solved, handles join requests via DM, and
-  auto-kicks/declines on timeout via a DB-driven sweeper (survives restarts).
-- **Antiflood** — Redis fixed-window message-rate limiting with configurable
-  mute/kick/ban (`/antiflood`, `/antifloodaction`).
-- **Content filters** — banned words, link/forward/mention blocking, blocked media types
-  (`/bannedwords`, `/blocklinks`, `/blockforwards`, `/blockmentions`, `/blockmedia`).
-- **Modes** — night mode, silent mode, slow mode, and role exemptions (`/nightmode`,
-  `/silentmode`, `/slowmode`, `/exempt`).
-- **Onboarding** — greets on add/promote, verifies admin rights, `/checksetup`.
+- **AI moderation queue** — classification calls are bounded by a global
+  `asyncio.Semaphore` (`AI_MAX_CONCURRENCY`) and a per-chat Redis rate limit, so AI is
+  a bounded fallback for whatever the fast rule-filters didn't already catch.
+- **Explainable quarantine card** — three actions: Ban, Approve, and **Rule** (promotes
+  the flagged text straight into `/bannedwords` so the same pattern is caught instantly
+  next time, no AI call needed).
+- **Raid shield** — detects a coordinated join surge (Redis window) and auto-locks the
+  chat (blocks non-admin messages) for a cooldown, with an audit row per incident
+  (`/raidshield`, `/raidconfig`, `/unlock`).
+- **Adaptive trust score (scaffold)** — `User.trust_score` moves with moderation
+  outcomes (bans/kicks/mutes/warns penalize, passing captcha or an admin overriding a
+  false-positive AI verdict rewards). View with `/trust`; using the score to change
+  moderation strictness is a later milestone.
 
-Schema is managed by **Alembic** from this release on (`create_all` dev bootstrap was
-removed) — see Quick start below.
+Schema is managed by **Alembic** in every environment (`create_all` dev bootstrap was
+removed in M2) — see Quick start below.
 
 ## Quick start (local, polling)
 
@@ -69,6 +70,10 @@ ollama pull qwen3.5:4b     # 9b/27b for higher quality if you have the RAM
 Then in `.env` set `AI_ENABLED=true` and `OLLAMA_MODEL=qwen3.5:4b`, restart the bot,
 and per chat run `/aimode quarantine`. On Linux servers use the `ai` compose profile:
 `docker compose --profile ai up -d ollama`.
+
+`AI_MAX_CONCURRENCY` (default 2) caps concurrent Ollama calls across all chats; each
+chat additionally gets its own Redis-backed budget (`config.ai.max_per_minute`,
+default 20/min) so one busy chat can't starve the rest.
 
 ## Webhook / ngrok (optional)
 

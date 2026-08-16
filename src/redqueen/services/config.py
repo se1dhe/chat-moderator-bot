@@ -25,6 +25,14 @@ DEFAULT_DATA: dict[str, Any] = {
         "silent": False,
         "slow_seconds": 0,
     },
+    "ai": {"max_per_minute": 20},
+    "raid": {
+        "enabled": False,
+        "join_threshold": 5,
+        "window_seconds": 30,
+        "lock_seconds": 600,
+        "locked_until": None,  # epoch seconds, or None when not locked
+    },
     "exempt_user_ids": [],
 }
 

@@ -210,12 +210,21 @@ CHANGELOG + ручная проверка в тестовом чате.
 - **DoD:** ✅ новичок проходит captcha; флуд/ссылки блокируются; тексты на 3 языках;
   32 pytest-теста на сервисный слой (i18n, config, filters, antiflood, modes, captcha).
 
-### M3 — AI-модерация (killer P0)
-- Ollama+Qwen, очередь анализа, пороги на чат, режимы off/quarantine/autoban.
-- Explainable карточки вердиктов (уже заложено — довести до прод-качества).
-- **Raid shield**: детект наплыва (Redis-окна по join/сообщениям), авто-лок + алерт.
-- Каркас **Adaptive trust score** (накопление сигналов, влияние на строгость проверок).
-- **DoD:** AI-карантин работает end-to-end; raid-лок срабатывает на симуляции наплыва.
+### M3 — AI-модерация (killer P0) ✅ (сделано)
+- AI-очередь: глобальный `asyncio.Semaphore` (`AI_MAX_CONCURRENCY`) + лимит запросов на
+  чат в минуту (Redis fixed-window, `config.ai.max_per_minute`) перед вызовом Ollama.
+  AI — последний этап message-pipeline (после antiflood/filters/modes), т.е. уже
+  действует как fallback для того, что не поймали быстрые правила.
+- Explainable-карточка вердикта: третья кнопка **«Правило»** — превращает пойманный
+  текст в запись `filters.banned_words`, чтобы повтор ловился быстрым фильтром без AI.
+- **Raid shield**: Redis-окно по join-событиям на чат → авто-лок (блок сообщений
+  не-админов) с cooldown, алерт в чат, аудит-таблица `RaidEvent`, команды
+  `/raidshield`, `/raidconfig`, `/unlock`.
+- Каркас **Adaptive trust score**: `services/trust.py` — бан/кик/мьют/warn штрафуют,
+  прохождение капчи и отмена ложного AI-вердикта поощряют `User.trust_score`;
+  команда `/trust`. Влияние на строгость проверок — отдельная будущая веха.
+- **DoD:** ✅ AI-карантин работает end-to-end (карантин/autoban/rule); raid-лок
+  срабатывает на симуляции наплыва join'ов; 40 pytest-тестов.
 
 ### M4 — Монетизация и Mini App
 - Telegram Stars: Pro-подписка на чат, `Payment` ledger, возвраты, гейтинг фич.
@@ -260,7 +269,7 @@ prod), pytest на сервисный слой и фильтры, `Dispatcher.fe
 
 ## 16. Следующий шаг
 
-Начинать **M3** (AI-модерация): очередь анализа на Ollama+Qwen, пороги на чат, режимы
-off/quarantine/autoban до прод-качества, Raid shield, каркас Adaptive trust score.
-Разработка продолжается в Claude Code — контекст репозитория и команды см. в
+Начинать **M4** (монетизация и Mini App): Telegram Stars, `Payment` ledger,
+Pro-гейтинг фич на уровне чата, Mini App (правила, AI-очередь, роли, аналитика) на
+EN/RU/UK. Разработка продолжается в Claude Code — контекст репозитория и команды см. в
 [`CLAUDE.md`](../CLAUDE.md).

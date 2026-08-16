@@ -4,6 +4,7 @@ from __future__ import annotations
 from collections.abc import Callable
 
 from aiogram import Bot, Router
+from aiogram.dispatcher.event.bases import SkipHandler
 from aiogram.filters import Command, CommandObject
 from aiogram.filters.callback_data import CallbackData
 from aiogram.filters.chat_member_updated import JOIN_TRANSITION, ChatMemberUpdatedFilter
@@ -15,7 +16,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from ..db import repo
 from ..db.models import CaptchaSession
 from ..filters import IsChatAdmin
-from ..services import captcha, moderation
+from ..services import captcha, moderation, trust
 from ..services.config import get_config, save_section
 
 router = Router(name="captcha")
@@ -49,13 +50,15 @@ def _prompt_text(challenge: captcha.Challenge, *, name: str, minutes: int, t: Ca
 async def on_member_join(
     event: ChatMemberUpdated, bot: Bot, session: AsyncSession, t: Callable[..., str]
 ) -> None:
+    # Raises SkipHandler (instead of returning) even when captcha isn't applicable so
+    # the raid-shield router — registered after this one — still sees every join.
     user = event.new_chat_member.user
     if user.is_bot:
-        return
+        raise SkipHandler
     settings = await repo.get_settings(session, event.chat.id)
     cfg = get_config(settings)["captcha"]
     if not cfg["enabled"]:
-        return
+        raise SkipHandler
 
     await moderation.mute(bot, session, chat_id=event.chat.id, user_id=user.id, actor_id=None,
                           until=None, reason="captcha_pending")
@@ -71,6 +74,7 @@ async def on_member_join(
         event.chat.id, text, reply_markup=_keyboard(row.id, challenge, t).as_markup()
     )
     row.prompt_message_id = sent.message_id
+    raise SkipHandler
 
 
 @router.chat_join_request()
@@ -123,6 +127,7 @@ async def on_answer(
 
     row.status = "passed"
     name = query.from_user.full_name
+    await trust.adjust(session, row.user_telegram_id, trust.CAPTCHA_PASS)
 
     if row.is_join_request:
         await bot.approve_chat_join_request(row.chat_telegram_id, row.user_telegram_id)

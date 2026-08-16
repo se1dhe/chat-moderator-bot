@@ -7,7 +7,7 @@ from aiogram import Bot
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from ..db import repo
-from . import moderation
+from . import moderation, trust
 
 
 @dataclass
@@ -36,6 +36,7 @@ async def issue_warn(
         session, chat_telegram_id=chat_id, user_telegram_id=user_id, actor_id=actor_id,
         action="warn", reason=reason,
     )
+    await trust.adjust(session, user_id, trust.WARN)
     if count < settings.warn_limit:
         return WarnResult(count=count, limit=settings.warn_limit, triggered=False)
 

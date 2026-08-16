@@ -72,6 +72,7 @@ UNWARNED = "<b>{name}</b> — одно предупреждение снято (
 NO_WARNS = "У <b>{name}</b> нет активных предупреждений."
 PURGE_NEED_REPLY = "Ответьте на первое сообщение, с которого нужно начать очистку."
 PURGED = "\U0001F534 Удалено сообщений: {count}."
+TRUST_SCORE = "Уровень доверия <b>{name}</b>: <b>{score}</b>/100"
 
 # --- AI-проверка -----------------------------------------------------------
 AI_QUARANTINE_CARD = (
@@ -83,6 +84,8 @@ AI_QUARANTINE_CARD = (
 )
 AI_CONFIRMED_BAN = "\U0001F534 Подтверждено. Участник забанен."
 AI_APPROVED = "✅ Одобрено. Действий не требуется."
+AI_RULE_BUTTON = "\U0001F4CF Правило"
+AI_RULE_CREATED = "\U0001F4CF Правило создано — впредь такие сообщения будут отловлены автоматически."
 AI_VERDICT_NOT_FOUND = "Вердикт не найден."
 AI_ADMIN_REQUIRED = "Требуются права администратора."
 
@@ -94,6 +97,7 @@ SETTINGS_CARD = (
     "• Режим AI: <b>{ai_mode}</b> (порог {ai_threshold}%)\n"
     "• Капча: <b>{captcha}</b>\n"
     "• Антифлуд: <b>{antiflood}</b>\n"
+    "• Raid shield: <b>{raid_shield}</b>\n"
     "• Запрещённые слова: <b>{banned_words_count}</b>\n"
     "• Блок ссылок/пересылок/упоминаний: <b>{block_links}/{block_forwards}/{block_mentions}</b>\n"
     "• Ночной / тихий / медленный режим: <b>{night_mode}/{silent_mode}/{slow_mode}</b>\n\n"
@@ -143,6 +147,19 @@ ANTIFLOOD_SET = "Антифлуд: <b>{limit} сообщ. / {window}с</b>, де
 ANTIFLOOD_ENABLED = "Антифлуд <b>включён</b>."
 ANTIFLOOD_DISABLED = "Антифлуд <b>отключён</b>."
 ANTIFLOOD_TRIGGERED = "\U0001F534 <b>{name}</b> превысил(а) порог флуда и был(а) {action}."
+
+# --- Raid shield -----------------------------------------------------------------
+RAIDSHIELD_USAGE = "Использование: /raidshield on|off"
+RAIDSHIELD_ENABLED = "Raid shield <b>включён</b>."
+RAIDSHIELD_DISABLED = "Raid shield <b>отключён</b>."
+RAIDCONFIG_USAGE = "Использование: /raidconfig ПОРОГ ОКНО_СЕК (напр. /raidconfig 5 30)"
+RAIDCONFIG_SET = "Raid shield: <b>{threshold} входов / {window}с</b> запускают блокировку."
+RAID_LOCKED = (
+    "\U0001F6A8 <b>Обнаружен наплыв.</b> {count} входов за короткое окно — чат "
+    "заблокирован на <b>{minutes} мин</b>. Сообщения не-админов будут удаляться. "
+    "/unlock — снять раньше."
+)
+RAID_UNLOCKED = "\U0001F513 Чат разблокирован."
 
 # --- Фильтры контента -----------------------------------------------------------
 BANNEDWORDS_USAGE = "Использование: /bannedwords add|remove|list <слово>"
