@@ -55,7 +55,17 @@ async def run() -> None:
     log.info("Authorized as @%s", me.username)
     await _setup_menu_button(bot, settings)
 
-    sweeper = asyncio.create_task(_captcha_sweeper(bot))
+    background = [asyncio.create_task(_captcha_sweeper(bot))]
+
+    # Self-provision the AI model on the backend: pull it in the background if missing,
+    # so a fresh deploy needs no manual `ollama pull`. AI uses rules until it's ready.
+    provider = dp.get("ai_provider")
+    if settings.ai_enabled and settings.ollama_auto_pull and hasattr(provider, "ensure_model"):
+        log.info("AI enabled (model=%s) — ensuring model on %s", settings.ollama_model, settings.ollama_url)
+        background.append(asyncio.create_task(provider.ensure_model()))
+    elif not settings.ai_enabled:
+        log.info("AI disabled — using rule-based moderation")
+
     runner: web.AppRunner | None = None
     try:
         if settings.run_mode == "webhook":
@@ -67,10 +77,10 @@ async def run() -> None:
             await bot.delete_webhook(drop_pending_updates=True)
             await dp.start_polling(bot)
     finally:
-        sweeper.cancel()
+        for task in background:
+            task.cancel()
         if runner is not None:
             await runner.cleanup()
-        provider = dp.get("ai_provider")
         if provider is not None:
             await provider.close()
         await redis.aclose()

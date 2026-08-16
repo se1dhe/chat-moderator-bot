@@ -30,6 +30,9 @@ class Settings(BaseSettings):
     ollama_model: str = Field(default="qwen3.5:4b", alias="OLLAMA_MODEL")
     ai_enabled: bool = Field(default=False, alias="AI_ENABLED")
     ai_max_concurrency: int = Field(default=2, alias="AI_MAX_CONCURRENCY")
+    # Pull OLLAMA_MODEL automatically on startup if it isn't present yet (backend
+    # self-provisioning). Runs in the background; AI uses the rule fallback until ready.
+    ollama_auto_pull: bool = Field(default=True, alias="OLLAMA_AUTO_PULL")
 
     # Runtime
     run_mode: str = Field(default="polling", alias="RUN_MODE")

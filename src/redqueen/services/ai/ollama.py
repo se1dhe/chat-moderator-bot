@@ -68,6 +68,60 @@ class OllamaProvider(AIProvider):
             log.warning("Ollama health check failed: %s", exc)
             return False
 
+    async def model_available(self) -> bool:
+        """Whether `self.model` is already downloaded on the Ollama host."""
+        try:
+            client = await self._client()
+            async with client.get(f"{self.base_url}/api/tags", timeout=10) as resp:
+                if resp.status != 200:
+                    return False
+                data = await resp.json()
+        except Exception:  # noqa: BLE001
+            return False
+        names = {m.get("name", "") for m in data.get("models", [])}
+        return self.model in names or f"{self.model}:latest" in names
+
+    async def ensure_model(self) -> bool:
+        """Pull `self.model` if it isn't present yet. Safe to call at startup; streams
+        progress to the log. Returns True once the model is available."""
+        try:
+            if await self.model_available():
+                log.info("Ollama model %s already present", self.model)
+                return True
+            log.info("Pulling Ollama model %s (this can take a while)…", self.model)
+            client = await self._client()
+            timeout = aiohttp.ClientTimeout(total=None, sock_read=None)
+            async with client.post(
+                f"{self.base_url}/api/pull",
+                json={"model": self.model, "stream": True},
+                timeout=timeout,
+            ) as resp:
+                resp.raise_for_status()
+                last_status = None
+                async for raw in resp.content:
+                    line = raw.strip()
+                    if not line:
+                        continue
+                    try:
+                        msg = json.loads(line)
+                    except json.JSONDecodeError:
+                        continue
+                    if msg.get("error"):
+                        log.error("Ollama pull failed for %s: %s — check OLLAMA_MODEL is a "
+                                  "valid tag in the Ollama library", self.model, msg["error"])
+                        return False
+                    status = msg.get("status")
+                    if status and status != last_status:
+                        log.info("Ollama pull [%s]: %s", self.model, status)
+                        last_status = status
+            ok = await self.model_available()
+            log.info("Ollama model %s ready: %s", self.model, ok)
+            return ok
+        except Exception as exc:  # noqa: BLE001
+            log.warning("Ollama ensure_model failed (%s); AI stays on the rule fallback "
+                        "until the model is available", exc)
+            return False
+
     async def classify_text(
         self, text: str, *, context: str | None = None, lang: str | None = None
     ) -> Verdict:

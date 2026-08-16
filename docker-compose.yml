@@ -26,7 +26,14 @@ services:
       - "11434:11434"
     volumes:
       - ollama:/root/.ollama
+    healthcheck:
+      test: ["CMD", "ollama", "list"]
+      interval: 10s
+      timeout: 5s
+      retries: 30
     # On Apple Silicon run Ollama natively for GPU; this service is for Linux/servers.
+    # The bot pulls OLLAMA_MODEL automatically on startup (OLLAMA_AUTO_PULL), so no
+    # manual `ollama pull` is needed — just point OLLAMA_URL at http://ollama:11434.
     profiles: ["ai"]
 
   bot:
@@ -46,6 +53,7 @@ services:
       OLLAMA_MODEL: ${OLLAMA_MODEL:-qwen3.5:4b}
       AI_ENABLED: ${AI_ENABLED:-false}
       AI_MAX_CONCURRENCY: ${AI_MAX_CONCURRENCY:-2}
+      OLLAMA_AUTO_PULL: ${OLLAMA_AUTO_PULL:-true}
       RUN_MODE: ${RUN_MODE:-polling}
       WEBHOOK_BASE_URL: ${WEBHOOK_BASE_URL:-}
       WEBHOOK_SECRET: ${WEBHOOK_SECRET:-}
