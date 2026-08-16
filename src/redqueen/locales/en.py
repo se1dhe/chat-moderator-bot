@@ -34,6 +34,17 @@ HELP = (
     "Grant me admin rights and disable Privacy Mode so I can see the threat surface."
 )
 
+PRO_INVOICE_TITLE = "RedQueen Pro"
+PRO_INVOICE_DESC = "Unlock AI auto-ban, raid shield and advanced analytics for this chat for {days} days."
+PRO_INVOICE_LABEL = "RedQueen Pro · {days} days"
+PRO_CMD_GROUP_ONLY = "Run /pro in the group or channel you want to upgrade."
+PRO_ALREADY = "⭐ This chat already has Pro — active until {until}. A new payment extends it."
+PRO_OFFER = "Upgrade this chat to <b>RedQueen Pro</b> ({stars} ⭐ / {days} days): AI auto-ban, raid shield, advanced analytics."
+PRO_ACTIVATED = "⭐ <b>Pro activated</b> for this chat until {until}. Thank you."
+SUB_STATUS_PRO = "Plan: <b>Pro</b> · active until {until}."
+SUB_STATUS_FREE = "Plan: <b>Free</b>. Use /pro to unlock AI auto-ban, raid shield and analytics."
+PRO_REQUIRED = "🔒 That's a Pro feature. Use /pro to upgrade this chat."
+
 PANEL_BUTTON = "🛡 Open control panel"
 PANEL_PROMPT = "Open the RedQueen console to manage this hive:"
 PANEL_UNCONFIGURED = "The control panel URL is not configured yet. Set WEBAPP_URL to enable it."

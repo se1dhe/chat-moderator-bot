@@ -125,6 +125,22 @@ class Subscription(TimestampMixin, Base):
     active_until: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
 
 
+class Payment(TimestampMixin, Base):
+    """Telegram Stars payment ledger — one row per successful charge (and refunds)."""
+
+    __tablename__ = "payments"
+    __table_args__ = (Index("ix_payments_chat", "chat_telegram_id", "created_at"),)
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    chat_telegram_id: Mapped[int] = mapped_column(BigInteger)
+    payer_id: Mapped[int] = mapped_column(BigInteger)
+    stars: Mapped[int] = mapped_column(Integer)  # XTR amount
+    plan: Mapped[str] = mapped_column(String(16), default="pro")
+    period_days: Mapped[int] = mapped_column(Integer, default=30)
+    telegram_payment_charge_id: Mapped[str | None] = mapped_column(String(128), unique=True)
+    status: Mapped[str] = mapped_column(String(16), default="paid")  # paid|refunded
+
+
 class CaptchaSession(TimestampMixin, Base):
     """A pending/resolved join-verification challenge for one user in one chat."""
 

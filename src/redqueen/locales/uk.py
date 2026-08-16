@@ -35,6 +35,17 @@ HELP = (
     "поверхню загрози."
 )
 
+PRO_INVOICE_TITLE = "RedQueen Pro"
+PRO_INVOICE_DESC = "Розблоковує AI авто-бан, raid shield та розширену аналітику для цього чату на {days} днів."
+PRO_INVOICE_LABEL = "RedQueen Pro · {days} днів"
+PRO_CMD_GROUP_ONLY = "Виконайте /pro у групі або каналі, який хочете покращити."
+PRO_ALREADY = "⭐ У цього чату вже є Pro — активний до {until}. Нова оплата продовжить його."
+PRO_OFFER = "Покращити цей чат до <b>RedQueen Pro</b> ({stars} ⭐ / {days} днів): AI авто-бан, raid shield, розширена аналітика."
+PRO_ACTIVATED = "⭐ <b>Pro активовано</b> для цього чату до {until}. Дякуємо."
+SUB_STATUS_PRO = "Тариф: <b>Pro</b> · активний до {until}."
+SUB_STATUS_FREE = "Тариф: <b>Free</b>. Команда /pro розблокує AI авто-бан, raid shield та аналітику."
+PRO_REQUIRED = "🔒 Це функція Pro. Використайте /pro, щоб покращити цей чат."
+
 PANEL_BUTTON = "🛡 Відкрити панель керування"
 PANEL_PROMPT = "Відкрийте консоль RedQueen для керування цим вуликом:"
 PANEL_UNCONFIGURED = "URL панелі керування ще не налаштовано. Задайте WEBAPP_URL, щоб увімкнути його."

@@ -6,6 +6,7 @@ import {
 import { useLang } from '../context/LangContext'
 import { useChatSettings } from '../context/ChatSettingsContext'
 import { Spinner } from '../components/ui'
+import { ProBanner } from '../components/ProBanner'
 import { haptic } from '../lib/telegram'
 
 export function Dashboard() {
@@ -60,6 +61,7 @@ export function Dashboard() {
 
   return (
     <div className="content fade-in">
+      <ProBanner chatId={cid} />
       {groups.map((g) => (
         <div key={g.label}>
           <div className="section-label">{g.label}</div>

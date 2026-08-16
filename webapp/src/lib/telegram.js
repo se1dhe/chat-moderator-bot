@@ -47,4 +47,11 @@ export function showConfirm(message) {
   })
 }
 
+export function openInvoice(url) {
+  return new Promise((resolve) => {
+    if (tg?.openInvoice) tg.openInvoice(url, resolve)
+    else { window.open(url, '_blank'); resolve('unknown') }
+  })
+}
+
 export const isTelegram = Boolean(tg && tg.initData)

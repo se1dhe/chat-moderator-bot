@@ -35,6 +35,17 @@ HELP = (
     "поверхность угрозы."
 )
 
+PRO_INVOICE_TITLE = "RedQueen Pro"
+PRO_INVOICE_DESC = "Разблокирует AI авто-бан, raid shield и расширенную аналитику для этого чата на {days} дней."
+PRO_INVOICE_LABEL = "RedQueen Pro · {days} дней"
+PRO_CMD_GROUP_ONLY = "Выполните /pro в группе или канале, который хотите улучшить."
+PRO_ALREADY = "⭐ У этого чата уже есть Pro — активен до {until}. Новая оплата продлит его."
+PRO_OFFER = "Улучшить этот чат до <b>RedQueen Pro</b> ({stars} ⭐ / {days} дней): AI авто-бан, raid shield, расширенная аналитика."
+PRO_ACTIVATED = "⭐ <b>Pro активирован</b> для этого чата до {until}. Спасибо."
+SUB_STATUS_PRO = "Тариф: <b>Pro</b> · активен до {until}."
+SUB_STATUS_FREE = "Тариф: <b>Free</b>. Команда /pro разблокирует AI авто-бан, raid shield и аналитику."
+PRO_REQUIRED = "🔒 Это функция Pro. Используйте /pro, чтобы улучшить этот чат."
+
 PANEL_BUTTON = "🛡 Открыть панель управления"
 PANEL_PROMPT = "Откройте консоль RedQueen для управления этим ульем:"
 PANEL_UNCONFIGURED = "URL панели управления ещё не настроен. Задайте WEBAPP_URL, чтобы включить его."

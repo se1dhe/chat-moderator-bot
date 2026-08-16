@@ -101,7 +101,7 @@ and is admin-gated per chat.
 
 ## Current status & next step
 
-**M1–M3 done. M4 in progress — TMA-first pivot (see the `redqueen-tma-pivot` memory).**
+**M1–M4 done — TMA-first pivot delivered (see the `redqueen-tma-pivot` memory).**
 The Mini App is now the primary console: an always-on aiohttp API (`src/redqueen/api/`,
 runs in both polling and webhook modes) validated by Telegram `initData`, and a premium
 React/Vite frontend (`webapp/`, dark-red design adapted from CP-helper) covering every
@@ -110,9 +110,15 @@ warns, exemptions) plus quarantine review, audit, and stats — all editable liv
 AI effectiveness was overhauled: reply-to context + language-aware few-shot prompt,
 Redis verdict cache (`ai_cache`), per-category thresholds tuned by the author's
 trust score (`trust.effective_threshold`), and edited-message re-scan.
-Alembic revisions: initial, `CaptchaSession`, `RaidEvent`, `ai_verdicts.text`.
-**Remaining for M4:** Telegram Stars monetization (`Payment` ledger, Pro gating) — to
-be built on top of the delivered value. See PROJECT_PLAN §12.
+Monetization is in: **Telegram Stars** — `services/billing.py` (is_pro / activate /
+record_payment), `handlers/payments.py` (/pro, /subscription, invoice, pre_checkout,
+successful_payment), `Payment` ledger, and Pro gating (`billing.PRO_FEATURES` =
+ai_autoban · raid_shield · analytics — enforced at runtime; core moderation stays free).
+The TMA shows a Pro banner + Stars upgrade via `openInvoice` (`/api/chats/{id}/billing`
+[+ `/invoice`]). Alembic revisions: initial, `CaptchaSession`, `RaidEvent`,
+`ai_verdicts.text`, `payments`.
+**Next: M5** — multimodal anti-scam (vision/voice), full adaptive trust, cross-chat
+reputation, clone-bots / white-label. See PROJECT_PLAN §12.
 
 ## Notes
 

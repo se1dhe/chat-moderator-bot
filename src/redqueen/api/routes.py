@@ -1,10 +1,11 @@
 """Mini App REST endpoints. Thin: authenticate → call services/repo → JSON."""
 from __future__ import annotations
 
+from aiogram.types import LabeledPrice
 from aiohttp import web
 
 from ..db import repo
-from ..services import quarantine, roles
+from ..services import billing, quarantine, roles
 from ..services.config import apply_patch, full_view
 from .auth import get_user, require_chat_admin
 
@@ -125,6 +126,36 @@ async def stats(request: web.Request) -> web.Response:
         return web.json_response({"actions": counts, "pending_quarantine": pending})
 
 
+async def billing_status(request: web.Request) -> web.Response:
+    cid = _chat_id(request)
+    await require_chat_admin(request, cid)
+    async with _session(request) as session:
+        sub = await billing.get_subscription(session, cid)
+        return web.json_response({
+            "pro": await billing.is_pro(session, cid),
+            "active_until": sub.active_until.isoformat() if sub and sub.active_until else None,
+            "price_stars": billing.PRO_PRICE_STARS,
+            "period_days": billing.PRO_PERIOD_DAYS,
+            "features": sorted(billing.PRO_FEATURES),
+        })
+
+
+async def billing_invoice(request: web.Request) -> web.Response:
+    """Create a Telegram Stars invoice link the Mini App opens via openInvoice()."""
+    cid = _chat_id(request)
+    await require_chat_admin(request, cid)
+    days = billing.PRO_PERIOD_DAYS
+    url = await request.app["bot"].create_invoice_link(
+        title="RedQueen Pro",
+        description=f"AI auto-ban, raid shield and advanced analytics for {days} days.",
+        payload=f"pro:{cid}:{days}",
+        provider_token="",
+        currency="XTR",
+        prices=[LabeledPrice(label=f"RedQueen Pro · {days} days", amount=billing.PRO_PRICE_STARS)],
+    )
+    return web.json_response({"url": url})
+
+
 def setup_routes(app: web.Application) -> None:
     app.router.add_get("/api/health", health)
     app.router.add_get("/api/me", me)
@@ -134,3 +165,5 @@ def setup_routes(app: web.Application) -> None:
     app.router.add_get("/api/chats/{cid}/quarantine", quarantine_list)
     app.router.add_post("/api/chats/{cid}/quarantine/{vid}", quarantine_decide)
     app.router.add_get("/api/chats/{cid}/stats", stats)
+    app.router.add_get("/api/chats/{cid}/billing", billing_status)
+    app.router.add_post("/api/chats/{cid}/billing/invoice", billing_invoice)

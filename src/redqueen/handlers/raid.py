@@ -15,7 +15,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from ..db import repo
 from ..db.models import RaidEvent
 from ..filters import IsChatAdmin
-from ..services import roles
+from ..services import billing, roles
 from ..services.config import get_config, save_section
 
 router = Router(name="raid")
@@ -34,6 +34,9 @@ async def on_join_watch(
     settings = await repo.get_settings(session, event.chat.id)
     cfg = get_config(settings)
     if not cfg["raid"]["enabled"] or is_locked(cfg):
+        return
+    # Raid shield is a Pro capability.
+    if not await billing.is_pro(session, event.chat.id):
         return
 
     key = f"rq:raidjoin:{event.chat.id}"

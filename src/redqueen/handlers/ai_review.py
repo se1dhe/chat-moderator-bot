@@ -16,7 +16,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from ..db import repo
 from ..db.models import AIVerdict
-from ..services import ai_budget, ai_cache, quarantine, trust
+from ..services import ai_budget, ai_cache, billing, quarantine, trust
 from ..services.ai import AIProvider
 from ..services.config import get_config
 
@@ -103,7 +103,8 @@ async def scan_message(
         meta={"score": verdict.score},
     )
 
-    if settings.ai_mode == "autoban":
+    # Auto-ban is a Pro capability; free chats fall back to the quarantine card.
+    if settings.ai_mode == "autoban" and await billing.is_pro(session, message.chat.id):
         try:
             await quarantine.decide(bot, session, row, actor_id=None, action="ban")
         except Exception as exc:  # noqa: BLE001

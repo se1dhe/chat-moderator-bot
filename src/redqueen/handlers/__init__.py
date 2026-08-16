@@ -12,6 +12,7 @@ from . import (
     moderation,
     modes,
     onboarding,
+    payments,
     raid,
     settings,
 )
@@ -20,6 +21,7 @@ from . import (
 def setup_routers(dp: Dispatcher) -> None:
     dp.include_router(common.router)
     dp.include_router(onboarding.router)
+    dp.include_router(payments.router)
     dp.include_router(moderation.router)
     dp.include_router(settings.router)
     # Join-watching (chat_member) and message-scanning pipelines: each stage raises

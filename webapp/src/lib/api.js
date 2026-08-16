@@ -28,4 +28,6 @@ export const api = {
   quarantine: (cid) => request('GET', `/chats/${cid}/quarantine`),
   decide: (cid, vid, action) => request('POST', `/chats/${cid}/quarantine/${vid}`, { action }),
   stats: (cid) => request('GET', `/chats/${cid}/stats`),
+  billing: (cid) => request('GET', `/chats/${cid}/billing`),
+  invoice: (cid) => request('POST', `/chats/${cid}/billing/invoice`),
 }

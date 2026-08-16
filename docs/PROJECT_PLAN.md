@@ -4,7 +4,7 @@
 > [ARCHITECTURE.md](./ARCHITECTURE.md); краткий roadmap — в [ROADMAP.md](./ROADMAP.md).
 > Этот файл — мастер: при расхождении верить ему.
 
-Обновлён: 2026-08-16.
+Обновлён: 2026-08-17.
 
 ---
 
@@ -226,7 +226,7 @@ CHANGELOG + ручная проверка в тестовом чате.
 - **DoD:** ✅ AI-карантин работает end-to-end (карантин/autoban/rule); raid-лок
   срабатывает на симуляции наплыва join'ов; 40 pytest-тестов.
 
-### M4 — Mini App (TMA-first) и монетизация  ← в работе
+### M4 — Mini App (TMA-first) и монетизация ✅ (сделано)
 > **Разворот приоритетов (2026-08-16):** управление становится **TMA-first** — Mini App
 > это основная поверхность, а не команды. Всё максимально настраиваемо в TMA, качество
 > премиальное; монетизация — поверх уже доставленной ценности (сначала ценность, потом
@@ -242,11 +242,15 @@ CHANGELOG + ручная проверка в тестовом чате.
   подключение через menu button / `/panel`.
 - ✅ **AI-эффективность**: контекст reply-to + language-aware few-shot промпт, Redis-кэш
   вердиктов, per-category пороги с поправкой на trust-score, ре-скан правок.
-- ⏳ **Монетизация**: Telegram Stars — Pro-подписка на чат, `Payment` ledger, возвраты,
-  гейтинг Pro-фич (AI autoban, raid shield, аналитика).
-- **DoD:** ✅ TMA управляет всеми настройками end-to-end; ⏳ оплата Stars включает Pro.
+- ✅ **Монетизация**: Telegram Stars (XTR) — `services/billing.py` (is_pro/activate/
+  record_payment), `handlers/payments.py` (/pro, /subscription, invoice, pre_checkout,
+  successful_payment), `Payment` ledger (идемпотентный по charge_id). Гейтинг Pro-фич
+  (`billing.PRO_FEATURES` = AI autoban · raid shield · analytics) в рантайме; ядро
+  модерации бесплатно. В TMA — Pro-баннер и апгрейд через `openInvoice`.
+- **DoD:** ✅ TMA управляет всеми настройками end-to-end; ✅ оплата Stars включает Pro
+  (на чат, с продлением и аудитом).
 
-### M5 — Мультимодальность, масштаб, white-label
+### M5 — Мультимодальность, масштаб, white-label  ← следующий этап
 - Vision (картинки/GIF), ключевые кадры видео, ASR голосовых, document extractor.
 - Adaptive trust score в полном объёме, кросс-чат репутация, шаринг чёрных списков.
 - Clone-боты / white-label (multi-bot над общей БД).
@@ -284,7 +288,7 @@ prod), pytest на сервисный слой и фильтры, `Dispatcher.fe
 
 ## 16. Следующий шаг
 
-Начинать **M4** (монетизация и Mini App): Telegram Stars, `Payment` ledger,
-Pro-гейтинг фич на уровне чата, Mini App (правила, AI-очередь, роли, аналитика) на
-EN/RU/UK. Разработка продолжается в Claude Code — контекст репозитория и команды см. в
-[`CLAUDE.md`](../CLAUDE.md).
+**M1–M4 сделаны** (TMA-first управление + Telegram Stars монетизация). Начинать **M5**:
+мультимодальный анти-скам (vision/voice), полный Adaptive trust score, кросс-чат
+репутация, clone-боты / white-label. Разработка продолжается в Claude Code — контекст
+репозитория и команды см. в [`CLAUDE.md`](../CLAUDE.md).

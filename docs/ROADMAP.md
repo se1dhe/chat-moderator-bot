@@ -28,19 +28,19 @@ sticker/GIF, массовые действия (ban/kick/mute/warn/unban + purge
 - Banned words (список), night/silent/slow mode, exemptions по ролям.
 - i18n-каркас (EN/RU/UK), онбординг с проверкой прав, `/checksetup`.
 
-## M3 — AI-модерация (киллер-фича) ✅  ← текущий этап
+## M3 — AI-модерация (киллер-фича) ✅
 - Ollama+Qwen, AI-очередь (`asyncio.Semaphore` + Redis-лимит на чат), карантин с
   карточкой решения для админа (кнопки Ban / Approve / **Rule**).
 - Режимы off / quarantine / autoban. Explainable-логи вердиктов.
 - **Raid shield**: детект наплыва по Redis-окну join'ов, авто-лок чата, `RaidEvent`.
 - Каркас **Adaptive trust score** (`services/trust.py`, команда `/trust`).
 
-## M4 — Монетизация и Mini App  ← следующий этап
+## M4 — Mini App (TMA-first) и монетизация ✅  ← текущий этап (сделан)
 - Telegram Stars: Pro-подписка на чат, ledger платежей, возвраты.
 - Mini App: правила, AI-очередь, роли, аналитика; языки EN/RU/UK.
 - Freemium-гейтинг фич на уровне чата.
 
-## M5 — Мультимодальность и масштаб
+## M5 — Мультимодальность и масштаб  ← следующий этап
 - Vision (изображения/GIF), ключевые кадры видео, ASR голосовых, document extractor.
 - Кросс-чат репутация, шаринг чёрных списков, clone-боты, вебхук+ngrok/прод-домен.
 

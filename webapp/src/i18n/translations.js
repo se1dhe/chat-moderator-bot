@@ -128,6 +128,17 @@ export const EN = {
   'stats.pending': 'Pending quarantine',
   'stats.total': 'Total actions',
   'stats.empty': 'No data yet.',
+
+  'pro.badge': 'PRO',
+  'pro.active': 'Pro active',
+  'pro.until': 'until {date}',
+  'pro.free': 'Free plan',
+  'pro.upgrade': 'Upgrade to Pro',
+  'pro.pitch': 'AI auto-ban · Raid shield · Advanced analytics',
+  'pro.price': '{stars} ⭐ / {days} days',
+  'pro.opening': 'Opening payment…',
+  'pro.thanks': 'Pro activated. Thank you!',
+  'pro.locked': 'Pro feature',
 }
 
 const RU = {
@@ -192,6 +203,12 @@ const RU = {
 
   'stats.title': 'Статистика', 'stats.actions': 'Действия', 'stats.pending': 'В карантине',
   'stats.total': 'Всего действий', 'stats.empty': 'Данных пока нет.',
+
+  'pro.badge': 'PRO', 'pro.active': 'Pro активен', 'pro.until': 'до {date}',
+  'pro.free': 'Тариф Free', 'pro.upgrade': 'Улучшить до Pro',
+  'pro.pitch': 'AI авто-бан · Raid shield · Расширенная аналитика',
+  'pro.price': '{stars} ⭐ / {days} дней', 'pro.opening': 'Открываю оплату…',
+  'pro.thanks': 'Pro активирован. Спасибо!', 'pro.locked': 'Функция Pro',
 }
 
 const UK = {
@@ -256,6 +273,12 @@ const UK = {
 
   'stats.title': 'Статистика', 'stats.actions': 'Дії', 'stats.pending': 'У карантині',
   'stats.total': 'Всього дій', 'stats.empty': 'Даних поки немає.',
+
+  'pro.badge': 'PRO', 'pro.active': 'Pro активний', 'pro.until': 'до {date}',
+  'pro.free': 'Тариф Free', 'pro.upgrade': 'Покращити до Pro',
+  'pro.pitch': 'AI авто-бан · Raid shield · Розширена аналітика',
+  'pro.price': '{stars} ⭐ / {days} днів', 'pro.opening': 'Відкриваю оплату…',
+  'pro.thanks': 'Pro активовано. Дякуємо!', 'pro.locked': 'Функція Pro',
 }
 
 export const LOCALES = { en: EN, ru: { ...EN, ...RU }, uk: { ...EN, ...UK } }
