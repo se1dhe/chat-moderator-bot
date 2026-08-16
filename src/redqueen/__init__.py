@@ -1,0 +1,3 @@
+"""RedQueen Security — advanced Telegram moderation bot."""
+
+__version__ = "0.1.0"
