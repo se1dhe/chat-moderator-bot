@@ -1,9 +1,16 @@
-"""Entry point: `python -m redqueen` or `redqueen` console script."""
+"""Entry point: `python -m redqueen` or `redqueen` console script.
+
+Always runs the Mini App API (aiohttp). In polling mode the API listens on its own
+host/port; in webhook mode the Telegram webhook is mounted onto that same app.
+"""
 from __future__ import annotations
 
 import asyncio
 import logging
 
+from aiohttp import web
+
+from .api import create_api_app
 from .bot import create_bot, create_dispatcher, create_redis
 from .config import get_settings
 from .db.base import dispose_engine, get_sessionmaker, init_engine
@@ -39,16 +46,25 @@ async def run() -> None:
     redis = create_redis(settings)
     dp = create_dispatcher(settings, redis)
 
+    api_app = create_api_app(
+        bot=bot, settings=settings, sessionmaker=get_sessionmaker(), redis=redis
+    )
+
     sweeper = asyncio.create_task(_captcha_sweeper(bot))
+    runner: web.AppRunner | None = None
     try:
         if settings.run_mode == "webhook":
-            await _run_webhook(bot, dp, settings)
+            runner = await _serve_webhook(bot, dp, api_app, settings)
+            await asyncio.Event().wait()  # webhook is push-driven; just stay alive
         else:
+            runner = await _serve_api(api_app, settings)
             log.info("Starting polling as RedQueen…")
             await bot.delete_webhook(drop_pending_updates=True)
             await dp.start_polling(bot)
     finally:
         sweeper.cancel()
+        if runner is not None:
+            await runner.cleanup()
         provider = dp.get("ai_provider")
         if provider is not None:
             await provider.close()
@@ -57,9 +73,17 @@ async def run() -> None:
         await dispose_engine()
 
 
-async def _run_webhook(bot, dp, settings) -> None:
+async def _serve_api(app: web.Application, settings) -> web.AppRunner:
+    runner = web.AppRunner(app)
+    await runner.setup()
+    site = web.TCPSite(runner, host=settings.api_host, port=settings.api_port)
+    await site.start()
+    log.info("Mini App API listening on %s:%s", settings.api_host, settings.api_port)
+    return runner
+
+
+async def _serve_webhook(bot, dp, app: web.Application, settings) -> web.AppRunner:
     from aiogram.webhook.aiohttp_server import SimpleRequestHandler, setup_application
-    from aiohttp import web
 
     url = f"{settings.webhook_base_url}{settings.webhook_path}"
     await bot.set_webhook(
@@ -67,7 +91,6 @@ async def _run_webhook(bot, dp, settings) -> None:
     )
     log.info("Webhook set to %s", url)
 
-    app = web.Application()
     SimpleRequestHandler(
         dispatcher=dp, bot=bot, secret_token=settings.webhook_secret or None
     ).register(app, path=settings.webhook_path)
@@ -77,8 +100,8 @@ async def _run_webhook(bot, dp, settings) -> None:
     await runner.setup()
     site = web.TCPSite(runner, host=settings.webhook_host, port=settings.webhook_port)
     await site.start()
-    log.info("Listening on %s:%s", settings.webhook_host, settings.webhook_port)
-    await asyncio.Event().wait()  # run forever
+    log.info("Webhook + Mini App API listening on %s:%s", settings.webhook_host, settings.webhook_port)
+    return runner
 
 
 def main() -> None:

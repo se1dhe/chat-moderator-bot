@@ -16,9 +16,9 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from ..db import repo
 from ..db.models import AIVerdict
-from ..services import ai_budget, moderation, trust
+from ..services import ai_budget, quarantine
 from ..services.ai import AIProvider
-from ..services.config import get_config, save_section
+from ..services.config import get_config
 
 log = logging.getLogger(__name__)
 
@@ -75,6 +75,7 @@ async def scan_message(
         category=verdict.category,
         score=verdict.score,
         explanation=verdict.explanation,
+        text=message.text,
         status="pending",
     )
     session.add(row)
@@ -88,13 +89,9 @@ async def scan_message(
 
     if settings.ai_mode == "autoban":
         try:
-            await moderation.ban(bot, session, chat_id=message.chat.id,
-                                 user_id=message.from_user.id, actor_id=None,
-                                 reason=f"AI:{verdict.category}")
-            await message.delete()
+            await quarantine.decide(bot, session, row, actor_id=None, action="ban")
         except Exception as exc:  # noqa: BLE001
             log.warning("autoban failed: %s", exc)
-        row.status = "rejected"
         return
 
     # quarantine: hold the message for admin decision
@@ -125,45 +122,14 @@ async def on_decision(
         await query.answer(t("AI_ADMIN_REQUIRED"), show_alert=True)
         return
 
-    if callback_data.action == "ban":
-        await moderation.ban(bot, session, chat_id=verdict.chat_telegram_id,
-                             user_id=verdict.user_telegram_id, actor_id=query.from_user.id,
-                             reason=f"AI:{verdict.category}")
-        verdict.status = "rejected"
-        verdict.decided_by = query.from_user.id
-        if verdict.message_id:
-            try:
-                await bot.delete_message(verdict.chat_telegram_id, verdict.message_id)
-            except Exception:  # noqa: BLE001
-                pass
-        text = t("AI_CONFIRMED_BAN")
-    elif callback_data.action == "rule":
-        flagged_text = None
-        if query.message and query.message.reply_to_message:
-            flagged_text = query.message.reply_to_message.text or query.message.reply_to_message.caption
-        if flagged_text:
-            chat_settings = await repo.get_settings(session, verdict.chat_telegram_id)
-            words = get_config(chat_settings)["filters"]["banned_words"]
-            snippet = flagged_text.strip().lower()[:60]
-            if snippet and snippet not in words:
-                words.append(snippet)
-                save_section(chat_settings, "filters", {"banned_words": words})
-        await moderation.ban(bot, session, chat_id=verdict.chat_telegram_id,
-                             user_id=verdict.user_telegram_id, actor_id=query.from_user.id,
-                             reason=f"AI:{verdict.category}")
-        verdict.status = "rejected"
-        verdict.decided_by = query.from_user.id
-        if verdict.message_id:
-            try:
-                await bot.delete_message(verdict.chat_telegram_id, verdict.message_id)
-            except Exception:  # noqa: BLE001
-                pass
-        text = t("AI_RULE_CREATED")
-    else:
-        verdict.status = "approved"
-        verdict.decided_by = query.from_user.id
-        await trust.adjust(session, verdict.user_telegram_id, trust.AI_FALSE_POSITIVE)
-        text = t("AI_APPROVED")
+    await quarantine.decide(
+        bot, session, verdict, actor_id=query.from_user.id, action=callback_data.action
+    )
+    text = {
+        "ban": t("AI_CONFIRMED_BAN"),
+        "rule": t("AI_RULE_CREATED"),
+        "approve": t("AI_APPROVED"),
+    }.get(callback_data.action, t("AI_APPROVED"))
 
     if query.message:
         await query.message.edit_text(text)

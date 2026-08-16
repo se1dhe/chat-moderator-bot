@@ -109,6 +109,7 @@ class AIVerdict(TimestampMixin, Base):
     category: Mapped[str] = mapped_column(String(32))  # spam|scam|toxicity|nsfw|flood|ok
     score: Mapped[int] = mapped_column(Integer)  # 0..100
     explanation: Mapped[str | None] = mapped_column(Text)
+    text: Mapped[str | None] = mapped_column(Text)  # flagged message text (queue view + Rule action)
     status: Mapped[str] = mapped_column(String(16), default="pending")  # pending|approved|rejected
     decided_by: Mapped[int | None] = mapped_column(BigInteger)
 

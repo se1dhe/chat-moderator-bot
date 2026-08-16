@@ -39,6 +39,12 @@ class Settings(BaseSettings):
     webhook_port: int = Field(default=8080, alias="WEBHOOK_PORT")
     webhook_secret: str = Field(default="", alias="WEBHOOK_SECRET")
 
+    # Mini App / API server. In polling mode the API listens here; in webhook mode the
+    # webhook is mounted onto the same app on webhook_host/webhook_port instead.
+    api_host: str = Field(default="0.0.0.0", alias="API_HOST")
+    api_port: int = Field(default=8080, alias="API_PORT")
+    webapp_dist: str = Field(default="webapp/dist", alias="WEBAPP_DIST")
+
     default_lang: str = Field(default="en", alias="DEFAULT_LANG")
     log_level: str = Field(default="INFO", alias="LOG_LEVEL")
 

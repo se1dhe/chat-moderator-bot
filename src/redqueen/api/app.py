@@ -1,0 +1,76 @@
+"""aiohttp application factory for the Mini App API (+ optional static TMA serving)."""
+from __future__ import annotations
+
+import logging
+from collections.abc import Awaitable, Callable
+from pathlib import Path
+
+from aiogram import Bot
+from aiohttp import web
+from redis.asyncio import Redis
+from sqlalchemy.ext.asyncio import async_sessionmaker
+
+from ..config import Settings
+from .routes import setup_routes
+
+log = logging.getLogger(__name__)
+
+_CORS_HEADERS = {
+    "Access-Control-Allow-Origin": "*",
+    "Access-Control-Allow-Methods": "GET, POST, PUT, OPTIONS",
+    "Access-Control-Allow-Headers": "Authorization, Content-Type, X-Init-Data",
+    "Access-Control-Max-Age": "600",
+}
+
+
+@web.middleware
+async def cors_middleware(
+    request: web.Request, handler: Callable[[web.Request], Awaitable[web.StreamResponse]]
+) -> web.StreamResponse:
+    # Auth is initData (not cookies), so a permissive CORS policy is safe and lets the
+    # Vite dev server (different origin) talk to the API during development.
+    if request.method == "OPTIONS":
+        return web.Response(status=204, headers=_CORS_HEADERS)
+    response = await handler(request)
+    response.headers.update(_CORS_HEADERS)
+    return response
+
+
+def _mount_static(app: web.Application, dist: Path) -> None:
+    """Serve the built Mini App under /app with SPA fallback to index.html."""
+    index = dist / "index.html"
+
+    async def spa(request: web.Request) -> web.StreamResponse:
+        rel = request.match_info.get("tail", "").lstrip("/")
+        candidate = (dist / rel).resolve()
+        if rel and candidate.is_file() and dist.resolve() in candidate.parents:
+            return web.FileResponse(candidate)
+        return web.FileResponse(index)
+
+    app.router.add_get("/app", spa)
+    app.router.add_get("/app/{tail:.*}", spa)
+    log.info("Serving Mini App from %s at /app", dist)
+
+
+def create_api_app(
+    *,
+    bot: Bot,
+    settings: Settings,
+    sessionmaker: async_sessionmaker,
+    redis: Redis,
+) -> web.Application:
+    app = web.Application(middlewares=[cors_middleware])
+    app["bot"] = bot
+    app["settings"] = settings
+    app["sessionmaker"] = sessionmaker
+    app["redis"] = redis
+
+    setup_routes(app)
+
+    dist = Path(settings.webapp_dist)
+    if (dist / "index.html").is_file():
+        _mount_static(app, dist)
+    else:
+        log.info("Mini App bundle not found at %s — API-only (build webapp to enable UI)", dist)
+
+    return app

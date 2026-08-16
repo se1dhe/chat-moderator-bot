@@ -1,10 +1,10 @@
 """Repository helpers — thin data-access functions over the async session."""
 from __future__ import annotations
 
-from sqlalchemy import select, update
+from sqlalchemy import func, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from .models import Chat, ChatSettings, ModAction, User, Warn
+from .models import AIVerdict, Chat, ChatSettings, ModAction, User, Warn
 
 
 async def get_or_create_chat(
@@ -143,3 +143,54 @@ async def log_action(
             meta=meta or {},
         )
     )
+
+
+# --- Mini App API reads ---------------------------------------------------------
+
+async def list_active_chats(session: AsyncSession) -> list[Chat]:
+    """All connected chats (the Mini App filters these down to ones the caller admins)."""
+    result = await session.scalars(select(Chat).where(Chat.is_active.is_(True)))
+    return list(result.all())
+
+
+async def recent_mod_actions(
+    session: AsyncSession, chat_telegram_id: int, *, limit: int = 50
+) -> list[ModAction]:
+    result = await session.scalars(
+        select(ModAction)
+        .where(ModAction.chat_telegram_id == chat_telegram_id)
+        .order_by(ModAction.id.desc())
+        .limit(limit)
+    )
+    return list(result.all())
+
+
+async def pending_ai_verdicts(
+    session: AsyncSession, chat_telegram_id: int, *, limit: int = 50
+) -> list[AIVerdict]:
+    result = await session.scalars(
+        select(AIVerdict)
+        .where(
+            AIVerdict.chat_telegram_id == chat_telegram_id,
+            AIVerdict.status == "pending",
+        )
+        .order_by(AIVerdict.id.desc())
+        .limit(limit)
+    )
+    return list(result.all())
+
+
+async def get_ai_verdict(session: AsyncSession, verdict_id: int) -> AIVerdict | None:
+    return await session.scalar(select(AIVerdict).where(AIVerdict.id == verdict_id))
+
+
+async def action_counts(
+    session: AsyncSession, chat_telegram_id: int
+) -> dict[str, int]:
+    """Total ModAction rows per action type for a chat (for the stats dashboard)."""
+    result = await session.execute(
+        select(ModAction.action, func.count())
+        .where(ModAction.chat_telegram_id == chat_telegram_id)
+        .group_by(ModAction.action)
+    )
+    return {action: int(n) for action, n in result.all()}
