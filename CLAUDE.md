@@ -132,8 +132,13 @@ through the text pipeline (Pro-gated). **Analytics** — stats API returns a 14-
 timeline + AI-category breakdown + member count; the TMA Stats screen charts them and
 the Dashboard shows contextual **tips**. All four modalities (text/vision/voice) are
 wired through the one explainable-quarantine flow.
-**Remaining M5:** document/URL extractor analysis, clone-bots / white-label (multi-bot
-over the shared DB). See PROJECT_PLAN §12.
+**Document/URL anti-scam (Pro)** — `ai_review.scan_document` scans caption/filename +
+small text attachments; rule fallback flags URL shorteners. **White-label ph1** —
+`BotInstance` registry (bot self-registers on startup), `Chat.bot_id` isolation (set on
+first contact; `/api/me` scoped by `bot.id`), `BOT_BRAND` config. A second brand already
+runs as its own process over the shared DB, isolated by `bot_id`.
+**Remaining M5:** white-label ph2 — single-process orchestrator running N bots +
+multi-bot API auth (validate initData against any registered bot). See PROJECT_PLAN §12.
 
 Note: `DbSessionMiddleware` commits (not rolls back) on `SkipHandler` — handlers that
 write then defer (captcha→raid, members→scanners) rely on this; keep it.
