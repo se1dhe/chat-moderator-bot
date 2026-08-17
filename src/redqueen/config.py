@@ -33,6 +33,11 @@ class Settings(BaseSettings):
     ollama_vision_model: str = Field(default="", alias="OLLAMA_VISION_MODEL")
     ai_enabled: bool = Field(default=False, alias="AI_ENABLED")
     ai_max_concurrency: int = Field(default=2, alias="AI_MAX_CONCURRENCY")
+    # Voice anti-scam via faster-whisper. Empty disables it. Needs the `voice` extra
+    # (`uv sync --extra voice`); the model auto-downloads on first use.
+    whisper_model: str = Field(default="", alias="WHISPER_MODEL")  # e.g. "small", "base"
+    whisper_device: str = Field(default="cpu", alias="WHISPER_DEVICE")
+    whisper_compute: str = Field(default="int8", alias="WHISPER_COMPUTE")
     # Pull OLLAMA_MODEL automatically on startup if it isn't present yet (backend
     # self-provisioning). Runs in the background; AI uses the rule fallback until ready.
     ollama_auto_pull: bool = Field(default=True, alias="OLLAMA_AUTO_PULL")

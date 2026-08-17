@@ -21,6 +21,9 @@ dev = [
     "ruff>=0.6",
     "aiosqlite>=0.20",
 ]
+voice = [
+    "faster-whisper>=1.0",
+]
 
 [project.scripts]
 redqueen = "redqueen.__main__:main"

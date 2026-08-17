@@ -13,6 +13,7 @@ from .db.base import get_sessionmaker
 from .handlers import setup_routers
 from .middlewares import DbSessionMiddleware, LangMiddleware
 from .services.ai import AIProvider, build_provider
+from .services.asr import Transcriber
 
 # Update types whose handlers need a DB session / resolved chat language.
 _DB_SCOPED_OBSERVERS = (
@@ -40,6 +41,9 @@ def create_dispatcher(settings: Settings, redis: Redis) -> Dispatcher:
     dp["settings"] = settings
     dp["redis"] = redis
     dp["ai_semaphore"] = asyncio.Semaphore(settings.ai_max_concurrency)
+    dp["transcriber"] = Transcriber(
+        settings.whisper_model, device=settings.whisper_device, compute_type=settings.whisper_compute
+    )
 
     session_mw = DbSessionMiddleware(get_sessionmaker())
     lang_mw = LangMiddleware(settings.default_lang)

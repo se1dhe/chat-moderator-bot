@@ -18,6 +18,7 @@ from ..db import repo
 from ..db.models import AIVerdict
 from ..services import ai_budget, ai_cache, billing, quarantine, trust
 from ..services.ai import AIProvider
+from ..services.asr import Transcriber
 from ..services.config import get_config
 
 log = logging.getLogger(__name__)
@@ -172,6 +173,39 @@ async def scan_visual(
         verdict = await ai_provider.classify_image(image, caption=message.caption, lang=lang)
 
     await _act_on_verdict(message, bot, session, settings, verdict, t, flagged_text=message.caption)
+
+
+@router.message(F.chat.type.in_({"group", "supergroup"}) & (F.voice | F.video_note))
+async def scan_voice(
+    message: Message, bot: Bot, session: AsyncSession, redis: Redis, ai_provider: AIProvider,
+    ai_semaphore: asyncio.Semaphore, transcriber: Transcriber, t: Callable[..., str], lang: str,
+) -> None:
+    settings = await repo.get_settings(session, message.chat.id)
+    if settings.ai_mode == "off" or message.from_user is None or message.from_user.is_bot:
+        raise SkipHandler
+    # Voice anti-scam (ASR) is a Pro capability and needs a configured Whisper model.
+    if not transcriber.enabled or not await billing.is_pro(session, message.chat.id):
+        raise SkipHandler
+
+    ai_cfg = get_config(settings)["ai"]
+    if not await ai_budget.allow(redis, chat_id=message.chat.id, limit=ai_cfg["max_per_minute"]):
+        raise SkipHandler
+
+    media = message.voice or message.video_note
+    try:
+        buf = await bot.download(media)
+        audio = buf.read()
+    except Exception as exc:
+        log.warning("voice download failed: %s", exc)
+        raise SkipHandler from exc
+
+    async with ai_semaphore:
+        text = await transcriber.transcribe(audio)
+        if not text:
+            raise SkipHandler
+        verdict = await ai_provider.classify_text(text, lang=lang)
+
+    await _act_on_verdict(message, bot, session, settings, verdict, t, flagged_text=text)
 
 
 @router.callback_query(ReviewCB.filter())
