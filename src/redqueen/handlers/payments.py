@@ -6,10 +6,11 @@ from collections.abc import Callable
 from datetime import datetime
 
 from aiogram import Bot, F, Router
-from aiogram.filters import Command
+from aiogram.filters import Command, CommandObject
 from aiogram.types import LabeledPrice, Message, PreCheckoutQuery
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from ..config import Settings
 from ..db import repo
 from ..filters import IsChatAdmin
 from ..services import billing
@@ -67,6 +68,23 @@ async def cmd_subscription(message: Message, session: AsyncSession, t: Callable[
         await message.reply(t("SUB_STATUS_PRO", until=_fmt(sub.active_until if sub else None)))
     else:
         await message.reply(t("SUB_STATUS_FREE"))
+
+
+@router.message(Command("grantpro"), F.chat.type.in_(_CHAT_TYPES))
+async def cmd_grantpro(
+    message: Message, command: CommandObject, session: AsyncSession, settings: Settings,
+    t: Callable[..., str],
+) -> None:
+    """Owner-only: comp Pro on this chat without payment (support / testing)."""
+    if message.from_user is None or message.from_user.id not in settings.owner_id_set:
+        return  # silent for non-owners — this command is not advertised
+    days = int(command.args) if (command.args or "").strip().isdigit() else billing.PRO_PERIOD_DAYS
+    until = await billing.activate_pro(session, message.chat.id, days=days)
+    await repo.log_action(
+        session, chat_telegram_id=message.chat.id, user_telegram_id=message.from_user.id,
+        actor_id=message.from_user.id, action="pro_grant", reason=f"owner comp {days}d",
+    )
+    await message.reply(t("PRO_ACTIVATED", until=_fmt(until)))
 
 
 @router.pre_checkout_query()
