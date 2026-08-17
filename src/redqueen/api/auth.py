@@ -1,12 +1,18 @@
-"""Request authentication for the Mini App API: initData → user, then admin gate."""
+"""Request authentication for the Mini App API: initData → user, then admin gate.
+
+Multi-bot aware: the shared API serves every brand bot, so a request's initData is
+validated against each registered bot's token; the one that validates binds the request
+to that bot (used for admin checks, chat scoping and actions)."""
 from __future__ import annotations
 
+from aiogram import Bot
 from aiohttp import web
 
 from ..services import roles
 from ..services.webapp_auth import InitDataError, WebAppUser, verify_init_data
 
 _USER_KEY = "webapp_user"
+_BOT_KEY = "webapp_bot"
 
 
 def _extract_init_data(request: web.Request) -> str:
@@ -17,17 +23,28 @@ def _extract_init_data(request: web.Request) -> str:
 
 
 async def get_user(request: web.Request) -> WebAppUser:
-    """Validate initData once per request; cache the user on the request object."""
+    """Validate initData against any registered bot; cache the user + bot on the request."""
     cached = request.get(_USER_KEY)
     if cached is not None:
         return cached
-    settings = request.app["settings"]
-    try:
-        user = verify_init_data(_extract_init_data(request), settings.bot_token)
-    except InitDataError as exc:
-        raise web.HTTPUnauthorized(reason=f"initData: {exc}") from exc
-    request[_USER_KEY] = user
-    return user
+    init_data = _extract_init_data(request)
+    bots: dict[int, Bot] = request.app["bots"]
+    last_error: InitDataError | None = None
+    for bot in bots.values():
+        try:
+            user = verify_init_data(init_data, bot.token)
+        except InitDataError as exc:
+            last_error = exc
+            continue
+        request[_USER_KEY] = user
+        request[_BOT_KEY] = bot
+        return user
+    raise web.HTTPUnauthorized(reason=f"initData: {last_error or 'no registered bot'}")
+
+
+def request_bot(request: web.Request) -> Bot:
+    """The bot bound to this request (whose token validated the initData)."""
+    return request.get(_BOT_KEY) or request.app["bot"]
 
 
 async def require_chat_admin(request: web.Request, chat_id: int) -> WebAppUser:
@@ -37,7 +54,7 @@ async def require_chat_admin(request: web.Request, chat_id: int) -> WebAppUser:
     if user.id in settings.owner_id_set:
         return user
     is_admin = await roles.is_admin(
-        request.app["bot"], request.app["redis"], chat_id=chat_id, user_id=user.id
+        request_bot(request), request.app["redis"], chat_id=chat_id, user_id=user.id
     )
     if not is_admin:
         raise web.HTTPForbidden(reason="not a chat administrator")

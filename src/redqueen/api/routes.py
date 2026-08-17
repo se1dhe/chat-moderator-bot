@@ -12,7 +12,7 @@ from ..i18n import t as _t
 from ..services import billing, moderation, quarantine, roles, warns
 from ..services.config import apply_patch, full_view
 from ..utils.duration import humanize, until_from_now
-from .auth import get_user, require_chat_admin
+from .auth import get_user, request_bot, require_chat_admin
 
 
 def _chat_id(request: web.Request) -> int:
@@ -32,7 +32,7 @@ async def health(request: web.Request) -> web.Response:
 
 async def me(request: web.Request) -> web.Response:
     user = await get_user(request)
-    bot, redis = request.app["bot"], request.app["redis"]
+    bot, redis = request_bot(request), request.app["redis"]
     owner = user.id in request.app["settings"].owner_id_set
     chats = []
     async with _session(request) as session:
@@ -123,7 +123,7 @@ async def quarantine_decide(request: web.Request) -> web.Response:
         if verdict is None or verdict.chat_telegram_id != cid:
             raise web.HTTPNotFound(reason="verdict not found")
         result = await quarantine.decide(
-            request.app["bot"], session, verdict, actor_id=user.id, action=action
+            request_bot(request), session, verdict, actor_id=user.id, action=action
         )
         await session.commit()
         return web.json_response({"status": verdict.status, "action": result})
@@ -166,7 +166,7 @@ async def billing_invoice(request: web.Request) -> web.Response:
     cid = _chat_id(request)
     await require_chat_admin(request, cid)
     days = billing.PRO_PERIOD_DAYS
-    url = await request.app["bot"].create_invoice_link(
+    url = await request_bot(request).create_invoice_link(
         title="RedQueen Pro",
         description=f"AI auto-ban, raid shield and advanced analytics for {days} days.",
         payload=f"pro:{cid}:{days}",
@@ -208,7 +208,7 @@ async def member_action(request: web.Request) -> web.Response:
     if action not in _MEMBER_ACTIONS:
         raise web.HTTPBadRequest(reason=f"action must be one of {sorted(_MEMBER_ACTIONS)}")
 
-    bot = request.app["bot"]
+    bot = request_bot(request)
     minutes = body.get("minutes")
     reason = (body.get("reason") or "").strip()[:200] or None
     _ACTION_WORDS = {"ban": "banned", "kick": "removed", "mute": "silenced"}

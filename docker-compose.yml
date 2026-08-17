@@ -61,6 +61,8 @@ services:
       BOT_TOKEN: ${BOT_TOKEN}
       OWNER_IDS: ${OWNER_IDS:-}
       BOT_BRAND: ${BOT_BRAND:-RedQueen}
+      BOT_TOKENS: ${BOT_TOKENS:-}
+      BOT_BRANDS: ${BOT_BRANDS:-}
       POSTGRES_HOST: postgres
       POSTGRES_DB: ${POSTGRES_DB:-redqueen}
       POSTGRES_USER: ${POSTGRES_USER:-redqueen}

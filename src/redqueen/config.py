@@ -15,6 +15,10 @@ class Settings(BaseSettings):
     owner_ids: str = Field(default="", alias="OWNER_IDS")
     # White-label: display brand for this bot instance (used in the registry + persona).
     bot_brand: str = Field(default="RedQueen", alias="BOT_BRAND")
+    # Run several brand bots in one process (orchestrator). Comma/newline-separated
+    # tokens + parallel brands; empty falls back to the single BOT_TOKEN / BOT_BRAND.
+    bot_tokens: str = Field(default="", alias="BOT_TOKENS")
+    bot_brands: str = Field(default="", alias="BOT_BRANDS")
 
     # Database
     postgres_host: str = Field(default="localhost", alias="POSTGRES_HOST")
@@ -82,6 +86,21 @@ class Settings(BaseSettings):
             if part.isdigit():
                 out.add(int(part))
         return out
+
+    @property
+    def token_list(self) -> list[str]:
+        """All bot tokens to run (BOT_TOKENS if set, else the single BOT_TOKEN)."""
+        raw = self.bot_tokens or self.bot_token
+        return [t.strip() for t in raw.replace("\n", ",").split(",") if t.strip()]
+
+    @property
+    def brand_list(self) -> list[str]:
+        """Brands parallel to token_list; padded with BOT_BRAND when shorter."""
+        brands = [b.strip() for b in self.bot_brands.replace("\n", ",").split(",") if b.strip()]
+        tokens = self.token_list
+        while len(brands) < len(tokens):
+            brands.append(self.bot_brand)
+        return brands[: len(tokens)]
 
 
 @lru_cache

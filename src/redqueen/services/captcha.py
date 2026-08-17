@@ -63,12 +63,18 @@ async def create_session(
     return row
 
 
-async def sweep_expired(bot: Bot, sessionmaker: async_sessionmaker[AsyncSession]) -> None:
+async def sweep_expired(
+    bots: dict[int, Bot], sessionmaker: async_sessionmaker[AsyncSession]
+) -> None:
     """Kick/decline members whose captcha timed out.
 
     Driven by `expires_at` in the DB (not an in-memory timer), so a bot restart never
-    loses track of a pending challenge. Call this periodically from the app lifecycle.
+    loses track of a pending challenge. `bots` is keyed by bot id; each expired session
+    is acted on by the bot that manages its chat (white-label isolation).
     """
+    fallback = next(iter(bots.values()), None)
+    if fallback is None:
+        return
     async with sessionmaker() as session:
         now = datetime.now(UTC)
         rows = (
@@ -84,6 +90,8 @@ async def sweep_expired(bot: Bot, sessionmaker: async_sessionmaker[AsyncSession]
             chat = await session.scalar(select(Chat).where(Chat.telegram_id == row.chat_telegram_id))
             lang = chat.lang if chat else None
             chat_name = chat.title if chat and chat.title else str(row.chat_telegram_id)
+            bot = bots.get(chat.bot_id) if chat and chat.bot_id else fallback
+            bot = bot or fallback
             try:
                 if row.is_join_request:
                     await bot.decline_chat_join_request(row.chat_telegram_id, row.user_telegram_id)

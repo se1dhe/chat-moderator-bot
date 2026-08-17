@@ -12,7 +12,7 @@ from redqueen.config import Settings
 async def client(fake_redis):
     settings = Settings(_env_file=None)
     settings.bot_token = "123456:TEST"
-    app = create_api_app(bot=None, settings=settings, sessionmaker=None, redis=fake_redis)
+    app = create_api_app(bots={}, settings=settings, sessionmaker=None, redis=fake_redis)
     async with TestClient(TestServer(app)) as c:
         yield c
 

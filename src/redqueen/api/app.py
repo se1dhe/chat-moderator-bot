@@ -54,13 +54,16 @@ def _mount_static(app: web.Application, dist: Path) -> None:
 
 def create_api_app(
     *,
-    bot: Bot,
+    bots: dict[int, Bot],
     settings: Settings,
     sessionmaker: async_sessionmaker,
     redis: Redis,
 ) -> web.Application:
     app = web.Application(middlewares=[cors_middleware])
-    app["bot"] = bot
+    # `bots` is keyed by the bot's Telegram id; a request is bound to whichever bot's
+    # token validates its initData. `bot` is the primary (first) for legacy references.
+    app["bots"] = bots
+    app["bot"] = next(iter(bots.values()), None)
     app["settings"] = settings
     app["sessionmaker"] = sessionmaker
     app["redis"] = redis
