@@ -126,8 +126,14 @@ vision via `OLLAMA_VISION_MODEL`, e.g. `qwen2.5vl:7b`; empty → caption fallbac
 SkipHandler); `/api/chats/{id}/members` search + `/members/{uid}/action`
 (ban/kick/mute/unmute/unban/warn); TMA **Members** screen with search and action buttons.
 Chat notification language is set from the adder on join and editable in the TMA.
-**Remaining M5:** voice (ASR) + document analysis, analytics charts + tips,
-clone-bots / white-label. See PROJECT_PLAN §12.
+**Voice anti-scam** — `services/asr.py` (lazy faster-whisper via `WHISPER_MODEL`, optional
+`voice` extra); `ai_review.scan_voice` transcribes voice/video-notes and runs them
+through the text pipeline (Pro-gated). **Analytics** — stats API returns a 14-day
+timeline + AI-category breakdown + member count; the TMA Stats screen charts them and
+the Dashboard shows contextual **tips**. All four modalities (text/vision/voice) are
+wired through the one explainable-quarantine flow.
+**Remaining M5:** document/URL extractor analysis, clone-bots / white-label (multi-bot
+over the shared DB). See PROJECT_PLAN §12.
 
 Note: `DbSessionMiddleware` commits (not rolls back) on `SkipHandler` — handlers that
 write then defer (captcha→raid, members→scanners) rely on this; keep it.
