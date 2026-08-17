@@ -49,8 +49,10 @@ async def check_flood(
 
     action = cfg["action"]
     if action == "ban":
+        ban_secs = cfg.get("ban_seconds", 0)
+        ban_until = until_from_now(timedelta(seconds=ban_secs)) if ban_secs else None
         await moderation.ban(bot, session, chat_id=message.chat.id, user_id=message.from_user.id,
-                             actor_id=None, reason="antiflood")
+                             actor_id=None, until=ban_until, reason="antiflood")
     elif action == "kick":
         await moderation.kick(bot, session, chat_id=message.chat.id, user_id=message.from_user.id,
                               actor_id=None, reason="antiflood")

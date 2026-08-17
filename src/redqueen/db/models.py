@@ -164,6 +164,10 @@ class ChatMember(Base):
     username: Mapped[str | None] = mapped_column(String(64))
     full_name: Mapped[str | None] = mapped_column(String(256))
     message_count: Mapped[int] = mapped_column(Integer, default=0)
+    # Last known moderation state, so the Mini App can show contextual actions
+    # (only offer "unban" for a banned member, "unmute" for a muted one, etc.).
+    state: Mapped[str] = mapped_column(String(16), default="active")  # active|muted|banned
+    muted_until: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     first_seen: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
     last_seen: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
 

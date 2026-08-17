@@ -12,7 +12,11 @@ from ..db.models import ChatSettings
 
 DEFAULT_DATA: dict[str, Any] = {
     "captcha": {"enabled": False, "mode": "button", "timeout_seconds": 300},
-    "antiflood": {"enabled": False, "limit": 5, "window": 10, "action": "mute", "mute_seconds": 600},
+    "antiflood": {"enabled": False, "limit": 5, "window": 10, "action": "mute",
+                  "mute_seconds": 600, "ban_seconds": 0},
+    # Duration of the penalty applied when the warn limit is hit (0 == permanent).
+    # Used only when `warn_action` is "mute" or "ban" respectively.
+    "warns": {"mute_seconds": 3600, "ban_seconds": 0},
     "filters": {
         "banned_words": [],
         "block_links": False,
@@ -95,6 +99,20 @@ def _as_bool(value: Any, default: bool) -> bool:
     return bool(value) if isinstance(value, bool) else default
 
 
+# Penalty durations in seconds: 0 means permanent, otherwise 30s..365d.
+_MAX_PENALTY_SECONDS = 365 * 86400
+
+
+def _duration(value: Any, default: int) -> int:
+    try:
+        v = int(value)
+    except (TypeError, ValueError):
+        return default
+    if v <= 0:
+        return 0  # permanent
+    return max(30, min(_MAX_PENALTY_SECONDS, v))
+
+
 def full_view(settings: ChatSettings) -> dict[str, Any]:
     """Everything the Mini App shows for a chat: core columns + JSONB sections."""
     cfg = get_config(settings)
@@ -105,6 +123,7 @@ def full_view(settings: ChatSettings) -> dict[str, Any]:
             "ai_mode": settings.ai_mode,
             "ai_threshold": settings.ai_threshold,
         },
+        "warns": cfg["warns"],
         "captcha": cfg["captcha"],
         "antiflood": cfg["antiflood"],
         "filters": cfg["filters"],
@@ -134,6 +153,13 @@ def apply_patch(settings: ChatSettings, patch: dict[str, Any]) -> dict[str, Any]
     if "ai_threshold" in core:
         settings.ai_threshold = _clamp(core["ai_threshold"], 0, 100, settings.ai_threshold)
 
+    if "warns" in patch:
+        w, cur = patch["warns"], cfg["warns"]
+        cfg["warns"] = {
+            "mute_seconds": _duration(w.get("mute_seconds"), cur["mute_seconds"]),
+            "ban_seconds": _duration(w.get("ban_seconds"), cur["ban_seconds"]),
+        }
+
     if "captcha" in patch:
         c, cur = patch["captcha"], cfg["captcha"]
         cfg["captcha"] = {
@@ -150,6 +176,7 @@ def apply_patch(settings: ChatSettings, patch: dict[str, Any]) -> dict[str, Any]
             "window": _clamp(a.get("window"), 2, 300, cur["window"]),
             "action": a["action"] if a.get("action") in _WARN_ACTIONS else cur["action"],
             "mute_seconds": _clamp(a.get("mute_seconds"), 30, 86400, cur["mute_seconds"]),
+            "ban_seconds": _duration(a.get("ban_seconds"), cur.get("ban_seconds", 0)),
         }
 
     if "filters" in patch:

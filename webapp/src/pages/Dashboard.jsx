@@ -1,7 +1,7 @@
 import { useNavigate, useParams } from 'react-router-dom'
 import {
   ShieldCheck, Gauge, Filter, Moon, BrainCircuit, Siren, AlertTriangle, UserCheck,
-  ChevronRight, ServerCrash,
+  ChevronRight, ServerCrash, Lock,
 } from 'lucide-react'
 import { useLang } from '../context/LangContext'
 import { useChatSettings } from '../context/ChatSettingsContext'
@@ -16,7 +16,7 @@ export function Dashboard() {
   const { t } = useLang()
   const { cid } = useParams()
   const navigate = useNavigate()
-  const { draft, error, reload, setSection } = useChatSettings()
+  const { draft, error, reload, setSection, pro, openUpgrade } = useChatSettings()
 
   if (error) {
     return (
@@ -41,7 +41,7 @@ export function Dashboard() {
       label: t('dash.protection'),
       items: [
         { key: 'captcha', icon: ShieldCheck, title: t('sec.captcha'), desc: t('sec.captcha.desc'), on: draft.captcha.enabled },
-        { key: 'raid', icon: Siren, title: t('sec.raid'), desc: t('sec.raid.desc'), on: draft.raid.enabled },
+        { key: 'raid', icon: Siren, title: t('sec.raid'), desc: t('sec.raid.desc'), on: draft.raid.enabled, pro: true },
         { key: 'warns', icon: AlertTriangle, title: t('sec.warns'), desc: t('sec.warns.desc'), on: true, state: `${draft.core.warn_limit} → ${t(`action.${draft.core.warn_action}`)}` },
       ],
     },
@@ -64,7 +64,7 @@ export function Dashboard() {
 
   return (
     <div className="content fade-in">
-      <ProBanner chatId={cid} />
+      <ProBanner />
 
       <Tips chatId={cid} />
 
@@ -75,23 +75,34 @@ export function Dashboard() {
         <div key={g.label}>
           <div className="section-label">{g.label}</div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.55rem' }}>
-            {g.items.map((it) => (
-              <button
-                key={it.key}
-                className="tile"
-                onClick={() => { haptic('light'); navigate(`/c/${cid}/s/${it.key}`) }}
-              >
-                <div className={`tile-icon ${it.on ? 'on' : ''}`}><it.icon size={20} /></div>
-                <div className="tile-body">
-                  <div className="tile-title">{it.title}</div>
-                  <div className="tile-desc">{it.desc}</div>
-                </div>
-                <span className={`tile-state ${it.on ? 'on' : ''}`}>
-                  {it.state ?? (it.on ? t('dash.enabled') : t('dash.disabled'))}
-                </span>
-                <ChevronRight size={16} className="tile-chevron" />
-              </button>
-            ))}
+            {g.items.map((it) => {
+              const locked = it.pro && !pro
+              return (
+                <button
+                  key={it.key}
+                  className="tile"
+                  onClick={() => {
+                    haptic('light')
+                    if (locked) openUpgrade()
+                    else navigate(`/c/${cid}/s/${it.key}`)
+                  }}
+                >
+                  <div className={`tile-icon ${!locked && it.on ? 'on' : ''}`}><it.icon size={20} /></div>
+                  <div className="tile-body">
+                    <div className="tile-title">{it.title}</div>
+                    <div className="tile-desc">{it.desc}</div>
+                  </div>
+                  {locked ? (
+                    <span className="badge badge-gold tile-pro"><Lock size={11} /> PRO</span>
+                  ) : (
+                    <span className={`tile-state ${it.on ? 'on' : ''}`}>
+                      {it.state ?? (it.on ? t('dash.enabled') : t('dash.disabled'))}
+                    </span>
+                  )}
+                  <ChevronRight size={16} className="tile-chevron" />
+                </button>
+              )
+            })}
           </div>
         </div>
       ))}

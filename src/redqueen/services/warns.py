@@ -2,12 +2,14 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from datetime import timedelta
 
 from aiogram import Bot
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from ..db import repo
-from . import moderation, trust
+from ..utils.duration import until_from_now
+from . import config, moderation, trust
 
 
 @dataclass
@@ -41,14 +43,19 @@ async def issue_warn(
         return WarnResult(count=count, limit=settings.warn_limit, triggered=False)
 
     action = settings.warn_action
+    durations = config.get_config(settings)["warns"]
     if action == "ban":
+        secs = durations.get("ban_seconds", 0)
+        until = until_from_now(timedelta(seconds=secs)) if secs else None
         await moderation.ban(bot, session, chat_id=chat_id, user_id=user_id, actor_id=None,
-                             reason="warn limit reached")
+                             until=until, reason="warn limit reached")
     elif action == "kick":
         await moderation.kick(bot, session, chat_id=chat_id, user_id=user_id, actor_id=None,
                               reason="warn limit reached")
     else:
+        secs = durations.get("mute_seconds", 3600)
+        until = until_from_now(timedelta(seconds=secs)) if secs else None
         await moderation.mute(bot, session, chat_id=chat_id, user_id=user_id, actor_id=None,
-                              reason="warn limit reached")
+                              until=until, reason="warn limit reached")
     await repo.reset_warns(session, chat_id, user_id)
     return WarnResult(count=count, limit=settings.warn_limit, triggered=True, action=action)

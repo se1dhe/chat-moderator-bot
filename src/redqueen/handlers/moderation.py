@@ -42,7 +42,7 @@ async def cmd_ban(
         return
     await moderation.ban(bot, session, chat_id=message.chat.id, user_id=target.user_id,
                          actor_id=message.from_user.id, reason=command.args)
-    await message.reply(t("BANNED", name=target.name))
+    await message.reply(t("BANNED", name=target.name, until=""))
 
 
 @router.message(Command("kick"), IsChatAdmin())
@@ -63,7 +63,8 @@ async def cmd_kick(
 
 @router.message(Command("mute"), IsChatAdmin())
 async def cmd_mute(
-    message: Message, command: CommandObject, bot: Bot, session: AsyncSession, t: Callable[..., str]
+    message: Message, command: CommandObject, bot: Bot, session: AsyncSession,
+    t: Callable[..., str], lang: str,
 ) -> None:
     target = resolve_target(message, command.args)
     if target is None:
@@ -78,7 +79,7 @@ async def cmd_mute(
     until = until_from_now(delta)
     await moderation.mute(bot, session, chat_id=message.chat.id, user_id=target.user_id,
                           actor_id=message.from_user.id, until=until)
-    await message.reply(t("MUTED", name=target.name, until=humanize(delta)))
+    await message.reply(t("MUTED", name=target.name, until=humanize(delta, lang)))
 
 
 @router.message(Command("unmute"), IsChatAdmin())

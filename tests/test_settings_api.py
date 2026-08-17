@@ -11,7 +11,7 @@ def _cs() -> ChatSettings:
 
 def test_full_view_shape():
     view = full_view(_cs())
-    assert set(view) == {"core", "captcha", "antiflood", "filters", "modes", "ai", "raid",
+    assert set(view) == {"core", "warns", "captcha", "antiflood", "filters", "modes", "ai", "raid",
                          "exempt_user_ids"}
     assert view["core"]["warn_limit"] == 3
     # raid never leaks the internal locked_until timestamp; only a boolean.
@@ -38,6 +38,19 @@ def test_apply_patch_ai_thresholds_filtered():
     cs = _cs()
     view = apply_patch(cs, {"ai": {"thresholds": {"scam": 150, "ok": 10, "bogus": 5}}})
     assert view["ai"]["thresholds"] == {"scam": 100}  # clamped; ok/bogus dropped
+
+
+def test_apply_patch_penalty_durations():
+    cs = _cs()
+    # 0/negative == permanent; positive values below 30s are floored to 30s.
+    view = apply_patch(cs, {"warns": {"mute_seconds": 7200, "ban_seconds": 0},
+                            "antiflood": {"ban_seconds": 5}})
+    assert view["warns"]["mute_seconds"] == 7200
+    assert view["warns"]["ban_seconds"] == 0        # permanent
+    assert view["antiflood"]["ban_seconds"] == 30   # floored
+    # Over-long durations are capped at 365 days.
+    view = apply_patch(cs, {"warns": {"ban_seconds": 999_999_999}})
+    assert view["warns"]["ban_seconds"] == 365 * 86400
 
 
 def test_apply_patch_banned_words_normalized():

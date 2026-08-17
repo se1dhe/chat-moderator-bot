@@ -1,22 +1,18 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { Crown, Sparkles } from 'lucide-react'
 import { useLang } from '../context/LangContext'
-import { api } from '../lib/api'
-import { openInvoice, haptic } from '../lib/telegram'
+import { useChatSettings } from '../context/ChatSettingsContext'
 
 const fmtDate = (iso) => (iso ? new Date(iso).toLocaleDateString() : '')
 
-export function ProBanner({ chatId }) {
+export function ProBanner() {
   const { t } = useLang()
-  const [billing, setBilling] = useState(null)
+  const { billing, pro, openUpgrade } = useChatSettings()
   const [busy, setBusy] = useState(false)
-
-  const load = () => api.billing(chatId).then(setBilling).catch(() => setBilling(null))
-  useEffect(() => { load() /* eslint-disable-next-line */ }, [chatId])
 
   if (!billing) return null
 
-  if (billing.pro) {
+  if (pro) {
     return (
       <div className="pro-banner pro-banner--active">
         <Crown size={20} />
@@ -31,17 +27,7 @@ export function ProBanner({ chatId }) {
 
   const upgrade = async () => {
     setBusy(true)
-    haptic('light')
-    try {
-      const { url } = await api.invoice(chatId)
-      const status = await openInvoice(url)
-      if (status === 'paid') {
-        haptic('success')
-        await load()
-      }
-    } finally {
-      setBusy(false)
-    }
+    try { await openUpgrade() } finally { setBusy(false) }
   }
 
   return (

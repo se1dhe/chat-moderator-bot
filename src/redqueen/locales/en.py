@@ -77,7 +77,7 @@ CHECKSETUP_OK = (
 CHECKSETUP_MISSING_RIGHTS = "⚠️ Missing rights: {missing}. Grant them, then run /checksetup again."
 
 # --- Moderation --------------------------------------------------------------
-BANNED = "\U0001F534 <b>{name}</b> has been terminated (banned)."
+BANNED = "\U0001F534 <b>{name}</b> has been terminated (banned){until}."
 KICKED = "\U0001F534 <b>{name}</b> has been removed."
 MUTED = "\U0001F507 <b>{name}</b> is silenced{until}."
 UNMUTED = "\U0001F509 <b>{name}</b> may speak again."

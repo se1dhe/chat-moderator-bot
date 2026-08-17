@@ -1,13 +1,18 @@
-import { X } from 'lucide-react'
+import { X, Lock } from 'lucide-react'
 import { haptic } from '../lib/telegram'
 
-export function Toggle({ checked, onChange }) {
+export function Toggle({ checked, onChange, disabled, onDisabledClick }) {
   return (
     <button
       type="button"
-      className={`toggle ${checked ? 'on' : ''}`}
-      onClick={() => { haptic('light'); onChange(!checked) }}
+      className={`toggle ${checked ? 'on' : ''} ${disabled ? 'is-disabled' : ''}`}
+      onClick={() => {
+        haptic('light')
+        if (disabled) { onDisabledClick?.(); return }
+        onChange(!checked)
+      }}
       aria-pressed={checked}
+      aria-disabled={disabled || undefined}
     />
   )
 }
@@ -29,16 +34,16 @@ export function SectionLabel({ children }) {
   return <div className="section-label">{children}</div>
 }
 
-export function Segmented({ options, value, onChange }) {
+export function Segmented({ options, value, onChange, onLocked }) {
   return (
     <div className="segmented">
       {options.map((o) => (
         <button
           key={o.value}
-          className={value === o.value ? 'active' : ''}
-          onClick={() => { haptic('light'); onChange(o.value) }}
+          className={`${value === o.value ? 'active' : ''} ${o.locked ? 'is-locked' : ''}`}
+          onClick={() => { haptic('light'); if (o.locked) { onLocked?.(o); return } onChange(o.value) }}
         >
-          {o.label}
+          {o.locked && <Lock size={11} style={{ marginRight: 3, verticalAlign: '-1px' }} />}{o.label}
         </button>
       ))}
     </div>

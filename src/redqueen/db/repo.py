@@ -236,6 +236,22 @@ async def record_member(
     await session.execute(stmt)
 
 
+async def set_member_state(
+    session: AsyncSession, chat_telegram_id: int, user_telegram_id: int,
+    *, state: str, muted_until: datetime | None = None,
+) -> None:
+    """Record a member's last moderation state so the Mini App can offer contextual
+    actions. No-op when the user isn't in the roster yet (never wrote a message)."""
+    await session.execute(
+        update(ChatMember)
+        .where(
+            ChatMember.chat_telegram_id == chat_telegram_id,
+            ChatMember.user_telegram_id == user_telegram_id,
+        )
+        .values(state=state, muted_until=muted_until)
+    )
+
+
 async def get_member(
     session: AsyncSession, chat_telegram_id: int, user_telegram_id: int
 ) -> ChatMember | None:

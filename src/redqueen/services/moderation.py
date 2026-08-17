@@ -37,13 +37,17 @@ _UNMUTED_PERMISSIONS = ChatPermissions(
 
 
 async def ban(
-    bot: Bot, session: AsyncSession, *, chat_id: int, user_id: int, actor_id: int, reason: str | None = None
+    bot: Bot, session: AsyncSession, *, chat_id: int, user_id: int, actor_id: int,
+    until: datetime | None = None, reason: str | None = None,
 ) -> None:
-    await bot.ban_chat_member(chat_id, user_id)
+    # A `until_date` in the past/near future or none == permanent ban (Telegram rule).
+    await bot.ban_chat_member(chat_id, user_id, until_date=until)
     await repo.log_action(
         session, chat_telegram_id=chat_id, user_telegram_id=user_id, actor_id=actor_id,
         action="ban", reason=reason,
+        meta={"until": until.isoformat()} if until else {},
     )
+    await repo.set_member_state(session, chat_id, user_id, state="banned")
     await trust.adjust(session, user_id, trust.BAN)
 
 
@@ -55,6 +59,7 @@ async def unban(
         session, chat_telegram_id=chat_id, user_telegram_id=user_id, actor_id=actor_id,
         action="unban",
     )
+    await repo.set_member_state(session, chat_id, user_id, state="active")
 
 
 async def kick(
@@ -67,6 +72,7 @@ async def kick(
         session, chat_telegram_id=chat_id, user_telegram_id=user_id, actor_id=actor_id,
         action="kick", reason=reason,
     )
+    await repo.set_member_state(session, chat_id, user_id, state="active")
     await trust.adjust(session, user_id, trust.KICK)
 
 
@@ -83,6 +89,7 @@ async def mute(
         meta={"until": until.isoformat()} if until else {},
     )
     if reason != "captcha_pending":  # procedural quarantine, not a behavioral penalty
+        await repo.set_member_state(session, chat_id, user_id, state="muted", muted_until=until)
         await trust.adjust(session, user_id, trust.MUTE)
 
 
@@ -94,3 +101,4 @@ async def unmute(
         session, chat_telegram_id=chat_id, user_telegram_id=user_id, actor_id=actor_id,
         action="unmute",
     )
+    await repo.set_member_state(session, chat_id, user_id, state="active", muted_until=None)

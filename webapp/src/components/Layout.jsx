@@ -1,21 +1,18 @@
 import { NavLink, Outlet, useNavigate, useParams } from 'react-router-dom'
-import { LayoutGrid, Users, ShieldAlert, ScrollText, BarChart3, ChevronLeft, Shield } from 'lucide-react'
+import { LayoutGrid, Users, ShieldAlert, ScrollText, BarChart3, ChevronLeft, Shield, Check, Loader2 } from 'lucide-react'
 import { useLang } from '../context/LangContext'
 import { ChatSettingsProvider, useChatSettings } from '../context/ChatSettingsContext'
 import { haptic } from '../lib/telegram'
 
-function SaveBar() {
-  const { dirty, saving, save, reset } = useChatSettings()
+// Tiny in-flow autosave hint (no fixed bar → no scroll repaint glitch).
+function SaveHint() {
+  const { saving } = useChatSettings()
   const { t } = useLang()
   return (
-    <div className={`savebar ${dirty ? 'show' : ''}`}>
-      <div style={{ display: 'flex', gap: '0.6rem' }}>
-        <button className="btn btn-ghost" onClick={reset} disabled={saving}>{t('common.cancel')}</button>
-        <button className="btn btn-primary btn-block" onClick={save} disabled={saving}>
-          {saving ? t('common.saving') : t('common.save')}
-        </button>
-      </div>
-    </div>
+    <span className={`save-hint ${saving ? 'is-saving' : ''}`}>
+      {saving ? <Loader2 size={13} className="spin" /> : <Check size={13} />}
+      {saving ? t('common.saving') : t('common.saved')}
+    </span>
   )
 }
 
@@ -38,6 +35,7 @@ function Header() {
         <div className="subtitle">{t('app.subtitle')}</div>
       </div>
       <div className="header-spacer" />
+      {section ? <SaveHint /> : null}
       <button className="lang-toggle" onClick={() => { haptic('light'); setLang(cycle[lang]) }}>{lang}</button>
     </header>
   )
@@ -73,7 +71,6 @@ export function Layout() {
         <Header />
         <Outlet />
         <Nav cid={cid} />
-        <SaveBar />
       </div>
     </ChatSettingsProvider>
   )

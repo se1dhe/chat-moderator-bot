@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
-import { BarChart3 } from 'lucide-react'
+import { BarChart3, Lock, Sparkles } from 'lucide-react'
 import { useLang } from '../context/LangContext'
+import { useChatSettings } from '../context/ChatSettingsContext'
 import { api } from '../lib/api'
 import { Spinner } from '../components/ui'
 
@@ -20,13 +21,32 @@ function last14(timeline) {
 export function Stats() {
   const { cid } = useParams()
   const { t } = useLang()
+  const { pro, billing, openUpgrade } = useChatSettings()
   const [data, setData] = useState(null)
 
   useEffect(() => {
+    if (!pro) return  // analytics is a Pro feature — don't fetch when locked
     let alive = true
     api.stats(cid).then((d) => alive && setData(d)).catch(() => alive && setData({ actions: {}, pending_quarantine: 0, timeline: {}, categories: {}, members: 0 }))
     return () => { alive = false }
-  }, [cid])
+  }, [cid, pro])
+
+  // Wait for billing to resolve, then gate: analytics requires Pro.
+  if (billing === null) return <div className="content"><Spinner /></div>
+  if (!pro) {
+    return (
+      <div className="content fade-in">
+        <div className="center-state">
+          <div className="lock-hero"><Lock size={40} /></div>
+          <h3>{t('stats.proTitle')}</h3>
+          <p>{t('stats.proPitch')}</p>
+          <button className="btn btn-primary" onClick={() => openUpgrade()}>
+            <Sparkles size={16} /> {t('pro.upgrade')}
+          </button>
+        </div>
+      </div>
+    )
+  }
 
   if (!data) return <div className="content"><Spinner /></div>
 

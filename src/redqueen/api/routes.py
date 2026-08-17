@@ -186,6 +186,8 @@ async def members_search(request: web.Request) -> web.Response:
         return web.json_response([{
             "user_id": r.user_telegram_id, "username": r.username, "full_name": r.full_name,
             "message_count": r.message_count,
+            "state": r.state,
+            "muted_until": r.muted_until.isoformat() if r.muted_until else None,
             "last_seen": r.last_seen.isoformat() if r.last_seen else None,
         } for r in rows])
 
@@ -223,8 +225,10 @@ async def member_action(request: web.Request) -> web.Response:
         notice = None
         try:
             if action == "ban":
-                await moderation.ban(bot, session, chat_id=cid, user_id=uid, actor_id=actor.id, reason=reason)
-                notice = _t(lang, "BANNED", name=name)
+                ban_delta = timedelta(minutes=int(minutes)) if minutes else None
+                await moderation.ban(bot, session, chat_id=cid, user_id=uid, actor_id=actor.id,
+                                     until=until_from_now(ban_delta), reason=reason)
+                notice = _t(lang, "BANNED", name=name, until=humanize(ban_delta, lang))
             elif action == "kick":
                 await moderation.kick(bot, session, chat_id=cid, user_id=uid, actor_id=actor.id, reason=reason)
                 notice = _t(lang, "KICKED", name=name)
@@ -238,7 +242,7 @@ async def member_action(request: web.Request) -> web.Response:
                 delta = timedelta(minutes=int(minutes)) if minutes else None
                 await moderation.mute(bot, session, chat_id=cid, user_id=uid, actor_id=actor.id,
                                       until=until_from_now(delta), reason=reason)
-                notice = _t(lang, "MUTED", name=name, until=humanize(delta))
+                notice = _t(lang, "MUTED", name=name, until=humanize(delta, lang))
             elif action == "warn":
                 result = await warns.issue_warn(bot, session, chat_id=cid, user_id=uid,
                                                 actor_id=actor.id, reason=reason)

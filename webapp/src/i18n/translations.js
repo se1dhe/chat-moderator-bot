@@ -39,6 +39,10 @@ export const EN = {
   'members.confirm': 'Apply "{action}" to {name}?',
   'members.done': 'Done: {action}',
   'members.failed': 'Action failed',
+  'members.duration': 'Duration',
+  'members.banned': 'banned',
+  'members.muted': 'muted',
+  'dur.1h': '1h', 'dur.8h': '8h', 'dur.1d': '1d', 'dur.7d': '7d', 'dur.perm': 'forever',
   'act.warn': 'Warn', 'act.mute': 'Mute', 'act.unmute': 'Unmute',
   'act.kick': 'Kick', 'act.ban': 'Ban', 'act.unban': 'Unban',
 
@@ -77,6 +81,7 @@ export const EN = {
   'antiflood.window': 'Per window',
   'antiflood.action': 'Action',
   'antiflood.muteSeconds': 'Mute duration',
+  'antiflood.banSeconds': 'Ban duration',
 
   'filters.words': 'Banned words',
   'filters.wordsPlaceholder': 'Add a word or phrase',
@@ -118,6 +123,8 @@ export const EN = {
 
   'warns.limit': 'Warnings before action',
   'warns.action': 'Action at limit',
+  'warns.muteDuration': 'Mute duration',
+  'warns.banDuration': 'Ban duration',
   'action.mute': 'Mute',
   'action.kick': 'Kick',
   'action.ban': 'Ban',
@@ -144,6 +151,8 @@ export const EN = {
   'stats.last14': 'Activity · last 14 days',
   'stats.categories': 'AI categories',
   'stats.empty': 'No data yet.',
+  'stats.proTitle': 'Analytics is a Pro feature',
+  'stats.proPitch': 'Unlock the 14-day timeline, AI category breakdown and member insights.',
 
   'tips.title': 'Recommendations',
   'tips.captcha': 'Turn on captcha — new members can post before verifying.',
@@ -165,6 +174,8 @@ export const EN = {
   'pro.opening': 'Opening payment…',
   'pro.thanks': 'Pro activated. Thank you!',
   'pro.locked': 'Pro feature',
+  'pro.raidNote': 'Raid shield is a Pro feature. Tap to unlock.',
+  'pro.autobanNote': 'AI auto-ban requires Pro. Quarantine mode is free.',
 }
 
 const RU = {
@@ -187,6 +198,8 @@ const RU = {
   'members.messages': '{n} сообщ.', 'members.reason': 'Причина (необязательно)',
   'members.confirm': 'Применить «{action}» к {name}?',
   'members.done': 'Готово: {action}', 'members.failed': 'Действие не удалось',
+  'members.duration': 'Срок', 'members.banned': 'забанен', 'members.muted': 'в мьюте',
+  'dur.1h': '1ч', 'dur.8h': '8ч', 'dur.1d': '1д', 'dur.7d': '7д', 'dur.perm': 'навсегда',
   'act.warn': 'Пред', 'act.mute': 'Мьют', 'act.unmute': 'Снять мьют',
   'act.kick': 'Кик', 'act.ban': 'Бан', 'act.unban': 'Разбан',
 
@@ -208,6 +221,7 @@ const RU = {
 
   'antiflood.enabled': 'Включить антифлуд', 'antiflood.limit': 'Сообщений',
   'antiflood.window': 'За период', 'antiflood.action': 'Действие', 'antiflood.muteSeconds': 'Длительность мьюта',
+  'antiflood.banSeconds': 'Длительность бана',
 
   'filters.words': 'Запрещённые слова', 'filters.wordsPlaceholder': 'Добавить слово или фразу',
   'filters.links': 'Блокировать ссылки', 'filters.forwards': 'Блокировать пересылки',
@@ -227,6 +241,7 @@ const RU = {
   'raid.lock': 'Длительность лока', 'raid.locked': 'Чат сейчас заблокирован', 'raid.unlock': 'Разблокировать',
 
   'warns.limit': 'Предупреждений до действия', 'warns.action': 'Действие при лимите',
+  'warns.muteDuration': 'Длительность мьюта', 'warns.banDuration': 'Длительность бана',
   'action.mute': 'Мьют', 'action.kick': 'Кик', 'action.ban': 'Бан',
 
   'exempt.empty': 'Исключений нет', 'exempt.add': 'Добавить ID пользователя',
@@ -241,6 +256,8 @@ const RU = {
   'stats.total': 'Всего действий', 'stats.members': 'Участники',
   'stats.last14': 'Активность · 14 дней', 'stats.categories': 'AI-категории',
   'stats.empty': 'Данных пока нет.',
+  'stats.proTitle': 'Аналитика — функция Pro',
+  'stats.proPitch': 'Открой график за 14 дней, разбивку по AI-категориям и данные по участникам.',
 
   'tips.title': 'Рекомендации',
   'tips.captcha': 'Включите капчу — новички могут писать до проверки.',
@@ -257,6 +274,8 @@ const RU = {
   'pro.pitch': 'AI авто-бан · Raid shield · Расширенная аналитика',
   'pro.price': '{stars} ⭐ / {days} дней', 'pro.opening': 'Открываю оплату…',
   'pro.thanks': 'Pro активирован. Спасибо!', 'pro.locked': 'Функция Pro',
+  'pro.raidNote': 'Raid shield — функция Pro. Нажмите, чтобы разблокировать.',
+  'pro.autobanNote': 'AI авто-бан доступен в Pro. Режим карантина — бесплатно.',
 }
 
 const UK = {
@@ -279,6 +298,8 @@ const UK = {
   'members.messages': '{n} повід.', 'members.reason': 'Причина (необовʼязково)',
   'members.confirm': 'Застосувати «{action}» до {name}?',
   'members.done': 'Готово: {action}', 'members.failed': 'Дію не виконано',
+  'members.duration': 'Строк', 'members.banned': 'забанено', 'members.muted': 'у мʼюті',
+  'dur.1h': '1г', 'dur.8h': '8г', 'dur.1d': '1д', 'dur.7d': '7д', 'dur.perm': 'назавжди',
   'act.warn': 'Попер', 'act.mute': 'Мʼют', 'act.unmute': 'Зняти мʼют',
   'act.kick': 'Кік', 'act.ban': 'Бан', 'act.unban': 'Розбан',
 
@@ -300,6 +321,7 @@ const UK = {
 
   'antiflood.enabled': 'Увімкнути антифлуд', 'antiflood.limit': 'Повідомлень',
   'antiflood.window': 'За період', 'antiflood.action': 'Дія', 'antiflood.muteSeconds': 'Тривалість мʼюту',
+  'antiflood.banSeconds': 'Тривалість бану',
 
   'filters.words': 'Заборонені слова', 'filters.wordsPlaceholder': 'Додати слово або фразу',
   'filters.links': 'Блокувати посилання', 'filters.forwards': 'Блокувати пересилання',
@@ -319,6 +341,7 @@ const UK = {
   'raid.lock': 'Тривалість локу', 'raid.locked': 'Чат зараз заблоковано', 'raid.unlock': 'Розблокувати',
 
   'warns.limit': 'Попереджень до дії', 'warns.action': 'Дія при ліміті',
+  'warns.muteDuration': 'Тривалість мʼюту', 'warns.banDuration': 'Тривалість бану',
   'action.mute': 'Мʼют', 'action.kick': 'Кік', 'action.ban': 'Бан',
 
   'exempt.empty': 'Винятків немає', 'exempt.add': 'Додати ID користувача',
@@ -333,6 +356,8 @@ const UK = {
   'stats.total': 'Всього дій', 'stats.members': 'Учасники',
   'stats.last14': 'Активність · 14 днів', 'stats.categories': 'AI-категорії',
   'stats.empty': 'Даних поки немає.',
+  'stats.proTitle': 'Аналітика — функція Pro',
+  'stats.proPitch': 'Відкрий графік за 14 днів, розбивку за AI-категоріями та дані про учасників.',
 
   'tips.title': 'Рекомендації',
   'tips.captcha': 'Увімкніть капчу — новачки можуть писати до перевірки.',
@@ -349,6 +374,8 @@ const UK = {
   'pro.pitch': 'AI авто-бан · Raid shield · Розширена аналітика',
   'pro.price': '{stars} ⭐ / {days} днів', 'pro.opening': 'Відкриваю оплату…',
   'pro.thanks': 'Pro активовано. Дякуємо!', 'pro.locked': 'Функція Pro',
+  'pro.raidNote': 'Raid shield — функція Pro. Натисніть, щоб розблокувати.',
+  'pro.autobanNote': 'AI авто-бан доступний у Pro. Режим карантину — безкоштовно.',
 }
 
 export const LOCALES = { en: EN, ru: { ...EN, ...RU }, uk: { ...EN, ...UK } }

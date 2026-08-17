@@ -24,6 +24,26 @@ def test_humanize():
     assert humanize(None) == ""
 
 
+def test_humanize_english_plural():
+    assert humanize(timedelta(hours=1)) == " for 1 hour"
+    assert humanize(timedelta(hours=2)) == " for 2 hours"
+
+
+def test_humanize_localized():
+    # Russian: one/few/many forms after "на".
+    assert humanize(timedelta(hours=1), "ru") == " на 1 час"
+    assert humanize(timedelta(hours=2), "ru") == " на 2 часа"
+    assert humanize(timedelta(hours=5), "ru") == " на 5 часов"
+    assert humanize(timedelta(minutes=21), "ru") == " на 21 минуту"  # ..1 but not 11 → one
+    # Ukrainian.
+    assert humanize(timedelta(hours=1), "uk") == " на 1 годину"
+    assert humanize(timedelta(hours=3), "uk") == " на 3 години"
+    assert humanize(timedelta(hours=11), "uk") == " на 11 годин"
+    # Unknown language falls back to English; permanent stays empty.
+    assert humanize(timedelta(minutes=5), "de") == " for 5 minutes"
+    assert humanize(None, "ru") == ""
+
+
 def test_target_from_arg():
     assert target_from_arg("12345").user_id == 12345
     assert target_from_arg("@12345").user_id == 12345

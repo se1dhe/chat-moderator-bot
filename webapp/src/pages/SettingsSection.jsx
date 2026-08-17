@@ -82,6 +82,15 @@ function Antiflood({ s, t }) {
           { value: 'kick', label: t('action.kick') },
           { value: 'ban', label: t('action.ban') },
         ]} />
+      {a.action === 'ban' && (
+        <div className="card" style={{ marginTop: '0.75rem' }}>
+          <Row title={t('antiflood.banSeconds')}
+            value={mins(a.ban_seconds) <= 0 ? t('dur.perm') : `${mins(a.ban_seconds)} ${t('common.minutes')}`}>
+            <Stepper value={mins(a.ban_seconds)} min={0} max={7 * 1440} step={60}
+              onChange={(v) => s.updateSection('antiflood', { ban_seconds: v * 60 })} />
+          </Row>
+        </div>
+      )}
     </>
   )
 }
@@ -166,11 +175,13 @@ function AI({ s, t }) {
     <>
       <div className="section-label">{t('ai.mode')}</div>
       <Segmented value={core.ai_mode} onChange={(v) => s.updateSection('core', { ai_mode: v })}
+        onLocked={() => s.openUpgrade()}
         options={[
           { value: 'off', label: t('ai.mode.off') },
           { value: 'quarantine', label: t('ai.mode.quarantine') },
-          { value: 'autoban', label: t('ai.mode.autoban') },
+          { value: 'autoban', label: t('ai.mode.autoban'), locked: !s.pro },
         ]} />
+      {!s.pro && <div className="row-desc" style={{ margin: '0.5rem 0.2rem 0' }}>{t('pro.autobanNote')}</div>}
 
       <div className="section-label">{t('ai.threshold')} · {core.ai_threshold}%</div>
       <div className="card card-pad">
@@ -209,8 +220,16 @@ function AI({ s, t }) {
 
 function Raid({ s, t }) {
   const r = s.draft.raid
+  const locked = !s.pro
   return (
     <>
+      {locked && (
+        <button className="pro-note" onClick={() => s.openUpgrade()}>
+          <Lock size={14} />
+          <span>{t('pro.raidNote')}</span>
+          <span className="badge badge-gold">PRO</span>
+        </button>
+      )}
       {r.locked && (
         <div className="card card-pad" style={{ display: 'flex', alignItems: 'center', gap: '0.7rem' }}>
           <span className="badge badge-danger"><Lock size={12} /> {t('raid.locked')}</span>
@@ -223,7 +242,8 @@ function Raid({ s, t }) {
       <div className="section-label">{t('sec.raid')}</div>
       <div className="card">
         <Row title={t('raid.enabled')}>
-          <Toggle checked={r.enabled} onChange={(v) => s.updateSection('raid', { enabled: v })} />
+          <Toggle checked={r.enabled && !locked} disabled={locked} onDisabledClick={() => s.openUpgrade()}
+            onChange={(v) => s.updateSection('raid', { enabled: v })} />
         </Row>
         <Row title={t('raid.threshold')} value={r.join_threshold}>
           <Stepper value={r.join_threshold} min={2} max={100} onChange={(v) => s.updateSection('raid', { join_threshold: v })} />
@@ -239,8 +259,14 @@ function Raid({ s, t }) {
   )
 }
 
+// Penalty-duration steppers use minutes; 0 == permanent. Cap at 7 days for the UI.
+const DAY_MIN = 1440
+
 function Warns({ s, t }) {
   const core = s.draft.core
+  const w = s.draft.warns
+  const muteMin = mins(w.mute_seconds)
+  const banMin = mins(w.ban_seconds)
   return (
     <>
       <div className="section-label">{t('sec.warns')}</div>
@@ -256,6 +282,23 @@ function Warns({ s, t }) {
           { value: 'kick', label: t('action.kick') },
           { value: 'ban', label: t('action.ban') },
         ]} />
+
+      {core.warn_action === 'mute' && (
+        <div className="card" style={{ marginTop: '0.75rem' }}>
+          <Row title={t('warns.muteDuration')} value={muteMin <= 0 ? t('dur.perm') : `${muteMin} ${t('common.minutes')}`}>
+            <Stepper value={muteMin} min={0} max={7 * DAY_MIN} step={30}
+              onChange={(v) => s.updateSection('warns', { mute_seconds: v * 60 })} />
+          </Row>
+        </div>
+      )}
+      {core.warn_action === 'ban' && (
+        <div className="card" style={{ marginTop: '0.75rem' }}>
+          <Row title={t('warns.banDuration')} value={banMin <= 0 ? t('dur.perm') : `${banMin} ${t('common.minutes')}`}>
+            <Stepper value={banMin} min={0} max={7 * DAY_MIN} step={60}
+              onChange={(v) => s.updateSection('warns', { ban_seconds: v * 60 })} />
+          </Row>
+        </div>
+      )}
     </>
   )
 }

@@ -30,7 +30,8 @@ def test_get_config_does_not_mutate_defaults_between_calls():
 def test_save_section_persists_and_keeps_sibling_defaults():
     cs = ChatSettings(data={})
     section = save_section(cs, "antiflood", {"enabled": True, "limit": 10})
-    assert section == {"enabled": True, "limit": 10, "window": 10, "action": "mute", "mute_seconds": 600}
+    assert section == {"enabled": True, "limit": 10, "window": 10, "action": "mute",
+                       "mute_seconds": 600, "ban_seconds": 0}
     assert cs.data["antiflood"]["enabled"] is True
 
 
