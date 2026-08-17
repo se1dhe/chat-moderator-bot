@@ -10,13 +10,14 @@ from aiogram.filters.callback_data import CallbackData
 from aiogram.filters.chat_member_updated import JOIN_TRANSITION, ChatMemberUpdatedFilter
 from aiogram.types import CallbackQuery, ChatJoinRequest, ChatMemberUpdated, Message
 from aiogram.utils.keyboard import InlineKeyboardBuilder
+from redis.asyncio import Redis
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from ..db import repo
 from ..db.models import CaptchaSession
 from ..filters import IsChatAdmin
-from ..services import captcha, moderation, trust
+from ..services import captcha, moderation, roles, trust
 from ..services.config import get_config, save_section
 
 router = Router(name="captcha")
@@ -48,7 +49,7 @@ def _prompt_text(challenge: captcha.Challenge, *, name: str, minutes: int, t: Ca
 
 @router.chat_member(ChatMemberUpdatedFilter(JOIN_TRANSITION))
 async def on_member_join(
-    event: ChatMemberUpdated, bot: Bot, session: AsyncSession, t: Callable[..., str]
+    event: ChatMemberUpdated, bot: Bot, session: AsyncSession, redis: Redis, t: Callable[..., str]
 ) -> None:
     # Raises SkipHandler (instead of returning) even when captcha isn't applicable so
     # the raid-shield router — registered after this one — still sees every join.
@@ -58,6 +59,10 @@ async def on_member_join(
     settings = await repo.get_settings(session, event.chat.id)
     cfg = get_config(settings)["captcha"]
     if not cfg["enabled"]:
+        raise SkipHandler
+
+    # Never gate admins or explicitly exempt members.
+    if await roles.is_exempt(bot, redis, chat_id=event.chat.id, user_id=user.id, settings=settings):
         raise SkipHandler
 
     # Cross-chat reputation: a member the Hive already trusts skips the gate.
