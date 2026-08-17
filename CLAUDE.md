@@ -117,8 +117,13 @@ ai_autoban · raid_shield · analytics — enforced at runtime; core moderation 
 The TMA shows a Pro banner + Stars upgrade via `openInvoice` (`/api/chats/{id}/billing`
 [+ `/invoice`]). Alembic revisions: initial, `CaptchaSession`, `RaidEvent`,
 `ai_verdicts.text`, `payments`.
-**Next: M5** — multimodal anti-scam (vision/voice), full adaptive trust, cross-chat
-reputation, clone-bots / white-label. See PROJECT_PLAN §12.
+**M5 in progress — multimodal anti-scam (Pro).** Image scanning is wired: the AI
+provider gains `classify_image` (Ollama vision via `OLLAMA_VISION_MODEL`, e.g.
+`qwen2.5vl:7b`; empty → caption-only fallback), `ai_review.scan_photo` runs the same
+explainable-quarantine flow on photos (Pro-gated), and `ensure_model` auto-pulls the
+vision model too. Verdicts reuse the `AIVerdict` table + quarantine card/queue.
+**Remaining M5:** voice/GIF/document analysis, full adaptive-trust enforcement,
+cross-chat reputation, clone-bots / white-label. See PROJECT_PLAN §12.
 
 ## Notes
 

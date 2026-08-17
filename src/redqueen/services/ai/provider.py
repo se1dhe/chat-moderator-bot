@@ -29,6 +29,15 @@ class AIProvider(ABC):
     ) -> Verdict:
         ...
 
+    async def classify_image(
+        self, image: bytes, *, caption: str | None = None, lang: str | None = None
+    ) -> Verdict:
+        """Classify an image (scam poster, NSFW, phishing screenshot). Providers without
+        vision may fall back to inspecting the caption. Default: analyze the caption only."""
+        if caption:
+            return await self.classify_text(caption, lang=lang)
+        return Verdict("ok", 50, "No vision analysis available")
+
     async def health(self) -> bool:
         """Whether the provider is reachable/usable right now."""
         return True

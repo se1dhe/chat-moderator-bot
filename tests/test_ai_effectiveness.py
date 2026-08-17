@@ -59,3 +59,25 @@ async def test_rules_detect_russian_toxicity():
 async def test_rules_pass_clean_ukrainian():
     v = await RuleProvider().classify_text("доброго ранку, як справи?")
     assert not v.is_violation
+
+
+@pytest.mark.asyncio
+async def test_classify_image_uses_caption_when_no_vision():
+    # No vision model → the caption is judged by the text rules.
+    v = await RuleProvider().classify_image(b"\x89PNG...", caption="free crypto giveaway t.me/x")
+    assert v.category in {"scam", "spam"}
+
+
+@pytest.mark.asyncio
+async def test_classify_image_without_caption_is_ok_offline():
+    v = await RuleProvider().classify_image(b"\x89PNG...", caption=None)
+    assert not v.is_violation
+
+
+@pytest.mark.asyncio
+async def test_ollama_image_falls_back_without_vision_model():
+    from redqueen.services.ai.ollama import OllamaProvider
+    prov = OllamaProvider("http://localhost:1", "qwen3:4b", RuleProvider(), vision_model="")
+    v = await prov.classify_image(b"img", caption="ты идиот")  # no network: vision disabled
+    assert v.category == "toxicity"
+    await prov.close()

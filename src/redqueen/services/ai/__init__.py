@@ -17,5 +17,6 @@ def build_provider(settings: Settings) -> AIProvider:
             base_url=settings.ollama_url,
             model=settings.ollama_model,
             fallback=RuleProvider(),
+            vision_model=settings.ollama_vision_model,
         )
     return RuleProvider()

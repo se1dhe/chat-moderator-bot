@@ -73,15 +73,20 @@ async def scan_message(
             verdict = await ai_provider.classify_text(text, context=context, lang=lang)
         await ai_cache.put(redis, message.chat.id, text, verdict)
 
+    await _act_on_verdict(message, bot, session, settings, verdict, t, flagged_text=text)
+
+
+async def _act_on_verdict(message, bot, session, settings, verdict, t, *, flagged_text) -> None:
+    """Shared tail for text & image scans: threshold check → quarantine card / autoban."""
     if not verdict.is_violation:
         raise SkipHandler
 
+    ai_cfg = get_config(settings)["ai"]
     # Per-category threshold (falls back to the chat default), then nudged by the
     # author's trust score: suspicious members are flagged more readily.
     base = ai_cfg["thresholds"].get(verdict.category, settings.ai_threshold)
     score_now = await trust.get_score(session, message.from_user.id)
-    threshold = trust.effective_threshold(base, score_now)
-    if verdict.score < threshold:
+    if verdict.score < trust.effective_threshold(base, score_now):
         raise SkipHandler
 
     row = AIVerdict(
@@ -91,7 +96,7 @@ async def scan_message(
         category=verdict.category,
         score=verdict.score,
         explanation=verdict.explanation,
-        text=message.text,
+        text=flagged_text,
         status="pending",
     )
     session.add(row)
@@ -111,7 +116,6 @@ async def scan_message(
             log.warning("autoban failed: %s", exc)
         return
 
-    # quarantine: hold the message for admin decision
     card = t(
         "AI_QUARANTINE_CARD",
         name=message.from_user.full_name,
@@ -120,6 +124,35 @@ async def scan_message(
         reason=verdict.explanation,
     )
     await message.reply(card, reply_markup=_decision_kb(row.id, t).as_markup())
+
+
+@router.message(F.chat.type.in_({"group", "supergroup"}) & F.photo)
+async def scan_photo(
+    message: Message, bot: Bot, session: AsyncSession, redis: Redis, ai_provider: AIProvider,
+    ai_semaphore: asyncio.Semaphore, t: Callable[..., str], lang: str,
+) -> None:
+    settings = await repo.get_settings(session, message.chat.id)
+    if settings.ai_mode == "off" or message.from_user is None or message.from_user.is_bot:
+        raise SkipHandler
+    # Multimodal anti-scam (image analysis) is a Pro capability.
+    if not await billing.is_pro(session, message.chat.id):
+        raise SkipHandler
+
+    ai_cfg = get_config(settings)["ai"]
+    if not await ai_budget.allow(redis, chat_id=message.chat.id, limit=ai_cfg["max_per_minute"]):
+        raise SkipHandler
+
+    try:
+        buf = await bot.download(message.photo[-1])  # largest size
+        image = buf.read()
+    except Exception as exc:
+        log.warning("photo download failed: %s", exc)
+        raise SkipHandler from exc
+
+    async with ai_semaphore:
+        verdict = await ai_provider.classify_image(image, caption=message.caption, lang=lang)
+
+    await _act_on_verdict(message, bot, session, settings, verdict, t, flagged_text=message.caption)
 
 
 @router.callback_query(ReviewCB.filter())

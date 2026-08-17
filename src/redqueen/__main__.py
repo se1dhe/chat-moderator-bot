@@ -54,6 +54,7 @@ async def run() -> None:
     dp["bot_username"] = me.username
     log.info("Authorized as @%s", me.username)
     await _setup_menu_button(bot, settings)
+    await _setup_commands(bot)
 
     background = [asyncio.create_task(_captcha_sweeper(bot))]
 
@@ -100,6 +101,69 @@ async def _setup_menu_button(bot, settings) -> None:
         log.info("Menu button wired to Mini App at %s", settings.webapp_url)
     except Exception as exc:  # noqa: BLE001
         log.warning("Could not set menu button: %s", exc)
+
+
+# The "/" command menu, in the RedQueen voice — registered for every UI language so no
+# manual BotFather /setcommands is needed.
+_COMMANDS = {
+    "en": [
+        ("panel", "Open the control console"),
+        ("settings", "This chat's defense protocols"),
+        ("help", "List all protocols"),
+        ("ban", "Terminate a member"),
+        ("kick", "Remove a member"),
+        ("mute", "Silence a member"),
+        ("warn", "Issue a warning"),
+        ("purge", "Purge messages"),
+        ("trust", "Inspect a member's trust score"),
+        ("pro", "Unlock RedQueen Pro"),
+        ("subscription", "Subscription status"),
+        ("checksetup", "Verify my clearance"),
+    ],
+    "ru": [
+        ("panel", "Открыть консоль управления"),
+        ("settings", "Протоколы защиты чата"),
+        ("help", "Все протоколы"),
+        ("ban", "Ликвидировать участника"),
+        ("kick", "Удалить участника"),
+        ("mute", "Заглушить участника"),
+        ("warn", "Вынести предупреждение"),
+        ("purge", "Очистить сообщения"),
+        ("trust", "Уровень доверия участника"),
+        ("pro", "Подключить RedQueen Pro"),
+        ("subscription", "Статус подписки"),
+        ("checksetup", "Проверить мои права"),
+    ],
+    "uk": [
+        ("panel", "Відкрити консоль керування"),
+        ("settings", "Протоколи захисту чату"),
+        ("help", "Усі протоколи"),
+        ("ban", "Ліквідувати учасника"),
+        ("kick", "Видалити учасника"),
+        ("mute", "Заглушити учасника"),
+        ("warn", "Винести попередження"),
+        ("purge", "Очистити повідомлення"),
+        ("trust", "Рівень довіри учасника"),
+        ("pro", "Підключити RedQueen Pro"),
+        ("subscription", "Статус підписки"),
+        ("checksetup", "Перевірити мої права"),
+    ],
+}
+
+
+async def _setup_commands(bot) -> None:
+    from aiogram.types import BotCommand
+    try:
+        # English is the default (no language_code); RU/UK are localized overlays.
+        for lang, items in _COMMANDS.items():
+            cmds = [BotCommand(command=c, description=d) for c, d in items]
+            if lang == "en":
+                await bot.set_my_commands(cmds)
+            else:
+                await bot.set_my_commands(cmds, language_code=lang)
+        log.info("Bot command menu registered (en/ru/uk)")
+    except Exception as exc:  # noqa: BLE001
+        log.warning("Could not set commands: %s", exc)
 
 
 async def _serve_api(app: web.Application, settings) -> web.AppRunner:

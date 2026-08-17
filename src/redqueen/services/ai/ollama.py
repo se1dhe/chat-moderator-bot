@@ -6,6 +6,7 @@ moderation never hard-depends on the model being up.
 """
 from __future__ import annotations
 
+import base64
 import json
 import logging
 
@@ -14,6 +15,16 @@ import aiohttp
 from .provider import CATEGORIES, AIProvider, Verdict
 
 log = logging.getLogger(__name__)
+
+_VISION_PROMPT = (
+    "You are RedQueen, a chat-moderation classifier inspecting an IMAGE shared in a "
+    "community. Classify it into exactly one category: ok, spam, scam, toxicity, nsfw, "
+    "flood. Focus on: crypto/giveaway/investment scam posters, phishing screenshots, "
+    "QR-code lures, sexual/explicit (nsfw) content, gore/hate imagery (toxicity). "
+    "Read any text in the image, across languages. Reserve scores above 85 for clear "
+    "violations. Return ONLY compact JSON: {\"category\": string, \"score\": integer "
+    "0-100, \"explanation\": short reason <= 20 words}. No prose."
+)
 
 _SYSTEM_PROMPT = (
     "You are RedQueen, a precise chat-moderation classifier for a multilingual "
@@ -48,9 +59,12 @@ _FEWSHOT = [
 class OllamaProvider(AIProvider):
     name = "ollama"
 
-    def __init__(self, base_url: str, model: str, fallback: AIProvider) -> None:
+    def __init__(
+        self, base_url: str, model: str, fallback: AIProvider, vision_model: str = ""
+    ) -> None:
         self.base_url = base_url.rstrip("/")
         self.model = model
+        self.vision_model = vision_model
         self.fallback = fallback
         self._session: aiohttp.ClientSession | None = None
 
@@ -68,8 +82,9 @@ class OllamaProvider(AIProvider):
             log.warning("Ollama health check failed: %s", exc)
             return False
 
-    async def model_available(self) -> bool:
-        """Whether `self.model` is already downloaded on the Ollama host."""
+    async def model_available(self, model: str | None = None) -> bool:
+        """Whether `model` (default the text model) is downloaded on the Ollama host."""
+        target = model or self.model
         try:
             client = await self._client()
             async with client.get(f"{self.base_url}/api/tags", timeout=10) as resp:
@@ -79,43 +94,47 @@ class OllamaProvider(AIProvider):
         except Exception:  # noqa: BLE001
             return False
         names = {m.get("name", "") for m in data.get("models", [])}
-        return self.model in names or f"{self.model}:latest" in names
+        return target in names or f"{target}:latest" in names
+
+    async def _pull(self, model: str) -> bool:
+        if await self.model_available(model):
+            log.info("Ollama model %s already present", model)
+            return True
+        log.info("Pulling Ollama model %s (this can take a while)…", model)
+        client = await self._client()
+        timeout = aiohttp.ClientTimeout(total=None, sock_read=None)
+        async with client.post(
+            f"{self.base_url}/api/pull", json={"model": model, "stream": True}, timeout=timeout,
+        ) as resp:
+            resp.raise_for_status()
+            last_status = None
+            async for raw in resp.content:
+                line = raw.strip()
+                if not line:
+                    continue
+                try:
+                    msg = json.loads(line)
+                except json.JSONDecodeError:
+                    continue
+                if msg.get("error"):
+                    log.error("Ollama pull failed for %s: %s — check the model is a valid "
+                              "tag in the Ollama library", model, msg["error"])
+                    return False
+                status = msg.get("status")
+                if status and status != last_status:
+                    log.info("Ollama pull [%s]: %s", model, status)
+                    last_status = status
+        ok = await self.model_available(model)
+        log.info("Ollama model %s ready: %s", model, ok)
+        return ok
 
     async def ensure_model(self) -> bool:
-        """Pull `self.model` if it isn't present yet. Safe to call at startup; streams
-        progress to the log. Returns True once the model is available."""
+        """Pull the text model (and the vision model if configured) when missing.
+        Safe to call at startup; degrades to the rule fallback on any failure."""
         try:
-            if await self.model_available():
-                log.info("Ollama model %s already present", self.model)
-                return True
-            log.info("Pulling Ollama model %s (this can take a while)…", self.model)
-            client = await self._client()
-            timeout = aiohttp.ClientTimeout(total=None, sock_read=None)
-            async with client.post(
-                f"{self.base_url}/api/pull",
-                json={"model": self.model, "stream": True},
-                timeout=timeout,
-            ) as resp:
-                resp.raise_for_status()
-                last_status = None
-                async for raw in resp.content:
-                    line = raw.strip()
-                    if not line:
-                        continue
-                    try:
-                        msg = json.loads(line)
-                    except json.JSONDecodeError:
-                        continue
-                    if msg.get("error"):
-                        log.error("Ollama pull failed for %s: %s — check OLLAMA_MODEL is a "
-                                  "valid tag in the Ollama library", self.model, msg["error"])
-                        return False
-                    status = msg.get("status")
-                    if status and status != last_status:
-                        log.info("Ollama pull [%s]: %s", self.model, status)
-                        last_status = status
-            ok = await self.model_available()
-            log.info("Ollama model %s ready: %s", self.model, ok)
+            ok = await self._pull(self.model)
+            if self.vision_model:
+                await self._pull(self.vision_model)
             return ok
         except Exception as exc:  # noqa: BLE001
             log.warning("Ollama ensure_model failed (%s); AI stays on the rule fallback "
@@ -157,6 +176,35 @@ class OllamaProvider(AIProvider):
         except Exception as exc:  # noqa: BLE001
             log.warning("Ollama classify failed, using fallback: %s", exc)
             return await self.fallback.classify_text(text, context=context, lang=lang)
+
+    async def classify_image(
+        self, image: bytes, *, caption: str | None = None, lang: str | None = None
+    ) -> Verdict:
+        if not self.vision_model:
+            return await self.fallback.classify_image(image, caption=caption, lang=lang)
+        user = f"Chat language: {lang}. " if lang else ""
+        user += f'Caption: "{caption[:500]}"' if caption else "No caption."
+        payload = {
+            "model": self.vision_model,
+            "format": "json",
+            "stream": False,
+            "options": {"temperature": 0},
+            "messages": [
+                {"role": "system", "content": _VISION_PROMPT},
+                {"role": "user", "content": user, "images": [base64.b64encode(image).decode()]},
+            ],
+        }
+        try:
+            client = await self._client()
+            async with client.post(
+                f"{self.base_url}/api/chat", json=payload, timeout=60
+            ) as resp:
+                resp.raise_for_status()
+                data = await resp.json()
+            return self._to_verdict(json.loads(data["message"]["content"]))
+        except Exception as exc:  # noqa: BLE001
+            log.warning("Ollama vision classify failed, using fallback: %s", exc)
+            return await self.fallback.classify_image(image, caption=caption, lang=lang)
 
     @staticmethod
     def _to_verdict(parsed: dict) -> Verdict:
