@@ -5,6 +5,7 @@ from collections.abc import Awaitable, Callable
 from typing import Any
 
 from aiogram import BaseMiddleware
+from aiogram.dispatcher.event.bases import SkipHandler
 from aiogram.types import TelegramObject
 from sqlalchemy.ext.asyncio import async_sessionmaker
 
@@ -25,6 +26,12 @@ class DbSessionMiddleware(BaseMiddleware):
                 result = await handler(event, data)
                 await session.commit()
                 return result
+            except SkipHandler:
+                # SkipHandler is control flow, not an error: the handler did its work and
+                # is deferring to the next router (e.g. captcha → raid on the same join).
+                # Persist those writes, then let propagation continue.
+                await session.commit()
+                raise
             except Exception:
                 await session.rollback()
                 raise
