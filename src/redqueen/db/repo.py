@@ -8,11 +8,12 @@ from sqlalchemy.dialects.postgresql import insert as pg_insert
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
-from .models import AIVerdict, Chat, ChatMember, ChatSettings, ModAction, User, Warn
+from .models import AIVerdict, BotInstance, Chat, ChatMember, ChatSettings, ModAction, User, Warn
 
 
 async def get_or_create_chat(
-    session: AsyncSession, telegram_id: int, *, type_: str = "group", title: str | None = None
+    session: AsyncSession, telegram_id: int, *, type_: str = "group", title: str | None = None,
+    bot_id: int | None = None,
 ) -> Chat:
     # Eager-load settings: async sessions cannot lazy-load a relationship on access,
     # so a pre-existing chat's `.settings` must be fetched up front.
@@ -20,13 +21,32 @@ async def get_or_create_chat(
         select(Chat).where(Chat.telegram_id == telegram_id).options(selectinload(Chat.settings))
     )
     if chat is None:
-        chat = Chat(telegram_id=telegram_id, type=type_, title=title)
+        chat = Chat(telegram_id=telegram_id, type=type_, title=title, bot_id=bot_id)
         chat.settings = ChatSettings()
         session.add(chat)
         await session.flush()
-    elif title and chat.title != title:
-        chat.title = title
+    else:
+        if title and chat.title != title:
+            chat.title = title
+        if bot_id and chat.bot_id is None:  # tag legacy rows with their managing bot
+            chat.bot_id = bot_id
     return chat
+
+
+async def upsert_bot_instance(
+    session: AsyncSession, *, bot_telegram_id: int, username: str | None, brand: str
+) -> BotInstance:
+    inst = await session.scalar(
+        select(BotInstance).where(BotInstance.bot_telegram_id == bot_telegram_id)
+    )
+    if inst is None:
+        inst = BotInstance(bot_telegram_id=bot_telegram_id, username=username, brand=brand)
+        session.add(inst)
+    else:
+        inst.username = username
+        inst.brand = brand
+        inst.is_active = True
+    return inst
 
 
 async def get_settings(session: AsyncSession, telegram_id: int) -> ChatSettings:
@@ -155,9 +175,13 @@ async def log_action(
 
 # --- Mini App API reads ---------------------------------------------------------
 
-async def list_active_chats(session: AsyncSession) -> list[Chat]:
-    """All connected chats (the Mini App filters these down to ones the caller admins)."""
-    result = await session.scalars(select(Chat).where(Chat.is_active.is_(True)))
+async def list_active_chats(session: AsyncSession, *, bot_id: int | None = None) -> list[Chat]:
+    """Connected chats. When `bot_id` is given, only this brand bot's chats (plus legacy
+    rows with no bot_id yet) — white-label isolation for the Mini App listing."""
+    stmt = select(Chat).where(Chat.is_active.is_(True))
+    if bot_id is not None:
+        stmt = stmt.where(or_(Chat.bot_id == bot_id, Chat.bot_id.is_(None)))
+    result = await session.scalars(stmt)
     return list(result.all())
 
 

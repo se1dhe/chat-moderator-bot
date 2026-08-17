@@ -40,7 +40,7 @@ async def on_bot_membership_changed(
     # Seed the chat's default notification language from whoever added the bot, so all
     # further RedQueen messages in this chat speak their language until changed in the TMA.
     chat = await repo.get_or_create_chat(
-        session, event.chat.id, type_=event.chat.type, title=event.chat.title
+        session, event.chat.id, type_=event.chat.type, title=event.chat.title, bot_id=bot.id
     )
     if event.from_user and event.from_user.language_code:
         chat.lang = resolve_lang(event.from_user.language_code)

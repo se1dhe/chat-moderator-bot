@@ -13,6 +13,8 @@ class Settings(BaseSettings):
     # Telegram
     bot_token: str = Field(default="", alias="BOT_TOKEN")
     owner_ids: str = Field(default="", alias="OWNER_IDS")
+    # White-label: display brand for this bot instance (used in the registry + persona).
+    bot_brand: str = Field(default="RedQueen", alias="BOT_BRAND")
 
     # Database
     postgres_host: str = Field(default="localhost", alias="POSTGRES_HOST")

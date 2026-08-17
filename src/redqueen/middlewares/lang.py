@@ -37,8 +37,10 @@ class LangMiddleware(BaseMiddleware):
         session: AsyncSession | None = data.get("session")
 
         if tg_chat is not None and tg_chat.type in _CHAT_SCOPED_TYPES and session is not None:
+            bot = data.get("bot")
             chat_row = await repo.get_or_create_chat(
-                session, tg_chat.id, type_=tg_chat.type, title=tg_chat.title
+                session, tg_chat.id, type_=tg_chat.type, title=tg_chat.title,
+                bot_id=bot.id if bot else None,
             )
             lang = chat_row.lang or self.default_lang
         else:

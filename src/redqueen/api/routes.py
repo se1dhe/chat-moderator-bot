@@ -36,7 +36,7 @@ async def me(request: web.Request) -> web.Response:
     owner = user.id in request.app["settings"].owner_id_set
     chats = []
     async with _session(request) as session:
-        for chat in await repo.list_active_chats(session):
+        for chat in await repo.list_active_chats(session, bot_id=bot.id):
             if owner or await roles.is_admin(bot, redis, chat_id=chat.telegram_id, user_id=user.id):
                 chats.append({"id": chat.telegram_id, "title": chat.title, "type": chat.type,
                               "lang": chat.lang})

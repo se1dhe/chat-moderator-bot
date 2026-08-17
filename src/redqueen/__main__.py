@@ -52,7 +52,8 @@ async def run() -> None:
 
     me = await bot.get_me()
     dp["bot_username"] = me.username
-    log.info("Authorized as @%s", me.username)
+    log.info("Authorized as @%s (brand: %s)", me.username, settings.bot_brand)
+    await _register_bot(me, settings)
     await _setup_menu_button(bot, settings)
     await _setup_commands(bot)
 
@@ -87,6 +88,19 @@ async def run() -> None:
         await redis.aclose()
         await bot.session.close()
         await dispose_engine()
+
+
+async def _register_bot(me, settings) -> None:
+    """Record this bot in the fleet registry (white-label / clones)."""
+    from .db import repo
+    try:
+        async with get_sessionmaker()() as session:
+            await repo.upsert_bot_instance(
+                session, bot_telegram_id=me.id, username=me.username, brand=settings.bot_brand
+            )
+            await session.commit()
+    except Exception as exc:  # noqa: BLE001
+        log.warning("Could not register bot instance: %s", exc)
 
 
 async def _setup_menu_button(bot, settings) -> None:

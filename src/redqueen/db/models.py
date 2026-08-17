@@ -38,6 +38,9 @@ class Chat(TimestampMixin, Base):
     title: Mapped[str | None] = mapped_column(String(256))
     lang: Mapped[str] = mapped_column(String(8), default="en")
     is_active: Mapped[bool] = mapped_column(Boolean, default=True)
+    # White-label isolation: which brand bot manages this chat (its Telegram id).
+    # NULL = legacy/primary; set on first contact. See BotInstance.
+    bot_id: Mapped[int | None] = mapped_column(BigInteger, index=True)
 
     settings: Mapped[ChatSettings] = relationship(
         back_populates="chat", uselist=False, cascade="all, delete-orphan"
@@ -124,6 +127,22 @@ class Subscription(TimestampMixin, Base):
     chat_telegram_id: Mapped[int] = mapped_column(BigInteger, unique=True, index=True)
     plan: Mapped[str] = mapped_column(String(16), default="free")  # free|pro
     active_until: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+
+
+class BotInstance(TimestampMixin, Base):
+    """Registry of brand bots running over this shared database (white-label / clones).
+
+    Tokens live in env (BOT_TOKENS), not here; this table records identity + branding so
+    the fleet can be listed and data can be isolated per bot via `Chat.bot_id`.
+    """
+
+    __tablename__ = "bot_instances"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    bot_telegram_id: Mapped[int] = mapped_column(BigInteger, unique=True, index=True)
+    username: Mapped[str | None] = mapped_column(String(64))
+    brand: Mapped[str] = mapped_column(String(64), default="RedQueen")
+    is_active: Mapped[bool] = mapped_column(Boolean, default=True)
 
 
 class ChatMember(Base):
