@@ -126,8 +126,23 @@ async def _act_on_verdict(message, bot, session, settings, verdict, t, *, flagge
     await message.reply(card, reply_markup=_decision_kb(row.id, t).as_markup())
 
 
-@router.message(F.chat.type.in_({"group", "supergroup"}) & F.photo)
-async def scan_photo(
+def _visual_source(message: Message):
+    """Return a downloadable image for photos, stickers and GIFs/animations.
+
+    Photos use the full-res size; stickers and animations use their thumbnail (animated
+    stickers/videos aren't still images, but their preview frame is enough to catch
+    scam posters, QR lures and NSFW content)."""
+    if message.photo:
+        return message.photo[-1]
+    if message.sticker:
+        return message.sticker.thumbnail
+    if message.animation:
+        return message.animation.thumbnail
+    return None
+
+
+@router.message(F.chat.type.in_({"group", "supergroup"}) & (F.photo | F.sticker | F.animation))
+async def scan_visual(
     message: Message, bot: Bot, session: AsyncSession, redis: Redis, ai_provider: AIProvider,
     ai_semaphore: asyncio.Semaphore, t: Callable[..., str], lang: str,
 ) -> None:
@@ -138,15 +153,19 @@ async def scan_photo(
     if not await billing.is_pro(session, message.chat.id):
         raise SkipHandler
 
+    source = _visual_source(message)
+    if source is None:
+        raise SkipHandler
+
     ai_cfg = get_config(settings)["ai"]
     if not await ai_budget.allow(redis, chat_id=message.chat.id, limit=ai_cfg["max_per_minute"]):
         raise SkipHandler
 
     try:
-        buf = await bot.download(message.photo[-1])  # largest size
+        buf = await bot.download(source)
         image = buf.read()
     except Exception as exc:
-        log.warning("photo download failed: %s", exc)
+        log.warning("visual download failed: %s", exc)
         raise SkipHandler from exc
 
     async with ai_semaphore:
