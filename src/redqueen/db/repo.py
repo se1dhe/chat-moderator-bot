@@ -212,6 +212,17 @@ async def record_member(
     await session.execute(stmt)
 
 
+async def get_member(
+    session: AsyncSession, chat_telegram_id: int, user_telegram_id: int
+) -> ChatMember | None:
+    return await session.scalar(
+        select(ChatMember).where(
+            ChatMember.chat_telegram_id == chat_telegram_id,
+            ChatMember.user_telegram_id == user_telegram_id,
+        )
+    )
+
+
 async def search_members(
     session: AsyncSession, chat_telegram_id: int, *, query: str = "", limit: int = 30
 ) -> list[ChatMember]:

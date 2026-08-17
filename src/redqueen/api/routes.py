@@ -8,9 +8,10 @@ from aiohttp import web
 
 from ..db import repo
 from ..i18n import SUPPORTED_LANGS
+from ..i18n import t as _t
 from ..services import billing, moderation, quarantine, roles, warns
 from ..services.config import apply_patch, full_view
-from ..utils.duration import until_from_now
+from ..utils.duration import humanize, until_from_now
 from .auth import get_user, require_chat_admin
 
 
@@ -210,25 +211,56 @@ async def member_action(request: web.Request) -> web.Response:
     bot = request.app["bot"]
     minutes = body.get("minutes")
     reason = (body.get("reason") or "").strip()[:200] or None
+    _ACTION_WORDS = {"ban": "banned", "kick": "removed", "mute": "silenced"}
+
     async with _session(request) as session:
+        chat = await repo.get_or_create_chat(session, cid)
+        lang = chat.lang
+        member = await repo.get_member(session, cid, uid)
+        name = (member.full_name if member and member.full_name
+                else f"@{member.username}" if member and member.username else str(uid))
+
+        notice = None
         try:
             if action == "ban":
                 await moderation.ban(bot, session, chat_id=cid, user_id=uid, actor_id=actor.id, reason=reason)
+                notice = _t(lang, "BANNED", name=name)
             elif action == "kick":
                 await moderation.kick(bot, session, chat_id=cid, user_id=uid, actor_id=actor.id, reason=reason)
+                notice = _t(lang, "KICKED", name=name)
             elif action == "unban":
                 await moderation.unban(bot, session, chat_id=cid, user_id=uid, actor_id=actor.id)
+                notice = _t(lang, "UNBANNED", name=name)
             elif action == "unmute":
                 await moderation.unmute(bot, session, chat_id=cid, user_id=uid, actor_id=actor.id)
+                notice = _t(lang, "UNMUTED", name=name)
             elif action == "mute":
-                until = until_from_now(timedelta(minutes=int(minutes))) if minutes else None
+                delta = timedelta(minutes=int(minutes)) if minutes else None
                 await moderation.mute(bot, session, chat_id=cid, user_id=uid, actor_id=actor.id,
-                                      until=until, reason=reason)
+                                      until=until_from_now(delta), reason=reason)
+                notice = _t(lang, "MUTED", name=name, until=humanize(delta))
             elif action == "warn":
-                await warns.issue_warn(bot, session, chat_id=cid, user_id=uid, actor_id=actor.id, reason=reason)
+                result = await warns.issue_warn(bot, session, chat_id=cid, user_id=uid,
+                                                actor_id=actor.id, reason=reason)
+                notice = _t(lang, "WARNED", name=name, count=result.count, limit=result.limit,
+                            reason=reason or "—")
+                if result.triggered:
+                    word = _ACTION_WORDS.get(result.action or "mute", "silenced")
+                    notice += "\n" + _t(lang, "WARN_LIMIT_HIT", name=name, action=word)
         except Exception as exc:
             # Telegram refuses to act on admins/owners or when lacking rights.
             raise web.HTTPBadRequest(reason=f"action failed: {exc}") from exc
+
+        # Announce in the chat (in the chat's language, with the reason) — parity with
+        # the slash-command flow, so members and other admins see what happened and why.
+        if notice and action != "warn" and reason:
+            notice += _t(lang, "ACTION_REASON", reason=reason)
+        if notice:
+            try:
+                await bot.send_message(cid, notice)
+            except Exception:  # noqa: BLE001
+                pass
+
         await session.commit()
         return web.json_response({"ok": True, "action": action})
 

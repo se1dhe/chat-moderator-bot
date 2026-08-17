@@ -357,7 +357,8 @@ input { font-family: inherit; }
 .member-card { padding: 0.8rem 0.9rem; }
 .member-name { font-weight: 700; font-size: 0.92rem; }
 .member-meta { font-size: 0.73rem; color: var(--text-muted); margin-top: 2px; }
-.member-actions { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-top: 0.7rem; }
+.member-reason { margin-top: 0.6rem; font-size: 0.82rem; padding: 0.5rem 0.7rem; }
+.member-actions { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-top: 0.6rem; }
 .member-actions .btn { flex: 1 1 auto; min-width: 30%; padding: 0.45rem 0.5rem; font-size: 0.78rem; }
 .bottom-nav a { font-size: 0.62rem; }  /* 5 items — a touch tighter */
 

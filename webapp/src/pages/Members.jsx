@@ -23,6 +23,7 @@ export function Members() {
   const [q, setQ] = useState('')
   const [rows, setRows] = useState(null)
   const [busy, setBusy] = useState(null)
+  const [reasons, setReasons] = useState({})
 
   const load = useCallback((query) => {
     api.members(cid, query).then(setRows).catch(() => setRows([]))
@@ -41,7 +42,8 @@ export function Members() {
     setBusy(`${m.user_id}:${a.key}`)
     haptic(a.cls ? 'warning' : 'light')
     try {
-      await api.memberAction(cid, m.user_id, a.key, a.extra || {})
+      const reason = (reasons[m.user_id] || '').trim()
+      await api.memberAction(cid, m.user_id, a.key, { ...(a.extra || {}), reason })
       haptic('success')
     } catch {
       haptic('error')
@@ -76,6 +78,12 @@ export function Members() {
                 </div>
               </div>
             </div>
+            <input
+              className="input member-reason"
+              value={reasons[m.user_id] || ''}
+              placeholder={t('members.reason')}
+              onChange={(e) => setReasons((r) => ({ ...r, [m.user_id]: e.target.value }))}
+            />
             <div className="member-actions">
               {ACTIONS.map((a) => (
                 <button key={a.key} className={`btn ${a.cls}`} disabled={busy === `${m.user_id}:${a.key}`}

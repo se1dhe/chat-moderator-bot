@@ -35,6 +35,7 @@ export const EN = {
   'members.search': 'Search by name, @username or id',
   'members.empty': 'No members recorded yet. They appear here once they write in the chat.',
   'members.messages': '{n} msgs',
+  'members.reason': 'Reason (optional)',
   'members.confirm': 'Apply "{action}" to {name}?',
   'members.done': 'Done: {action}',
   'members.failed': 'Action failed',
@@ -183,7 +184,8 @@ const RU = {
 
   'members.title': 'Участники', 'members.search': 'Поиск по имени, @username или id',
   'members.empty': 'Пока никого. Участники появляются здесь, как только напишут в чат.',
-  'members.messages': '{n} сообщ.', 'members.confirm': 'Применить «{action}» к {name}?',
+  'members.messages': '{n} сообщ.', 'members.reason': 'Причина (необязательно)',
+  'members.confirm': 'Применить «{action}» к {name}?',
   'members.done': 'Готово: {action}', 'members.failed': 'Действие не удалось',
   'act.warn': 'Пред', 'act.mute': 'Мьют', 'act.unmute': 'Снять мьют',
   'act.kick': 'Кик', 'act.ban': 'Бан', 'act.unban': 'Разбан',
@@ -274,7 +276,8 @@ const UK = {
 
   'members.title': 'Учасники', 'members.search': 'Пошук за іменем, @username або id',
   'members.empty': 'Поки нікого. Учасники зʼявляються тут, щойно напишуть у чат.',
-  'members.messages': '{n} повід.', 'members.confirm': 'Застосувати «{action}» до {name}?',
+  'members.messages': '{n} повід.', 'members.reason': 'Причина (необовʼязково)',
+  'members.confirm': 'Застосувати «{action}» до {name}?',
   'members.done': 'Готово: {action}', 'members.failed': 'Дію не виконано',
   'act.warn': 'Попер', 'act.mute': 'Мʼют', 'act.unmute': 'Зняти мʼют',
   'act.kick': 'Кік', 'act.ban': 'Бан', 'act.unban': 'Розбан',
