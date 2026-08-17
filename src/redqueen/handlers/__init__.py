@@ -9,6 +9,7 @@ from . import (
     captcha,
     common,
     content_filters,
+    members,
     moderation,
     modes,
     onboarding,
@@ -31,6 +32,7 @@ def setup_routers(dp: Dispatcher) -> None:
     # catch-all stage).
     dp.include_router(captcha.router)
     dp.include_router(raid.router)
+    dp.include_router(members.router)  # records the sender, then defers to the scanners
     dp.include_router(antiflood.router)
     dp.include_router(content_filters.router)
     dp.include_router(modes.router)

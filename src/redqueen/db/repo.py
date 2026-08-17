@@ -1,11 +1,12 @@
 """Repository helpers — thin data-access functions over the async session."""
 from __future__ import annotations
 
-from sqlalchemy import func, select, update
+from sqlalchemy import func, or_, select, update
+from sqlalchemy.dialects.postgresql import insert as pg_insert
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
-from .models import AIVerdict, Chat, ChatSettings, ModAction, User, Warn
+from .models import AIVerdict, Chat, ChatMember, ChatSettings, ModAction, User, Warn
 
 
 async def get_or_create_chat(
@@ -187,6 +188,41 @@ async def pending_ai_verdicts(
 
 async def get_ai_verdict(session: AsyncSession, verdict_id: int) -> AIVerdict | None:
     return await session.scalar(select(AIVerdict).where(AIVerdict.id == verdict_id))
+
+
+async def record_member(
+    session: AsyncSession, *, chat_telegram_id: int, user_telegram_id: int,
+    username: str | None, full_name: str | None,
+) -> None:
+    """Upsert a seen member (bump message_count + last_seen). One statement, no read."""
+    stmt = pg_insert(ChatMember).values(
+        chat_telegram_id=chat_telegram_id, user_telegram_id=user_telegram_id,
+        username=username, full_name=full_name, message_count=1,
+    ).on_conflict_do_update(
+        constraint="uq_chat_member",
+        set_={
+            "username": username,
+            "full_name": full_name,
+            "message_count": ChatMember.message_count + 1,
+            "last_seen": func.now(),
+        },
+    )
+    await session.execute(stmt)
+
+
+async def search_members(
+    session: AsyncSession, chat_telegram_id: int, *, query: str = "", limit: int = 30
+) -> list[ChatMember]:
+    stmt = select(ChatMember).where(ChatMember.chat_telegram_id == chat_telegram_id)
+    q = query.strip().lstrip("@")
+    if q:
+        like = f"%{q}%"
+        conds = [ChatMember.username.ilike(like), ChatMember.full_name.ilike(like)]
+        if q.isdigit():
+            conds.append(ChatMember.user_telegram_id == int(q))
+        stmt = stmt.where(or_(*conds))
+    stmt = stmt.order_by(ChatMember.last_seen.desc()).limit(limit)
+    return list((await session.scalars(stmt)).all())
 
 
 async def action_counts(

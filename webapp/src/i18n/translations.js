@@ -26,9 +26,20 @@ export const EN = {
   'chats.supergroup': 'Group',
 
   'nav.dashboard': 'Overview',
+  'nav.members': 'Members',
   'nav.quarantine': 'Quarantine',
   'nav.audit': 'Audit',
   'nav.stats': 'Stats',
+
+  'members.title': 'Members',
+  'members.search': 'Search by name, @username or id',
+  'members.empty': 'No members recorded yet. They appear here once they write in the chat.',
+  'members.messages': '{n} msgs',
+  'members.confirm': 'Apply "{action}" to {name}?',
+  'members.done': 'Done: {action}',
+  'members.failed': 'Action failed',
+  'act.warn': 'Warn', 'act.mute': 'Mute', 'act.unmute': 'Unmute',
+  'act.kick': 'Kick', 'act.ban': 'Ban', 'act.unban': 'Unban',
 
   'dash.chatLang': 'Chat notification language',
   'dash.protection': 'Protection',
@@ -154,7 +165,15 @@ const RU = {
   'chats.empty': 'Пока нет чатов. Добавьте RedQueen в группу и выдайте права админа.',
   'chats.group': 'Группа', 'chats.channel': 'Канал', 'chats.supergroup': 'Группа',
 
-  'nav.dashboard': 'Обзор', 'nav.quarantine': 'Карантин', 'nav.audit': 'Аудит', 'nav.stats': 'Статистика',
+  'nav.dashboard': 'Обзор', 'nav.members': 'Участники', 'nav.quarantine': 'Карантин',
+  'nav.audit': 'Аудит', 'nav.stats': 'Статистика',
+
+  'members.title': 'Участники', 'members.search': 'Поиск по имени, @username или id',
+  'members.empty': 'Пока никого. Участники появляются здесь, как только напишут в чат.',
+  'members.messages': '{n} сообщ.', 'members.confirm': 'Применить «{action}» к {name}?',
+  'members.done': 'Готово: {action}', 'members.failed': 'Действие не удалось',
+  'act.warn': 'Пред', 'act.mute': 'Мьют', 'act.unmute': 'Снять мьют',
+  'act.kick': 'Кик', 'act.ban': 'Бан', 'act.unban': 'Разбан',
 
   'dash.chatLang': 'Язык уведомлений чата',
   'dash.protection': 'Защита', 'dash.content': 'Контент и флуд', 'dash.intelligence': 'Интеллект',
@@ -225,7 +244,15 @@ const UK = {
   'chats.empty': 'Поки немає чатів. Додайте RedQueen у групу та надайте права адміна.',
   'chats.group': 'Група', 'chats.channel': 'Канал', 'chats.supergroup': 'Група',
 
-  'nav.dashboard': 'Огляд', 'nav.quarantine': 'Карантин', 'nav.audit': 'Аудит', 'nav.stats': 'Статистика',
+  'nav.dashboard': 'Огляд', 'nav.members': 'Учасники', 'nav.quarantine': 'Карантин',
+  'nav.audit': 'Аудит', 'nav.stats': 'Статистика',
+
+  'members.title': 'Учасники', 'members.search': 'Пошук за іменем, @username або id',
+  'members.empty': 'Поки нікого. Учасники зʼявляються тут, щойно напишуть у чат.',
+  'members.messages': '{n} повід.', 'members.confirm': 'Застосувати «{action}» до {name}?',
+  'members.done': 'Готово: {action}', 'members.failed': 'Дію не виконано',
+  'act.warn': 'Попер', 'act.mute': 'Мʼют', 'act.unmute': 'Зняти мʼют',
+  'act.kick': 'Кік', 'act.ban': 'Бан', 'act.unban': 'Розбан',
 
   'dash.chatLang': 'Мова сповіщень чату',
   'dash.protection': 'Захист', 'dash.content': 'Контент і флуд', 'dash.intelligence': 'Інтелект',

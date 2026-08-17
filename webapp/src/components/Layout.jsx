@@ -1,5 +1,5 @@
 import { NavLink, Outlet, useNavigate, useParams } from 'react-router-dom'
-import { LayoutGrid, ShieldAlert, ScrollText, BarChart3, ChevronLeft, Shield } from 'lucide-react'
+import { LayoutGrid, Users, ShieldAlert, ScrollText, BarChart3, ChevronLeft, Shield } from 'lucide-react'
 import { useLang } from '../context/LangContext'
 import { ChatSettingsProvider, useChatSettings } from '../context/ChatSettingsContext'
 import { haptic } from '../lib/telegram'
@@ -48,6 +48,7 @@ function Nav({ cid }) {
   const base = `/c/${cid}`
   const items = [
     { to: base, icon: LayoutGrid, label: t('nav.dashboard'), end: true },
+    { to: `${base}/members`, icon: Users, label: t('nav.members') },
     { to: `${base}/quarantine`, icon: ShieldAlert, label: t('nav.quarantine') },
     { to: `${base}/audit`, icon: ScrollText, label: t('nav.audit') },
     { to: `${base}/stats`, icon: BarChart3, label: t('nav.stats') },

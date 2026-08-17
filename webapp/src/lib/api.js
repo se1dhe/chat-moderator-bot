@@ -30,4 +30,7 @@ export const api = {
   stats: (cid) => request('GET', `/chats/${cid}/stats`),
   billing: (cid) => request('GET', `/chats/${cid}/billing`),
   invoice: (cid) => request('POST', `/chats/${cid}/billing/invoice`),
+  members: (cid, q = '') => request('GET', `/chats/${cid}/members?q=${encodeURIComponent(q)}`),
+  memberAction: (cid, uid, action, extra = {}) =>
+    request('POST', `/chats/${cid}/members/${uid}/action`, { action, ...extra }),
 }

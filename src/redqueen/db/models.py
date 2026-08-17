@@ -12,6 +12,7 @@ from sqlalchemy import (
     Integer,
     String,
     Text,
+    UniqueConstraint,
     func,
 )
 from sqlalchemy.dialects.postgresql import JSONB
@@ -123,6 +124,29 @@ class Subscription(TimestampMixin, Base):
     chat_telegram_id: Mapped[int] = mapped_column(BigInteger, unique=True, index=True)
     plan: Mapped[str] = mapped_column(String(16), default="free")  # free|pro
     active_until: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+
+
+class ChatMember(Base):
+    """A member the bot has seen in a chat — the searchable roster the Mini App acts on.
+
+    Telegram's Bot API can't enumerate chat members, so we build this from observed
+    messages: who wrote, when, how often. Powers member search + moderation from the TMA.
+    """
+
+    __tablename__ = "chat_members"
+    __table_args__ = (
+        UniqueConstraint("chat_telegram_id", "user_telegram_id", name="uq_chat_member"),
+        Index("ix_chat_members_chat", "chat_telegram_id"),
+    )
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    chat_telegram_id: Mapped[int] = mapped_column(BigInteger)
+    user_telegram_id: Mapped[int] = mapped_column(BigInteger)
+    username: Mapped[str | None] = mapped_column(String(64))
+    full_name: Mapped[str | None] = mapped_column(String(256))
+    message_count: Mapped[int] = mapped_column(Integer, default=0)
+    first_seen: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+    last_seen: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
 
 
 class Payment(TimestampMixin, Base):

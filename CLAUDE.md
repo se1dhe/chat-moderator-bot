@@ -116,14 +116,21 @@ successful_payment), `Payment` ledger, and Pro gating (`billing.PRO_FEATURES` =
 ai_autoban · raid_shield · analytics — enforced at runtime; core moderation stays free).
 The TMA shows a Pro banner + Stars upgrade via `openInvoice` (`/api/chats/{id}/billing`
 [+ `/invoice`]). Alembic revisions: initial, `CaptchaSession`, `RaidEvent`,
-`ai_verdicts.text`, `payments`.
-**M5 in progress — multimodal anti-scam (Pro).** Image scanning is wired: the AI
-provider gains `classify_image` (Ollama vision via `OLLAMA_VISION_MODEL`, e.g.
-`qwen2.5vl:7b`; empty → caption-only fallback), `ai_review.scan_photo` runs the same
-explainable-quarantine flow on photos (Pro-gated), and `ensure_model` auto-pulls the
-vision model too. Verdicts reuse the `AIVerdict` table + quarantine card/queue.
-**Remaining M5:** voice/GIF/document analysis, full adaptive-trust enforcement,
-cross-chat reputation, clone-bots / white-label. See PROJECT_PLAN §12.
+`ai_verdicts.text`, `payments`, `chat_members`.
+**M5 in progress.** Delivered: **multimodal anti-scam (Pro)** — `classify_image` (Ollama
+vision via `OLLAMA_VISION_MODEL`, e.g. `qwen2.5vl:7b`; empty → caption fallback);
+`ai_review.scan_visual` runs photos/stickers/GIFs through the same quarantine flow;
+`ensure_model` auto-pulls the vision model. **Cross-chat reputation** — trusted members
+(`trust.should_bypass_captcha`) skip the join gate. **Member roster + TMA moderation** —
+`handlers/members.py` records seen members (`ChatMember`, upsert per message, defers via
+SkipHandler); `/api/chats/{id}/members` search + `/members/{uid}/action`
+(ban/kick/mute/unmute/unban/warn); TMA **Members** screen with search and action buttons.
+Chat notification language is set from the adder on join and editable in the TMA.
+**Remaining M5:** voice (ASR) + document analysis, analytics charts + tips,
+clone-bots / white-label. See PROJECT_PLAN §12.
+
+Note: `DbSessionMiddleware` commits (not rolls back) on `SkipHandler` — handlers that
+write then defer (captcha→raid, members→scanners) rely on this; keep it.
 
 ## Notes
 

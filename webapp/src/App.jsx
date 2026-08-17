@@ -3,6 +3,7 @@ import { Layout } from './components/Layout'
 import { ChatPicker } from './pages/ChatPicker'
 import { Dashboard } from './pages/Dashboard'
 import { SettingsSection } from './pages/SettingsSection'
+import { Members } from './pages/Members'
 import { Quarantine } from './pages/Quarantine'
 import { Audit } from './pages/Audit'
 import { Stats } from './pages/Stats'
@@ -14,6 +15,7 @@ export default function App() {
       <Route path="/c/:cid" element={<Layout />}>
         <Route index element={<Dashboard />} />
         <Route path="s/:section" element={<SettingsSection />} />
+        <Route path="members" element={<Members />} />
         <Route path="quarantine" element={<Quarantine />} />
         <Route path="audit" element={<Audit />} />
         <Route path="stats" element={<Stats />} />

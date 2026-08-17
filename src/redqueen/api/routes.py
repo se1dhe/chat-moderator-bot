@@ -1,13 +1,16 @@
 """Mini App REST endpoints. Thin: authenticate → call services/repo → JSON."""
 from __future__ import annotations
 
+from datetime import timedelta
+
 from aiogram.types import LabeledPrice
 from aiohttp import web
 
 from ..db import repo
 from ..i18n import SUPPORTED_LANGS
-from ..services import billing, quarantine, roles
+from ..services import billing, moderation, quarantine, roles, warns
 from ..services.config import apply_patch, full_view
+from ..utils.duration import until_from_now
 from .auth import get_user, require_chat_admin
 
 
@@ -164,6 +167,63 @@ async def billing_invoice(request: web.Request) -> web.Response:
     return web.json_response({"url": url})
 
 
+async def members_search(request: web.Request) -> web.Response:
+    cid = _chat_id(request)
+    await require_chat_admin(request, cid)
+    q = request.query.get("q", "")
+    async with _session(request) as session:
+        rows = await repo.search_members(session, cid, query=q)
+        return web.json_response([{
+            "user_id": r.user_telegram_id, "username": r.username, "full_name": r.full_name,
+            "message_count": r.message_count,
+            "last_seen": r.last_seen.isoformat() if r.last_seen else None,
+        } for r in rows])
+
+
+_MEMBER_ACTIONS = {"ban", "kick", "mute", "unmute", "unban", "warn"}
+
+
+async def member_action(request: web.Request) -> web.Response:
+    cid = _chat_id(request)
+    actor = await require_chat_admin(request, cid)
+    try:
+        uid = int(request.match_info["uid"])
+    except (KeyError, ValueError) as exc:
+        raise web.HTTPBadRequest(reason="bad user id") from exc
+    try:
+        body = await request.json()
+    except Exception as exc:
+        raise web.HTTPBadRequest(reason="invalid JSON body") from exc
+    action = (body or {}).get("action")
+    if action not in _MEMBER_ACTIONS:
+        raise web.HTTPBadRequest(reason=f"action must be one of {sorted(_MEMBER_ACTIONS)}")
+
+    bot = request.app["bot"]
+    minutes = body.get("minutes")
+    reason = (body.get("reason") or "").strip()[:200] or None
+    async with _session(request) as session:
+        try:
+            if action == "ban":
+                await moderation.ban(bot, session, chat_id=cid, user_id=uid, actor_id=actor.id, reason=reason)
+            elif action == "kick":
+                await moderation.kick(bot, session, chat_id=cid, user_id=uid, actor_id=actor.id, reason=reason)
+            elif action == "unban":
+                await moderation.unban(bot, session, chat_id=cid, user_id=uid, actor_id=actor.id)
+            elif action == "unmute":
+                await moderation.unmute(bot, session, chat_id=cid, user_id=uid, actor_id=actor.id)
+            elif action == "mute":
+                until = until_from_now(timedelta(minutes=int(minutes))) if minutes else None
+                await moderation.mute(bot, session, chat_id=cid, user_id=uid, actor_id=actor.id,
+                                      until=until, reason=reason)
+            elif action == "warn":
+                await warns.issue_warn(bot, session, chat_id=cid, user_id=uid, actor_id=actor.id, reason=reason)
+        except Exception as exc:
+            # Telegram refuses to act on admins/owners or when lacking rights.
+            raise web.HTTPBadRequest(reason=f"action failed: {exc}") from exc
+        await session.commit()
+        return web.json_response({"ok": True, "action": action})
+
+
 def setup_routes(app: web.Application) -> None:
     app.router.add_get("/api/health", health)
     app.router.add_get("/api/me", me)
@@ -175,3 +235,5 @@ def setup_routes(app: web.Application) -> None:
     app.router.add_get("/api/chats/{cid}/stats", stats)
     app.router.add_get("/api/chats/{cid}/billing", billing_status)
     app.router.add_post("/api/chats/{cid}/billing/invoice", billing_invoice)
+    app.router.add_get("/api/chats/{cid}/members", members_search)
+    app.router.add_post("/api/chats/{cid}/members/{uid}/action", member_action)
