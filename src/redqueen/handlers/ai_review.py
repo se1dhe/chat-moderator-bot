@@ -175,6 +175,48 @@ async def scan_visual(
     await _act_on_verdict(message, bot, session, settings, verdict, t, flagged_text=message.caption)
 
 
+_TEXT_MIMES = {
+    "text/plain", "text/markdown", "text/csv", "application/csv", "application/json",
+}
+_MAX_DOC_BYTES = 100_000
+
+
+@router.message(F.chat.type.in_({"group", "supergroup"}) & F.document)
+async def scan_document(
+    message: Message, bot: Bot, session: AsyncSession, redis: Redis, ai_provider: AIProvider,
+    ai_semaphore: asyncio.Semaphore, t: Callable[..., str], lang: str,
+) -> None:
+    settings = await repo.get_settings(session, message.chat.id)
+    if settings.ai_mode == "off" or message.from_user is None or message.from_user.is_bot:
+        raise SkipHandler
+    # Document/URL anti-scam is a Pro capability.
+    if not await billing.is_pro(session, message.chat.id):
+        raise SkipHandler
+
+    doc = message.document
+    parts = [message.caption or "", doc.file_name or ""]
+    # Read the body of small, text-like attachments; everything else is judged by its
+    # caption + filename (which is where scam links/lures usually live anyway).
+    if doc.mime_type in _TEXT_MIMES and (doc.file_size or 0) <= _MAX_DOC_BYTES:
+        try:
+            buf = await bot.download(doc)
+            parts.append(buf.read().decode("utf-8", "ignore")[:4000])
+        except Exception as exc:  # noqa: BLE001
+            log.debug("document download failed: %s", exc)
+
+    combined = "\n".join(p for p in parts if p).strip()
+    if not combined:
+        raise SkipHandler
+
+    ai_cfg = get_config(settings)["ai"]
+    if not await ai_budget.allow(redis, chat_id=message.chat.id, limit=ai_cfg["max_per_minute"]):
+        raise SkipHandler
+    async with ai_semaphore:
+        verdict = await ai_provider.classify_text(combined, lang=lang)
+
+    await _act_on_verdict(message, bot, session, settings, verdict, t, flagged_text=combined[:500])
+
+
 @router.message(F.chat.type.in_({"group", "supergroup"}) & (F.voice | F.video_note))
 async def scan_voice(
     message: Message, bot: Bot, session: AsyncSession, redis: Redis, ai_provider: AIProvider,

@@ -62,6 +62,12 @@ async def test_rules_pass_clean_ukrainian():
 
 
 @pytest.mark.asyncio
+async def test_rules_flag_url_shortener():
+    v = await RuleProvider().classify_text("click here bit.ly/free-crypto now")
+    assert v.is_violation
+
+
+@pytest.mark.asyncio
 async def test_classify_image_uses_caption_when_no_vision():
     # No vision model → the caption is judged by the text rules.
     v = await RuleProvider().classify_image(b"\x89PNG...", caption="free crypto giveaway t.me/x")

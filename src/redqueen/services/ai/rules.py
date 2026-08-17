@@ -21,6 +21,8 @@ _SCAM_PATTERNS = [
 _SPAM_HINTS = [
     r"(.)\1{9,}",                    # long char runs (aaaaa...)
     r"(?:https?://\S+\s*){3,}",      # several links crammed together
+    # URL shorteners — classic scam-link obfuscation.
+    r"\b(?:bit\.ly|tinyurl\.com|cutt\.ly|is\.gd|t\.co|goo\.gl|rb\.gy|shorturl\.at)/\w+",
 ]
 _TOXIC_WORDS = {
     # kept mild; extend per-locale over time
