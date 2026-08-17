@@ -1,6 +1,8 @@
 """Repository helpers — thin data-access functions over the async session."""
 from __future__ import annotations
 
+from datetime import UTC, datetime, timedelta
+
 from sqlalchemy import func, or_, select, update
 from sqlalchemy.dialects.postgresql import insert as pg_insert
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -235,3 +237,30 @@ async def action_counts(
         .group_by(ModAction.action)
     )
     return {action: int(n) for action, n in result.all()}
+
+
+async def actions_timeline(
+    session: AsyncSession, chat_telegram_id: int, *, days: int = 14
+) -> dict[str, int]:
+    """ModAction counts per day (UTC) over the last `days`. Sparse — client fills gaps."""
+    since = datetime.now(UTC) - timedelta(days=days)
+    day = func.date_trunc("day", ModAction.created_at)
+    result = await session.execute(
+        select(day.label("d"), func.count())
+        .where(ModAction.chat_telegram_id == chat_telegram_id, ModAction.created_at >= since)
+        .group_by(day)
+        .order_by(day)
+    )
+    return {d.date().isoformat(): int(n) for d, n in result.all()}
+
+
+async def verdict_category_counts(
+    session: AsyncSession, chat_telegram_id: int
+) -> dict[str, int]:
+    """AIVerdict counts per category — the AI 'what did we catch' breakdown."""
+    result = await session.execute(
+        select(AIVerdict.category, func.count())
+        .where(AIVerdict.chat_telegram_id == chat_telegram_id)
+        .group_by(AIVerdict.category)
+    )
+    return {cat: int(n) for cat, n in result.all()}

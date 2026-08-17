@@ -134,7 +134,16 @@ async def stats(request: web.Request) -> web.Response:
     async with _session(request) as session:
         counts = await repo.action_counts(session, cid)
         pending = len(await repo.pending_ai_verdicts(session, cid, limit=1000))
-        return web.json_response({"actions": counts, "pending_quarantine": pending})
+        timeline = await repo.actions_timeline(session, cid, days=14)
+        categories = await repo.verdict_category_counts(session, cid)
+        members = len(await repo.search_members(session, cid, limit=100000))
+        return web.json_response({
+            "actions": counts,
+            "pending_quarantine": pending,
+            "timeline": timeline,
+            "categories": categories,
+            "members": members,
+        })
 
 
 async def billing_status(request: web.Request) -> web.Response:
