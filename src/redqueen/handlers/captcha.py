@@ -60,6 +60,10 @@ async def on_member_join(
     if not cfg["enabled"]:
         raise SkipHandler
 
+    # Cross-chat reputation: a member the Hive already trusts skips the gate.
+    if trust.should_bypass_captcha(await trust.get_score(session, user.id)):
+        raise SkipHandler
+
     await moderation.mute(bot, session, chat_id=event.chat.id, user_id=user.id, actor_id=None,
                           until=None, reason="captcha_pending")
 

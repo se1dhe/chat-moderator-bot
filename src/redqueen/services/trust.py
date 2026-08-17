@@ -20,6 +20,13 @@ AI_FALSE_POSITIVE = 3
 DEFAULT_SCORE = 50
 # How far (percentage points) full trust swing shifts the AI threshold in each direction.
 THRESHOLD_SWING = 10
+# At/above this global score a member is trusted across the hive and skips join captcha.
+CAPTCHA_BYPASS_SCORE = 75
+
+
+def should_bypass_captcha(trust_score: int) -> bool:
+    """A member the Hive already trusts (good standing across chats) skips the gate."""
+    return trust_score >= CAPTCHA_BYPASS_SCORE
 
 
 async def adjust(session: AsyncSession, user_id: int, delta: int) -> int:

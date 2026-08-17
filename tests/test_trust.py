@@ -26,6 +26,13 @@ class FakeSession:
         return None
 
 
+def test_should_bypass_captcha_only_for_high_trust():
+    assert trust.should_bypass_captcha(trust.CAPTCHA_BYPASS_SCORE) is True
+    assert trust.should_bypass_captcha(100) is True
+    assert trust.should_bypass_captcha(trust.DEFAULT_SCORE) is False
+    assert trust.should_bypass_captcha(trust.CAPTCHA_BYPASS_SCORE - 1) is False
+
+
 @pytest.mark.asyncio
 async def test_adjust_creates_user_at_default_then_applies_delta():
     session = FakeSession()
