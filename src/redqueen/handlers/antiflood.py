@@ -64,8 +64,10 @@ async def check_flood(
     except Exception:  # noqa: BLE001
         pass
 
+    # Land the notice in the same forum topic the flood happened in (None = General).
     await message.answer(
-        t("ANTIFLOOD_TRIGGERED", name=message.from_user.full_name, action=_ACTION_WORDS[action])
+        t("ANTIFLOOD_TRIGGERED", name=message.from_user.full_name, action=_ACTION_WORDS[action]),
+        message_thread_id=message.message_thread_id,
     )
 
 

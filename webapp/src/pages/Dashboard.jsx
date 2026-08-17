@@ -5,15 +5,17 @@ import {
 } from 'lucide-react'
 import { useLang } from '../context/LangContext'
 import { useChatSettings } from '../context/ChatSettingsContext'
-import { Spinner } from '../components/ui'
+import { Spinner, Segmented } from '../components/ui'
 import { ProBanner } from '../components/ProBanner'
 import { haptic } from '../lib/telegram'
+
+const LANGS = [{ value: 'en', label: 'EN' }, { value: 'ru', label: 'RU' }, { value: 'uk', label: 'UK' }]
 
 export function Dashboard() {
   const { t } = useLang()
   const { cid } = useParams()
   const navigate = useNavigate()
-  const { draft, error, reload } = useChatSettings()
+  const { draft, error, reload, setSection } = useChatSettings()
 
   if (error) {
     return (
@@ -62,6 +64,10 @@ export function Dashboard() {
   return (
     <div className="content fade-in">
       <ProBanner chatId={cid} />
+
+      <div className="section-label">{t('dash.chatLang')}</div>
+      <Segmented value={draft.lang} onChange={(v) => setSection('lang', v)} options={LANGS} />
+
       {groups.map((g) => (
         <div key={g.label}>
           <div className="section-label">{g.label}</div>

@@ -30,6 +30,7 @@ export const EN = {
   'nav.audit': 'Audit',
   'nav.stats': 'Stats',
 
+  'dash.chatLang': 'Chat notification language',
   'dash.protection': 'Protection',
   'dash.content': 'Content & flood',
   'dash.intelligence': 'Intelligence',
@@ -155,6 +156,7 @@ const RU = {
 
   'nav.dashboard': 'Обзор', 'nav.quarantine': 'Карантин', 'nav.audit': 'Аудит', 'nav.stats': 'Статистика',
 
+  'dash.chatLang': 'Язык уведомлений чата',
   'dash.protection': 'Защита', 'dash.content': 'Контент и флуд', 'dash.intelligence': 'Интеллект',
   'dash.enabled': 'Активно', 'dash.disabled': 'Выкл',
 
@@ -225,6 +227,7 @@ const UK = {
 
   'nav.dashboard': 'Огляд', 'nav.quarantine': 'Карантин', 'nav.audit': 'Аудит', 'nav.stats': 'Статистика',
 
+  'dash.chatLang': 'Мова сповіщень чату',
   'dash.protection': 'Захист', 'dash.content': 'Контент і флуд', 'dash.intelligence': 'Інтелект',
   'dash.enabled': 'Активно', 'dash.disabled': 'Вимк',
 

@@ -6,8 +6,12 @@ from collections.abc import Callable
 from aiogram import Bot, F, Router
 from aiogram.filters import Command
 from aiogram.types import ChatMemberUpdated, Message
+from sqlalchemy.ext.asyncio import AsyncSession
 
+from ..db import repo
 from ..filters import IsChatAdmin
+from ..i18n import resolve_lang
+from ..i18n import t as _t
 
 router = Router(name="onboarding")
 
@@ -24,12 +28,26 @@ def _missing_rights(member) -> list[str]:
 
 
 @router.my_chat_member()
-async def on_bot_membership_changed(event: ChatMemberUpdated, bot: Bot, t: Callable[..., str]) -> None:
+async def on_bot_membership_changed(
+    event: ChatMemberUpdated, bot: Bot, session: AsyncSession
+) -> None:
     if event.chat.type not in _CHAT_SCOPED_TYPES:
         return
     old_status, new_status = event.old_chat_member.status, event.new_chat_member.status
     if new_status not in _GREET_STATUSES or old_status == new_status:
         return
+
+    # Seed the chat's default notification language from whoever added the bot, so all
+    # further RedQueen messages in this chat speak their language until changed in the TMA.
+    chat = await repo.get_or_create_chat(
+        session, event.chat.id, type_=event.chat.type, title=event.chat.title
+    )
+    if event.from_user and event.from_user.language_code:
+        chat.lang = resolve_lang(event.from_user.language_code)
+    lang = chat.lang
+
+    def t(key: str, **kw: object) -> str:
+        return _t(lang, key, **kw)
 
     chat_name = event.chat.title or str(event.chat.id)
     if new_status != "administrator":

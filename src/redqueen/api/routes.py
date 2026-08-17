@@ -5,6 +5,7 @@ from aiogram.types import LabeledPrice
 from aiohttp import web
 
 from ..db import repo
+from ..i18n import SUPPORTED_LANGS
 from ..services import billing, quarantine, roles
 from ..services.config import apply_patch, full_view
 from .auth import get_user, require_chat_admin
@@ -45,9 +46,12 @@ async def get_settings(request: web.Request) -> web.Response:
     cid = _chat_id(request)
     await require_chat_admin(request, cid)
     async with _session(request) as session:
+        chat = await repo.get_or_create_chat(session, cid)
         settings = await repo.get_settings(session, cid)
         await session.commit()  # get_settings may create the chat row
-        return web.json_response(full_view(settings))
+        view = full_view(settings)
+        view["lang"] = chat.lang
+        return web.json_response(view)
 
 
 async def put_settings(request: web.Request) -> web.Response:
@@ -60,8 +64,12 @@ async def put_settings(request: web.Request) -> web.Response:
     if not isinstance(patch, dict):
         raise web.HTTPBadRequest(reason="body must be an object")
     async with _session(request) as session:
+        chat = await repo.get_or_create_chat(session, cid)
         settings = await repo.get_settings(session, cid)
+        if patch.get("lang") in SUPPORTED_LANGS:
+            chat.lang = patch["lang"]
         view = apply_patch(settings, patch)
+        view["lang"] = chat.lang
         await session.commit()
         return web.json_response(view)
 
