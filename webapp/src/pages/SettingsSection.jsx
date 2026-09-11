@@ -183,6 +183,41 @@ function AI({ s, t }) {
         ]} />
       {!s.pro && <div className="row-desc" style={{ margin: '0.5rem 0.2rem 0' }}>{t('pro.autobanNote')}</div>}
 
+      <div className="section-label">AI Provider</div>
+      <Segmented value={core.ai_provider || 'ollama'} onChange={(v) => s.updateSection('core', { ai_provider: v })}
+        options={[
+          { value: 'ollama', label: 'Local (Ollama)' },
+          { value: 'openai', label: 'OpenAI' },
+          { value: 'gemini', label: 'Gemini' },
+          { value: 'claude', label: 'Claude' },
+        ]} />
+        
+      {(core.ai_provider && core.ai_provider !== 'ollama') && (
+        <div className="card" style={{ marginTop: '0.75rem', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+          <div style={{ padding: '0.75rem 1rem' }}>
+            <div style={{ fontSize: '0.85rem', fontWeight: 600, marginBottom: '0.25rem' }}>API Key {core.ai_has_key && '(Saved)'}</div>
+            <input 
+              className="input" 
+              type="password"
+              placeholder={core.ai_has_key ? "••••••••••••••••" : "Enter API Key"}
+              onChange={(e) => s.updateSection('core', { ai_api_key: e.target.value })}
+              style={{ width: '100%' }}
+            />
+          </div>
+          <div style={{ padding: '0 1rem 0.75rem' }}>
+            <div style={{ fontSize: '0.85rem', fontWeight: 600, marginBottom: '0.25rem' }}>Model</div>
+            <input 
+              className="input" 
+              type="text"
+              placeholder="e.g. gpt-4o-mini"
+              value={core.ai_model || ''}
+              onChange={(e) => s.updateSection('core', { ai_model: e.target.value })}
+              style={{ width: '100%' }}
+            />
+          </div>
+        </div>
+      )}
+
       <div className="section-label">{t('ai.threshold')} · {core.ai_threshold}%</div>
       <div className="card card-pad">
         <Slider value={core.ai_threshold} min={0} max={100} step={5} onChange={(v) => s.updateSection('core', { ai_threshold: v })} />

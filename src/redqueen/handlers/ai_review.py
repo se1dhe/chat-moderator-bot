@@ -70,11 +70,29 @@ async def scan_message(
         if not await ai_budget.allow(redis, chat_id=message.chat.id, limit=ai_cfg["max_per_minute"]):
             raise SkipHandler
         context = message.reply_to_message.text if message.reply_to_message else None
-        async with ai_semaphore:
-            verdict = await ai_provider.classify_text(text, context=context, lang=lang)
+        try:
+            # wait_for wrapper protects both the semaphore acquisition queue and the AI call.
+            # If the queue is stuck (e.g. Ollama hung), this times out in 5 seconds and falls back to rule mode.
+            verdict = await asyncio.wait_for(
+                _classify_with_semaphore(ai_semaphore, ai_provider, text, context, lang, settings),
+                timeout=5.0
+            )
+        except asyncio.TimeoutError:
+            log.warning(f"AI timeout for chat {message.chat.id}, falling back to rules")
+            # fallback to rule provider directly
+            verdict = await ai_provider.fallback.classify_text(text, context=context, lang=lang) if hasattr(ai_provider, "fallback") else Verdict("ok", 50, "timeout fallback")
+
         await ai_cache.put(redis, message.chat.id, text, verdict)
 
     await _act_on_verdict(message, bot, session, settings, verdict, t, flagged_text=text)
+
+async def _classify_with_semaphore(sem, provider, text, context, lang, settings):
+    async with sem:
+        return await provider.classify_text(text, context=context, lang=lang, chat_settings=settings)
+
+async def _classify_image_with_semaphore(sem, provider, image, caption, lang, settings):
+    async with sem:
+        return await provider.classify_image(image, caption=caption, lang=lang, chat_settings=settings)
 
 
 async def _act_on_verdict(message, bot, session, settings, verdict, t, *, flagged_text) -> None:
@@ -169,8 +187,13 @@ async def scan_visual(
         log.warning("visual download failed: %s", exc)
         raise SkipHandler from exc
 
-    async with ai_semaphore:
-        verdict = await ai_provider.classify_image(image, caption=message.caption, lang=lang)
+    try:
+        verdict = await asyncio.wait_for(
+            _classify_image_with_semaphore(ai_semaphore, ai_provider, image, message.caption, lang, settings),
+            timeout=5.0
+        )
+    except asyncio.TimeoutError:
+        verdict = await ai_provider.fallback.classify_image(image, caption=message.caption, lang=lang) if hasattr(ai_provider, "fallback") else Verdict("ok", 50, "timeout")
 
     await _act_on_verdict(message, bot, session, settings, verdict, t, flagged_text=message.caption)
 
@@ -211,8 +234,13 @@ async def scan_document(
     ai_cfg = get_config(settings)["ai"]
     if not await ai_budget.allow(redis, chat_id=message.chat.id, limit=ai_cfg["max_per_minute"]):
         raise SkipHandler
-    async with ai_semaphore:
-        verdict = await ai_provider.classify_text(combined, lang=lang)
+    try:
+        verdict = await asyncio.wait_for(
+            _classify_with_semaphore(ai_semaphore, ai_provider, combined, None, lang, settings),
+            timeout=5.0
+        )
+    except asyncio.TimeoutError:
+        verdict = await ai_provider.fallback.classify_text(combined, lang=lang) if hasattr(ai_provider, "fallback") else Verdict("ok", 50, "timeout")
 
     await _act_on_verdict(message, bot, session, settings, verdict, t, flagged_text=combined[:500])
 
@@ -241,11 +269,16 @@ async def scan_voice(
         log.warning("voice download failed: %s", exc)
         raise SkipHandler from exc
 
-    async with ai_semaphore:
-        text = await transcriber.transcribe(audio)
-        if not text:
-            raise SkipHandler
-        verdict = await ai_provider.classify_text(text, lang=lang)
+    text = await transcriber.transcribe(audio)
+    if not text:
+        raise SkipHandler
+    try:
+        verdict = await asyncio.wait_for(
+            _classify_with_semaphore(ai_semaphore, ai_provider, text, None, lang, settings),
+            timeout=5.0
+        )
+    except asyncio.TimeoutError:
+        verdict = await ai_provider.fallback.classify_text(text, lang=lang) if hasattr(ai_provider, "fallback") else Verdict("ok", 50, "timeout")
 
     await _act_on_verdict(message, bot, session, settings, verdict, t, flagged_text=text)
 

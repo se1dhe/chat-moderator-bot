@@ -37,7 +37,7 @@ class RuleProvider(AIProvider):
     name = "rules"
 
     async def classify_text(
-        self, text: str, *, context: str | None = None, lang: str | None = None
+        self, text: str, *, context: str | None = None, lang: str | None = None, chat_settings = None
     ) -> Verdict:
         low = text.lower()
         for pat in _SCAM_PATTERNS:

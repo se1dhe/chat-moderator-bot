@@ -10,13 +10,18 @@ __all__ = ["AIProvider", "RuleProvider", "Verdict", "build_provider"]
 
 def build_provider(settings: Settings) -> AIProvider:
     """Return the configured provider. Falls back to rules when AI is disabled."""
+    from .rules import RuleProvider
+    fallback = RuleProvider()
+    
     if settings.ai_enabled:
         from .ollama import OllamaProvider
+        from .router import RouterProvider
 
-        return OllamaProvider(
+        ollama = OllamaProvider(
             base_url=settings.ollama_url,
             model=settings.ollama_model,
-            fallback=RuleProvider(),
+            fallback=fallback,
             vision_model=settings.ollama_vision_model,
         )
-    return RuleProvider()
+        return RouterProvider(ollama, fallback, settings.secret_key)
+    return fallback

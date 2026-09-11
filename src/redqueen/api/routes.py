@@ -3,6 +3,7 @@ from __future__ import annotations
 
 from datetime import timedelta
 
+import aiogram.exceptions
 from aiogram.types import LabeledPrice
 from aiohttp import web
 
@@ -72,6 +73,20 @@ async def put_settings(request: web.Request) -> web.Response:
         settings = await repo.get_settings(session, cid)
         if patch.get("lang") in SUPPORTED_LANGS:
             chat.lang = patch["lang"]
+
+        if "core" in patch and "ai_api_key" in patch["core"]:
+            api_key = patch["core"]["ai_api_key"]
+            if api_key:
+                from cryptography.fernet import Fernet
+                try:
+                    f = Fernet(request.app["settings"].secret_key)
+                    settings.ai_api_key_encrypted = f.encrypt(api_key.encode()).decode()
+                except Exception as e:
+                    import logging
+                    logging.getLogger(__name__).error(f"Failed to encrypt API key: {e}")
+            else:
+                settings.ai_api_key_encrypted = None
+
         view = apply_patch(settings, patch)
         view["lang"] = chat.lang
         await session.commit()
@@ -137,7 +152,7 @@ async def stats(request: web.Request) -> web.Response:
         pending = len(await repo.pending_ai_verdicts(session, cid, limit=1000))
         timeline = await repo.actions_timeline(session, cid, days=14)
         categories = await repo.verdict_category_counts(session, cid)
-        members = len(await repo.search_members(session, cid, limit=100000))
+        members = await repo.count_members(session, cid)
         return web.json_response({
             "actions": counts,
             "pending_quarantine": pending,
@@ -251,7 +266,7 @@ async def member_action(request: web.Request) -> web.Response:
                 if result.triggered:
                     word = _ACTION_WORDS.get(result.action or "mute", "silenced")
                     notice += "\n" + _t(lang, "WARN_LIMIT_HIT", name=name, action=word)
-        except Exception as exc:
+        except aiogram.exceptions.TelegramAPIError as exc:
             # Telegram refuses to act on admins/owners or when lacking rights.
             raise web.HTTPBadRequest(reason=f"action failed: {exc}") from exc
 
@@ -269,7 +284,41 @@ async def member_action(request: web.Request) -> web.Response:
         return web.json_response({"ok": True, "action": action})
 
 
+@web.middleware
+async def rate_limit_middleware(request: web.Request, handler):
+    if request.path.startswith("/api/"):
+        redis = request.app["redis"]
+        # Basic rate limiting by IP (or user ID if authed, but let's use IP/User ID).
+        # We can extract user ID from initData if possible, but for simplicity, we'll use a token bucket or simple counter per IP/Auth.
+        # Actually, get_user might throw if not authed, so let's limit by auth header if present, or IP.
+        key = request.headers.get("Authorization", request.remote)
+        rl_key = f"rl:{key}"
+        try:
+            count = await redis.incr(rl_key)
+            if count == 1:
+                await redis.expire(rl_key, 1) # 1 second window
+            if count > 30: # 30 requests per second
+                raise web.HTTPTooManyRequests()
+        except Exception as e:
+            if isinstance(e, web.HTTPException): raise
+            # Ignore redis errors for rate limiting
+            pass
+    return await handler(request)
+
+@web.middleware
+async def error_handling_middleware(request: web.Request, handler):
+    try:
+        return await handler(request)
+    except web.HTTPException:
+        raise
+    except Exception as e:
+        import logging
+        logging.getLogger(__name__).exception("Unhandled API Error")
+        raise web.HTTPInternalServerError(reason="Internal Server Error")
+
 def setup_routes(app: web.Application) -> None:
+    app.middlewares.append(error_handling_middleware)
+    app.middlewares.append(rate_limit_middleware)
     app.router.add_get("/api/health", health)
     app.router.add_get("/api/me", me)
     app.router.add_get("/api/chats/{cid}/settings", get_settings)

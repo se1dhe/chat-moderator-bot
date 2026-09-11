@@ -26,12 +26,6 @@ class DbSessionMiddleware(BaseMiddleware):
                 result = await handler(event, data)
                 await session.commit()
                 return result
-            except SkipHandler:
-                # SkipHandler is control flow, not an error: the handler did its work and
-                # is deferring to the next router (e.g. captcha → raid on the same join).
-                # Persist those writes, then let propagation continue.
-                await session.commit()
-                raise
             except Exception:
                 await session.rollback()
                 raise

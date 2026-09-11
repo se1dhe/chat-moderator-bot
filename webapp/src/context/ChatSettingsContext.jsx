@@ -20,6 +20,7 @@ export function ChatSettingsProvider({ chatId, children }) {
   const draftRef = useRef(null)
   const savedRef = useRef(null)
   const timerRef = useRef(null)
+  const patchRef = useRef({})
 
   const commit = (v) => { setSaved(v); savedRef.current = v; setDraft(clone(v)); draftRef.current = clone(v) }
 
@@ -55,25 +56,35 @@ export function ChatSettingsProvider({ chatId, children }) {
   }, [chatId, loadBilling])
 
   const flush = useCallback(async () => {
-    const payload = draftRef.current
-    if (!payload) return
+    const payload = patchRef.current
+    if (Object.keys(payload).length === 0) return
+    patchRef.current = {} // clear before request to queue any new edits
     setSaving(true)
     setError(null)
     try {
       const v = await api.putSettings(chatId, payload)
       setSaved(v)
       savedRef.current = v
-      // Re-sync the draft to the server's validated view (range clamps applied), but only
-      // if the user hasn't kept editing while the request was in flight.
-      if (JSON.stringify(draftRef.current) === JSON.stringify(payload)) {
-        setDraft(clone(v))
-        draftRef.current = clone(v)
-      }
+      
+      setDraft((_oldDraft) => {
+        const latest = clone(v)
+        // re-apply any edits that happened while request was in-flight
+        for (const [k, val] of Object.entries(patchRef.current)) {
+          if (typeof val === 'object' && !Array.isArray(val) && val !== null) {
+            latest[k] = { ...latest[k], ...val }
+          } else {
+            latest[k] = val
+          }
+        }
+        draftRef.current = latest
+        return latest
+      })
       haptic('success')
     } catch (e) {
       setError(e)
       haptic('error')
-      if (savedRef.current) { setDraft(clone(savedRef.current)); draftRef.current = clone(savedRef.current) }
+      // Restore patch queue on failure so it can be retried
+      patchRef.current = { ...payload, ...patchRef.current }
     } finally {
       setSaving(false)
     }
@@ -88,6 +99,7 @@ export function ChatSettingsProvider({ chatId, children }) {
     setDraft((d) => {
       const next = { ...d, [section]: { ...d[section], ...patch } }
       draftRef.current = next
+      patchRef.current = { ...patchRef.current, [section]: { ...patchRef.current[section], ...patch } }
       return next
     })
     schedule()
@@ -97,6 +109,7 @@ export function ChatSettingsProvider({ chatId, children }) {
     setDraft((d) => {
       const next = { ...d, [section]: value }
       draftRef.current = next
+      patchRef.current = { ...patchRef.current, [section]: value }
       return next
     })
     schedule()

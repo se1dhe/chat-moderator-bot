@@ -122,6 +122,9 @@ def full_view(settings: ChatSettings) -> dict[str, Any]:
             "warn_action": settings.warn_action,
             "ai_mode": settings.ai_mode,
             "ai_threshold": settings.ai_threshold,
+            "ai_provider": getattr(settings, "ai_provider", "ollama"),
+            "ai_model": getattr(settings, "ai_model", ""),
+            "ai_has_key": bool(getattr(settings, "ai_api_key_encrypted", None)),
         },
         "warns": cfg["warns"],
         "captcha": cfg["captcha"],
@@ -152,6 +155,10 @@ def apply_patch(settings: ChatSettings, patch: dict[str, Any]) -> dict[str, Any]
         settings.ai_mode = core["ai_mode"]
     if "ai_threshold" in core:
         settings.ai_threshold = _clamp(core["ai_threshold"], 0, 100, settings.ai_threshold)
+    if "ai_provider" in core and core["ai_provider"] in {"ollama", "openai", "gemini", "claude"}:
+        settings.ai_provider = core["ai_provider"]
+    if "ai_model" in core:
+        settings.ai_model = str(core["ai_model"])[:64]
 
     if "warns" in patch:
         w, cur = patch["warns"], cfg["warns"]

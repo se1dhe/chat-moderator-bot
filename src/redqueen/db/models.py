@@ -57,6 +57,9 @@ class ChatSettings(Base):
     warn_action: Mapped[str] = mapped_column(String(16), default="mute")  # mute|ban|kick
     ai_mode: Mapped[str] = mapped_column(String(16), default="off")  # off|quarantine|autoban
     ai_threshold: Mapped[int] = mapped_column(Integer, default=80)  # 0..100 confidence %
+    ai_provider: Mapped[str] = mapped_column(String(16), default="ollama", server_default="ollama")
+    ai_model: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    ai_api_key_encrypted: Mapped[str | None] = mapped_column(Text, nullable=True)
     data: Mapped[dict] = mapped_column(JSONB, default=dict)
 
     chat: Mapped[Chat] = relationship(back_populates="settings")

@@ -67,6 +67,7 @@ class Settings(BaseSettings):
 
     default_lang: str = Field(default="en", alias="DEFAULT_LANG")
     log_level: str = Field(default="INFO", alias="LOG_LEVEL")
+    secret_key: str = Field(default="KKFASYFPZEdaRYZcFdhDHBsMCaJhT-tG6F3axLXZuUY=", alias="SECRET_KEY")
 
     @computed_field  # type: ignore[prop-decorator]
     @property

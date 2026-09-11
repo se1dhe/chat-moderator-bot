@@ -142,7 +142,7 @@ class OllamaProvider(AIProvider):
             return False
 
     async def classify_text(
-        self, text: str, *, context: str | None = None, lang: str | None = None
+        self, text: str, *, context: str | None = None, lang: str | None = None, chat_settings = None
     ) -> Verdict:
         parts = []
         if lang:
@@ -178,7 +178,7 @@ class OllamaProvider(AIProvider):
             return await self.fallback.classify_text(text, context=context, lang=lang)
 
     async def classify_image(
-        self, image: bytes, *, caption: str | None = None, lang: str | None = None
+        self, image: bytes, *, caption: str | None = None, lang: str | None = None, chat_settings = None
     ) -> Verdict:
         if not self.vision_model:
             return await self.fallback.classify_image(image, caption=caption, lang=lang)

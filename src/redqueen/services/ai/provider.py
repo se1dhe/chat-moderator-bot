@@ -25,17 +25,17 @@ class AIProvider(ABC):
 
     @abstractmethod
     async def classify_text(
-        self, text: str, *, context: str | None = None, lang: str | None = None
+        self, text: str, *, context: str | None = None, lang: str | None = None, chat_settings = None
     ) -> Verdict:
         ...
 
     async def classify_image(
-        self, image: bytes, *, caption: str | None = None, lang: str | None = None
+        self, image: bytes, *, caption: str | None = None, lang: str | None = None, chat_settings = None
     ) -> Verdict:
         """Classify an image (scam poster, NSFW, phishing screenshot). Providers without
         vision may fall back to inspecting the caption. Default: analyze the caption only."""
         if caption:
-            return await self.classify_text(caption, lang=lang)
+            return await self.classify_text(caption, lang=lang, chat_settings=chat_settings)
         return Verdict("ok", 50, "No vision analysis available")
 
     async def health(self) -> bool:

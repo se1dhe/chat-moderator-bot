@@ -262,6 +262,12 @@ async def get_member(
         )
     )
 
+async def count_members(session: AsyncSession, chat_telegram_id: int) -> int:
+    result = await session.scalar(
+        select(func.count()).select_from(ChatMember).where(ChatMember.chat_telegram_id == chat_telegram_id)
+    )
+    return int(result or 0)
+
 
 async def search_members(
     session: AsyncSession, chat_telegram_id: int, *, query: str = "", limit: int = 30

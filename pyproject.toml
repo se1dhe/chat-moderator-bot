@@ -12,6 +12,7 @@ dependencies = [
     "redis>=5.0",
     "pydantic-settings>=2.4",
     "aiohttp>=3.10",
+    "cryptography>=50.0.1",
 ]
 
 [project.optional-dependencies]
