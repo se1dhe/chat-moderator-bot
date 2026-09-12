@@ -127,6 +127,12 @@ async def _act_on_verdict(message, bot, session, settings, verdict, t, *, flagge
         meta={"score": verdict.score},
     )
 
+    # 1. Hide the offending message immediately
+    try:
+        await message.delete()
+    except Exception as exc:
+        log.warning("Could not delete flagged message: %s", exc)
+
     # Auto-ban is a Pro capability; free chats fall back to the quarantine card.
     if settings.ai_mode == "autoban" and await billing.is_pro(session, message.chat.id):
         try:
@@ -142,7 +148,22 @@ async def _act_on_verdict(message, bot, session, settings, verdict, t, *, flagge
         score=verdict.score / 100,
         reason=verdict.explanation,
     )
-    await message.reply(card, reply_markup=_decision_kb(row.id, t).as_markup())
+    markup = _decision_kb(row.id, t).as_markup()
+
+    # 2. Send the quarantine card to the admins in PM instead of spamming the group
+    try:
+        admins = await bot.get_chat_administrators(message.chat.id)
+        for admin in admins:
+            if admin.user.is_bot:
+                continue
+            try:
+                await bot.send_message(admin.user.id, f"<b>Chat: {message.chat.title}</b>
+
+" + card, reply_markup=markup)
+            except Exception:
+                pass  # Admin hasn't started the bot in PM, ignore
+    except Exception as exc:
+        log.warning("Could not fetch admins to send quarantine card: %s", exc)
 
 
 def _visual_source(message: Message):
