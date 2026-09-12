@@ -1,11 +1,11 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 
-// Served by the bot's aiohttp app under /app, so assets must resolve relative to /app/.
+// Served by the bot's aiohttp app under / and /app.
 // In dev, /api is proxied to the local API server so initData-authed calls just work.
 export default defineConfig({
   plugins: [react()],
-  base: '/app/',
+  base: '/',
   server: {
     host: true,
     allowedHosts: true, // let ngrok / any tunnel host through in dev

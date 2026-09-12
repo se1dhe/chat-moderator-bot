@@ -41,6 +41,9 @@ def _mount_static(app: web.Application, dist: Path) -> None:
 
     async def spa(request: web.Request) -> web.StreamResponse:
         rel = request.match_info.get("tail", "").lstrip("/")
+        if rel.startswith("app/"):
+            rel = rel[4:]
+        
         candidate = (dist / rel).resolve()
         if rel and candidate.is_file() and dist.resolve() in candidate.parents:
             return web.FileResponse(candidate)
