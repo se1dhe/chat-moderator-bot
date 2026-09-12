@@ -5,6 +5,7 @@ import { useLang } from '../context/LangContext'
 import { useChatSettings } from '../context/ChatSettingsContext'
 import { Toggle, Row, Segmented, Stepper, Slider, Chips, Spinner } from '../components/ui'
 import { haptic } from '../lib/telegram'
+import { api } from '../lib/api'
 
 const CATEGORIES = ['spam', 'scam', 'toxicity', 'nsfw', 'flood']
 
@@ -409,7 +410,7 @@ function AutoComment({ s, t }) {
           <div className="section-label">{t('sec.autocomment.media')}</div>
           <div className="card p-4 flex items-center justify-between">
             <div className="text-[13px] text-[var(--tg-theme-hint-color)] truncate mr-3">
-              {c.media_url ? 'Media attached' : 'No media'}
+              {c.media_url ? t('common.mediaAttached') : t('common.noMedia')}
             </div>
             <label className={`btn btn-secondary px-3 py-1 text-[13px] whitespace-nowrap cursor-pointer ${uploading ? 'opacity-50' : ''}`}>
               {uploading ? t('common.uploading') : t('common.upload')}

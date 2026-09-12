@@ -1,5 +1,9 @@
 export const LOCALES = {
   en: {
+    'common.noMedia': 'No media',
+    'common.mediaAttached': 'Media attached',
+    'common.removeMedia': 'Remove media',
+
     'pay.title': 'Choose Payment Method',
     'pay.subtitle': 'How would you like to pay for RedQueen Pro?',
     'pay.stars.title': 'Telegram Stars',
@@ -273,6 +277,10 @@ export const LOCALES = {
   },
   
   ru: {
+    'common.noMedia': 'Нет медиа',
+    'common.mediaAttached': 'Медиа прикреплено',
+    'common.removeMedia': 'Удалить медиа',
+
     'pay.title': 'Выберите способ оплаты',
     'pay.subtitle': 'Как вы хотите оплатить RedQueen Pro?',
     'pay.stars.title': 'Telegram Stars',
@@ -546,6 +554,10 @@ export const LOCALES = {
   },
   
   uk: {
+    'common.noMedia': 'Немає медіа',
+    'common.mediaAttached': 'Медіа прикріплено',
+    'common.removeMedia': 'Видалити медіа',
+
     'pay.title': 'Виберіть спосіб оплати',
     'pay.subtitle': 'Як ви хочете оплатити RedQueen Pro?',
     'pay.stars.title': 'Telegram Stars',
