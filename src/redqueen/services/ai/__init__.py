@@ -13,12 +13,6 @@ def build_provider(settings: Settings) -> AIProvider:
     from .rules import RuleProvider
     fallback = RuleProvider()
     
-    if settings.gemini_api_key:
-        from .gemini import GeminiProvider
-        from .router import RouterProvider
-        gemini = GeminiProvider(api_key=settings.gemini_api_key)
-        return RouterProvider(gemini, fallback)
-        
     if settings.ai_enabled:
         from .ollama import OllamaProvider
         from .router import RouterProvider
@@ -29,6 +23,5 @@ def build_provider(settings: Settings) -> AIProvider:
             fallback=fallback,
             vision_model=settings.ollama_vision_model,
         )
-        return RouterProvider(ollama, fallback)
-
+        return RouterProvider(ollama, fallback, settings.secret_key)
     return fallback
