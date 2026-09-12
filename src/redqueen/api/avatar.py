@@ -16,7 +16,11 @@ async def get_avatar(request: web.Request) -> web.Response:
     
     import base64
     cache_key = f"avatar:{cid}"
-    cached = await redis.get(cache_key)
+    try:
+        cached = await redis.get(cache_key)
+    except UnicodeDecodeError:
+        cached = None
+        
     if cached is not None:
         if cached == "":
             raise web.HTTPNotFound(reason="No avatar (cached failure)")
