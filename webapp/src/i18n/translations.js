@@ -4,6 +4,8 @@ export const LOCALES = {
     'common.retry': 'Retry',
     'common.save': 'Save',
     'common.cancel': 'Cancel',
+    'common.uploading': 'Uploading...',
+    'common.upload': 'Upload File',
     
     'nav.dashboard': 'Overview',
     'nav.members': 'Members',
@@ -32,6 +34,15 @@ export const LOCALES = {
     'sec.warns.desc': 'Strike system for violations',
     'sec.ai': 'AI Core',
     'sec.ai.desc': 'Context-aware toxicity & spam detection',
+    
+    'sec.autocomment': 'Auto-Comment',
+    'sec.autocomment.desc': 'First comment in discussions',
+    'sec.autocomment.enable': 'Enable feature',
+    'sec.autocomment.enable.desc': 'Post comment under new channel posts',
+    'sec.autocomment.text': 'Comment Text',
+    'sec.autocomment.text.ph': 'Text (Markdown & HTML supported)...',
+    'sec.autocomment.media': 'Media File (Optional)',
+    'sec.autocomment.media.desc': 'If a media file is uploaded, the text will be used as a caption.',
 
     'action.ban': 'Ban',
     'action.mute': 'Mute',
@@ -99,6 +110,8 @@ export const LOCALES = {
     'common.retry': 'Повторить',
     'common.save': 'Сохранить',
     'common.cancel': 'Отмена',
+    'common.uploading': 'Загрузка...',
+    'common.upload': 'Загрузить файл',
     
     'nav.dashboard': 'Обзор',
     'nav.members': 'Участники',
@@ -127,6 +140,15 @@ export const LOCALES = {
     'sec.warns.desc': 'Система страйков за нарушения',
     'sec.ai': 'ИИ Ядро',
     'sec.ai.desc': 'Нейросетевой анализ контекста и спама',
+
+    'sec.autocomment': 'Авто-Комментарий',
+    'sec.autocomment.desc': 'Первый коммент в обсуждениях',
+    'sec.autocomment.enable': 'Включить функцию',
+    'sec.autocomment.enable.desc': 'Оставлять комментарий под новыми постами',
+    'sec.autocomment.text': 'Текст комментария',
+    'sec.autocomment.text.ph': 'Текст (поддерживается Markdown и HTML)...',
+    'sec.autocomment.media': 'Медиа файл (Опционально)',
+    'sec.autocomment.media.desc': 'Если загружен файл, текст будет использован как подпись к нему.',
 
     'action.ban': 'Бан',
     'action.mute': 'Мут',
@@ -194,6 +216,8 @@ export const LOCALES = {
     'common.retry': 'Повторити',
     'common.save': 'Зберегти',
     'common.cancel': 'Скасувати',
+    'common.uploading': 'Завантаження...',
+    'common.upload': 'Завантажити файл',
     
     'nav.dashboard': 'Огляд',
     'nav.members': 'Учасники',
@@ -219,9 +243,18 @@ export const LOCALES = {
     'sec.raid': 'Анти-Рейд',
     'sec.raid.desc': 'Блокування при масових вступах',
     'sec.warns': 'Варни',
-    'sec.warns.desc': 'Система страйків за порушення',
+    'sec.warns.desc': 'Система страйков за порушення',
     'sec.ai': 'ШІ Ядро',
     'sec.ai.desc': 'Нейромережевий аналіз контексту та спаму',
+
+    'sec.autocomment': 'Авто-Коментар',
+    'sec.autocomment.desc': 'Перший коментар в обговореннях',
+    'sec.autocomment.enable': 'Увімкнути функцію',
+    'sec.autocomment.enable.desc': 'Залишати коментар під новими постами',
+    'sec.autocomment.text': 'Текст коментаря',
+    'sec.autocomment.text.ph': 'Текст (підтримується Markdown та HTML)...',
+    'sec.autocomment.media': 'Медіа файл (Опціонально)',
+    'sec.autocomment.media.desc': 'Якщо завантажено файл, текст буде використано як підпис до нього.',
 
     'action.ban': 'Бан',
     'action.mute': 'Мут',

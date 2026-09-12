@@ -423,6 +423,38 @@ async def error_handling_middleware(request: web.Request, handler):
         logging.getLogger(__name__).exception("Unhandled API Error")
         raise web.HTTPInternalServerError(reason="Internal Server Error")
 
+async def upload_media(request: web.Request) -> web.Response:
+    """Accept multipart upload, send to admin's PM to get a permanent file_id."""
+    init = _init_data(request)
+    uid = init.user.id
+    cid = _chat_id(request)
+    await require_chat_admin(request, cid)
+
+    reader = await request.multipart()
+    field = await reader.next()
+    if not field:
+        raise web.HTTPBadRequest(reason="No file provided")
+    
+    filename = field.filename or "file"
+    content = await field.read()
+    
+    bot = request_bot(request)
+    
+    from aiogram.types import BufferedInputFile
+    file = BufferedInputFile(content, filename=filename)
+    
+    try:
+        if filename.lower().endswith((".mp4", ".gif")):
+            msg = await bot.send_animation(uid, animation=file)
+            file_id = f"animation:{msg.animation.file_id}"
+        else:
+            msg = await bot.send_photo(uid, photo=file)
+            file_id = f"photo:{msg.photo[-1].file_id}"
+    except Exception as e:
+        raise web.HTTPBadRequest(reason=f"Failed to process media (bot might need PM access): {e}")
+        
+    return web.json_response({"file_id": file_id})
+
 def setup_routes(app: web.Application) -> None:
     app.middlewares.append(error_handling_middleware)
     app.middlewares.append(rate_limit_middleware)
@@ -443,6 +475,7 @@ def setup_routes(app: web.Application) -> None:
     app.router.add_post("/api/chats/{cid}/billing/invoice", billing_invoice)
     app.router.add_get("/api/chats/{cid}/members", members_search)
     app.router.add_post("/api/chats/{cid}/members/{uid}/action", member_action)
+    app.router.add_post("/api/chats/{cid}/upload", upload_media)
     app.router.add_post("/webhook/cryptopay", cryptopay_webhook)
 
 

@@ -25,10 +25,11 @@ async def handle_automatic_forward(message: Message, settings: ChatSettings, bot
     
     try:
         if media_url:
-            # We don't know the exact media type from a raw URL. Best effort:
-            # Try to send as photo. If it's a video or gif, it might fail.
-            # In a real scenario we might check extensions, but for now we'll just try photo/animation
-            if media_url.endswith(".mp4") or media_url.endswith(".gif"):
+            if media_url.startswith("animation:"):
+                await message.reply_animation(animation=media_url.split(":", 1)[1], caption=text, parse_mode="HTML")
+            elif media_url.startswith("photo:"):
+                await message.reply_photo(photo=media_url.split(":", 1)[1], caption=text, parse_mode="HTML")
+            elif media_url.endswith(".mp4") or media_url.endswith(".gif"):
                 await message.reply_animation(animation=media_url, caption=text, parse_mode="HTML")
             else:
                 await message.reply_photo(photo=media_url, caption=text, parse_mode="HTML")

@@ -35,4 +35,15 @@ export const api = {
   members: (cid, q = '', opts = {}) => request('GET', `/chats/${cid}/members?q=${encodeURIComponent(q)}`, undefined, opts),
   memberAction: (cid, uid, action, extra = {}) =>
     request('POST', `/chats/${cid}/members/${uid}/action`, { action, ...extra }),
+  uploadMedia: async (cid, file) => {
+    const formData = new FormData()
+    formData.append('file', file)
+    const resp = await fetch(`/api/chats/${cid}/upload`, {
+      method: 'POST',
+      headers: { Authorization: `tma ${initData}` },
+      body: formData,
+    })
+    if (!resp.ok) throw new Error(await resp.text())
+    return resp.json()
+  }
 }
