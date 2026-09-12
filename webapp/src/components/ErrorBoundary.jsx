@@ -31,7 +31,7 @@ export class ErrorBoundary extends React.Component {
           alignItems: 'center',
           justifyContent: 'center',
           padding: '24px',
-          background: 'var(--tg-theme-bg-color, #07070e)',
+          background: 'var(--bg-base, #07070e)',
           color: 'var(--tg-theme-text-color, #fff)',
           textAlign: 'center'
         }}>

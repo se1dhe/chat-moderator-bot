@@ -17,6 +17,7 @@ export function ChatSettingsProvider({ chatId, children }) {
   const [error, setError] = useState(null)
   const [saving, setSaving] = useState(false)
   const [billing, setBilling] = useState(null)  // { pro, active_until, price_stars, period_days, features }
+  const [paymentResolver, setPaymentResolver] = useState(null)
 
   const draftRef = useRef(null)
   const savedRef = useRef(null)
