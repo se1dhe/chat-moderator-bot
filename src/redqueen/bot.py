@@ -50,7 +50,7 @@ def create_dispatcher(
         settings.whisper_model, device=settings.whisper_device, compute_type=settings.whisper_compute
     )
 
-    session_mw = DbSessionMiddleware(get_sessionmaker())
+    session_mw = DbSessionMiddleware(get_sessionmaker(), redis)
     lang_mw = LangMiddleware(settings.default_lang)
     for name in _DB_SCOPED_OBSERVERS:
         observer = getattr(dp, name)

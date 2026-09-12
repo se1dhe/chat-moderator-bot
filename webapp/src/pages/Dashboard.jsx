@@ -6,7 +6,7 @@ import {
 import { motion } from 'framer-motion'
 import { useLang } from '../context/LangContext'
 import { useChatSettings } from '../context/ChatSettingsContext'
-import { Spinner, Segmented } from '../components/ui'
+import { Spinner, Segmented, SwitchRow } from '../components/ui'
 import { ProBanner } from '../components/ProBanner'
 import { Tips } from '../components/Tips'
 import { OnboardingWizard } from '../components/OnboardingWizard'
@@ -92,6 +92,16 @@ export function Dashboard() {
 
       <div className="section-label">{t('dash.chatLang')}</div>
       <Segmented value={draft.lang} onChange={(v) => setSection('lang', v)} options={LANGS} />
+
+      <div className="section-label">Privacy</div>
+      <div className="card">
+        <SwitchRow 
+          label={t('dash.privacy')}
+          desc={t('dash.privacy.desc')}
+          checked={draft.core.anonymize_events ?? false}
+          onChange={(v) => setSection('core', { ...draft.core, anonymize_events: v })}
+        />
+      </div>
 
       {groups.map((g, gi) => (
         <motion.div key={g.label} variants={container} initial="hidden" animate="show">

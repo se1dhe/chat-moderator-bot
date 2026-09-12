@@ -11,8 +11,9 @@ from sqlalchemy.ext.asyncio import async_sessionmaker
 
 
 class DbSessionMiddleware(BaseMiddleware):
-    def __init__(self, sessionmaker: async_sessionmaker) -> None:
+    def __init__(self, sessionmaker: async_sessionmaker, redis) -> None:
         self.sessionmaker = sessionmaker
+        self.redis = redis
 
     async def __call__(
         self,
@@ -21,6 +22,7 @@ class DbSessionMiddleware(BaseMiddleware):
         data: dict[str, Any],
     ) -> Any:
         async with self.sessionmaker() as session:
+            session.info["redis"] = self.redis
             data["session"] = session
             try:
                 result = await handler(event, data)

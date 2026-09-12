@@ -219,6 +219,42 @@ async def log_action(
             meta=meta or {},
         )
     )
+    
+    redis = session.info.get("redis")
+    if redis:
+        try:
+            import json
+            chat = await get_or_create_chat(session, chat_telegram_id)
+            anonymize = chat.settings.anonymize_events
+            
+            chat_title = chat.title or "Group"
+            user_name = "Unknown"
+            
+            if user_telegram_id:
+                user = await session.scalar(select(User).where(User.telegram_id == user_telegram_id))
+                if user:
+                    user_name = user.username or user.full_name or "Unknown"
+                    
+            if anonymize:
+                if len(chat_title) > 4:
+                    chat_title = chat_title[:2] + "***" + chat_title[-2:]
+                else:
+                    chat_title = "***"
+                    
+                if len(user_name) > 3:
+                    user_name = user_name[:2] + "***" + user_name[-1:]
+                else:
+                    user_name = "***"
+                    
+            await redis.publish("live_events", json.dumps({
+                "action": action,
+                "reason": reason,
+                "chat_title": chat_title,
+                "user_name": user_name
+            }))
+        except Exception as e:
+            import logging
+            logging.getLogger(__name__).error(f"Failed to publish live event: {e}")
 
 
 # --- Mini App API reads ---------------------------------------------------------

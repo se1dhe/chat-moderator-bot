@@ -23,8 +23,13 @@ def _chat_id(request: web.Request) -> int:
         raise web.HTTPBadRequest(reason="bad chat id") from exc
 
 
-def _session(request: web.Request):
-    return request.app["sessionmaker"]()
+from contextlib import asynccontextmanager
+
+@asynccontextmanager
+async def _session(request: web.Request):
+    async with request.app["sessionmaker"]() as session:
+        session.info["redis"] = request.app["redis"]
+        yield session
 
 
 async def health(request: web.Request) -> web.Response:
@@ -428,6 +433,10 @@ def setup_routes(app: web.Application) -> None:
     app.router.add_put("/api/chats/{cid}/settings", put_settings)
     app.router.add_get("/api/chats/{cid}/audit", audit)
     app.router.add_get("/api/chats/{cid}/quarantine", quarantine_list)
+    
+    from .live import live_feed, global_stats
+    app.router.add_get("/api/live/feed", live_feed)
+    app.router.add_get("/api/stats/global", global_stats)
     app.router.add_post("/api/chats/{cid}/quarantine/{vid}", quarantine_decide)
     app.router.add_get("/api/chats/{cid}/stats", stats)
     app.router.add_get("/api/chats/{cid}/billing", billing_status)

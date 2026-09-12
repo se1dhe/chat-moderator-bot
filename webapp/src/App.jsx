@@ -8,12 +8,14 @@ import { Quarantine } from './pages/Quarantine'
 import { Audit } from './pages/Audit'
 import { Stats } from './pages/Stats'
 import { WhatsNewModal } from './components/WhatsNewModal'
+import { Landing } from './pages/Landing'
+import { isTelegram } from './lib/telegram'
 
 export default function App() {
   return (
     <>
       <Routes>
-        <Route path="/" element={<ChatPicker />} />
+        <Route path="/" element={isTelegram ? <ChatPicker /> : <Landing />} />
         <Route path="/c/:cid" element={<Layout />}>
           <Route index element={<Dashboard />} />
           <Route path="s/:section" element={<SettingsSection />} />

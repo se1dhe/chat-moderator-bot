@@ -60,6 +60,7 @@ class ChatSettings(Base):
     ai_provider: Mapped[str] = mapped_column(String(16), default="ollama", server_default="ollama")
     ai_model: Mapped[str | None] = mapped_column(String(64), nullable=True)
     ai_api_key_encrypted: Mapped[str | None] = mapped_column(Text, nullable=True)
+    anonymize_events: Mapped[bool] = mapped_column(Boolean, default=False, server_default="false")
     data: Mapped[dict] = mapped_column(JSONB, default=dict)
 
     chat: Mapped[Chat] = relationship(back_populates="settings")

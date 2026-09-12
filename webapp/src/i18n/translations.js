@@ -52,6 +52,8 @@ export const EN = {
   'dash.intelligence': 'Intelligence',
   'dash.enabled': 'Active',
   'dash.disabled': 'Off',
+  'dash.privacy': 'Live feed anonymization',
+  'dash.privacy.desc': 'Partially hide chat/user names on the public live feed',
 
   'sec.captcha': 'Captcha',
   'sec.captcha.desc': 'Verify newcomers before they can speak',
@@ -241,6 +243,8 @@ const RU = {
   'dash.chatLang': 'Язык уведомлений чата',
   'dash.protection': 'Защита', 'dash.content': 'Контент и флуд', 'dash.intelligence': 'Интеллект',
   'dash.enabled': 'Активно', 'dash.disabled': 'Выкл',
+  'dash.privacy': 'Анонимность на сайте',
+  'dash.privacy.desc': 'Частично скрывать название чата и ники на главном сайте',
 
   'sec.captcha': 'Капча', 'sec.captcha.desc': 'Проверка новичков до первого сообщения',
   'sec.antiflood': 'Антифлуд', 'sec.antiflood.desc': 'Сдерживание всплесков сообщений',
@@ -381,6 +385,8 @@ const UK = {
   'dash.chatLang': 'Мова сповіщень чату',
   'dash.protection': 'Захист', 'dash.content': 'Контент і флуд', 'dash.intelligence': 'Інтелект',
   'dash.enabled': 'Активно', 'dash.disabled': 'Вимк',
+  'dash.privacy': 'Анонімність на сайті',
+  'dash.privacy.desc': 'Частково приховувати назву чату та ніки на головному сайті',
 
   'sec.captcha': 'Капча', 'sec.captcha.desc': 'Перевірка новачків до першого повідомлення',
   'sec.antiflood': 'Антифлуд', 'sec.antiflood.desc': 'Стримування сплесків повідомлень',
