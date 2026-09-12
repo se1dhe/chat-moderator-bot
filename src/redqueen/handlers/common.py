@@ -17,7 +17,12 @@ from sqlalchemy.ext.asyncio import AsyncSession
 router = Router(name="common")
 
 
-async def _send_welcome(message: Message | CallbackQuery, lang: str, settings: Settings) -> None:
+async def _send_welcome(
+    message: Message | CallbackQuery,
+    lang: str,
+    settings: Settings,
+    bot_username: str | None = None,
+) -> None:
     def t(key: str, **kw: object) -> str:
         return _t(lang, key, **kw)
         
@@ -26,21 +31,27 @@ async def _send_welcome(message: Message | CallbackQuery, lang: str, settings: S
         kb.button(text=t("PANEL_BUTTON"), web_app=WebAppInfo(url=settings.webapp_url))
         
     logo = FSInputFile("webapp/dist/logo.jpg")
+
+    # Build a deep-link that survives forwarding (inline keyboards are stripped)
+    bot_link = f"https://t.me/{bot_username}" if bot_username else ""
     
     if lang == "ru":
         desc = "Продвинутая система модерации и аналитики Telegram-сообществ."
         prompt = "Нажмите на кнопку ниже, чтобы открыть панель управления и добавить бота в свои чаты."
+        fwd_hint = f"\n\n🔗 [Открыть RedQueen]({bot_link})" if bot_link else ""
     elif lang == "uk":
         desc = "Просунута система модерації та аналітики Telegram-спільнот."
         prompt = "Натисніть на кнопку нижче, щоб відкрити панель керування та додати бота у свої чати."
+        fwd_hint = f"\n\n🔗 [Відкрити RedQueen]({bot_link})" if bot_link else ""
     else:
         desc = "Advanced Telegram moderation SaaS and analytics."
         prompt = "Click the button below to open the dashboard and add the bot to your chats."
+        fwd_hint = f"\n\n🔗 [Open RedQueen]({bot_link})" if bot_link else ""
 
     text = (
         f"👑 *RedQueen Security*\n\n"
         f"_{desc}_\n\n"
-        f"{prompt}"
+        f"{prompt}{fwd_hint}"
     )
     
     msg = message if isinstance(message, Message) else message.message
@@ -57,11 +68,12 @@ async def cmd_start(
     message: Message,
     session: AsyncSession,
     settings: Settings,
+    bot_username: str | None = None,
 ) -> None:
     # Check if user already exists in DB
     user = await repo.get_user(session, message.from_user.id)
     if user and user.lang:
-        await _send_welcome(message, user.lang, settings)
+        await _send_welcome(message, user.lang, settings, bot_username)
         return
 
     kb = InlineKeyboardBuilder()
@@ -81,6 +93,7 @@ async def on_lang_selected(
     call: CallbackQuery,
     session: AsyncSession,
     settings: Settings,
+    bot_username: str | None = None,
 ) -> None:
     lang = call.data.split(":")[1]
     
@@ -95,7 +108,7 @@ async def on_lang_selected(
     await session.commit()
     
     await call.message.delete()
-    await _send_welcome(call, lang, settings)
+    await _send_welcome(call, lang, settings, bot_username)
 
 
 @router.message(Command("help"))
