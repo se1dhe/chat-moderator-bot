@@ -1,13 +1,14 @@
 // API client — every request carries the Telegram initData for auth.
 import { initData } from './telegram'
 
-async function request(method, path, body) {
+async function request(method, path, body, opts = {}) {
   const headers = { Authorization: `tma ${initData}` }
   if (body !== undefined) headers['Content-Type'] = 'application/json'
   const resp = await fetch(`/api${path}`, {
     method,
     headers,
     body: body !== undefined ? JSON.stringify(body) : undefined,
+    signal: opts.signal,
   })
   if (!resp.ok) {
     let detail = resp.statusText
@@ -31,7 +32,7 @@ export const api = {
   stats: (cid) => request('GET', `/chats/${cid}/stats`),
   billing: (cid) => request('GET', `/chats/${cid}/billing`),
   invoice: (cid) => request('POST', `/chats/${cid}/billing/invoice`),
-  members: (cid, q = '') => request('GET', `/chats/${cid}/members?q=${encodeURIComponent(q)}`),
+  members: (cid, q = '', opts = {}) => request('GET', `/chats/${cid}/members?q=${encodeURIComponent(q)}`, undefined, opts),
   memberAction: (cid, uid, action, extra = {}) =>
     request('POST', `/chats/${cid}/members/${uid}/action`, { action, ...extra }),
 }

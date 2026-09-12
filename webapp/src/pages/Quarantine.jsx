@@ -20,10 +20,13 @@ export function Quarantine() {
 
   const decide = async (vid, action) => {
     setBusy(vid)
-    haptic(action === 'approve' ? 'success' : 'warning')
     try {
       await api.decide(cid, vid, action)
+      haptic(action === 'approve' ? 'success' : 'warning')
       setItems((list) => list.filter((v) => v.id !== vid))
+    } catch (e) {
+      haptic('error')
+      window.Telegram?.WebApp?.showAlert?.(e.message || 'Error processing decision')
     } finally {
       setBusy(null)
     }

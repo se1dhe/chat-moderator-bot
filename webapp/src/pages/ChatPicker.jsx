@@ -15,12 +15,10 @@ export function ChatPicker() {
   const navigate = useNavigate()
   const [state, setState] = useState({ loading: true })
 
-  useEffect(() => {
-    let alive = true
+  const load = () => {
+    setState({ loading: true })
     api.me()
       .then((data) => {
-        if (!alive) return
-        
         if (data.user?.lang && data.user.lang !== lang) {
           setLang(data.user.lang)
         }
@@ -30,11 +28,14 @@ export function ChatPicker() {
           navigate(`/c/${sp}`, { replace: true })
           return
         }
-        // Give the preloader a minimum of 1s to show off the animation
         setTimeout(() => setState({ loading: false, data }), 800)
       })
-      .catch((e) => alive && setState({ loading: false, error: e }))
-    return () => { alive = false }
+      .catch((e) => setState({ loading: false, error: e }))
+  }
+
+  useEffect(() => {
+    load()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [navigate])
 
   const cycle = { en: 'ru', ru: 'uk', uk: 'en' }
@@ -69,7 +70,7 @@ export function ChatPicker() {
           <div className="center-state">
             <ServerCrash size={44} className="ico" />
             <h3>{t('common.error')}</h3>
-            <button className="btn" onClick={() => setState({ loading: true }) || location.reload()}>
+            <button className="btn" onClick={load}>
               {t('common.retry')}
             </button>
           </div>

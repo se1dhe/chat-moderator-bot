@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from 'react'
+import { useEffect, useState, useCallback, useRef } from 'react'
 import { useParams } from 'react-router-dom'
 import { Users, Search, TriangleAlert, VolumeX, Volume2, UserMinus, Ban, RotateCcw } from 'lucide-react'
 import { useLang } from '../context/LangContext'
@@ -43,9 +43,19 @@ export function Members() {
   const [busy, setBusy] = useState(null)
   const [reasons, setReasons] = useState({})
   const [durs, setDurs] = useState({})  // user_id -> minutes for mute/ban
+  
+  const abortCtrlRef = useRef(null)
 
   const load = useCallback((query) => {
-    api.members(cid, query).then(setRows).catch(() => setRows([]))
+    if (abortCtrlRef.current) abortCtrlRef.current.abort()
+    const ctrl = new AbortController()
+    abortCtrlRef.current = ctrl
+    
+    api.members(cid, query, { signal: ctrl.signal })
+      .then(setRows)
+      .catch((e) => {
+        if (e.name !== 'AbortError') setRows([])
+      })
   }, [cid])
 
   useEffect(() => {

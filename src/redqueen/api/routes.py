@@ -122,6 +122,7 @@ async def put_settings(request: web.Request) -> web.Response:
                 except Exception as e:
                     import logging
                     logging.getLogger(__name__).error(f"Failed to encrypt API key: {e}")
+                    raise web.HTTPBadRequest(reason="Invalid SERVER_KEY configuration, cannot save API key")
             else:
                 settings.ai_api_key_encrypted = None
 
