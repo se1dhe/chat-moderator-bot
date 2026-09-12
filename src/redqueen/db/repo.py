@@ -62,21 +62,31 @@ async def set_warn_limit(session: AsyncSession, chat_telegram_id: int, limit: in
     settings.warn_limit = limit
 
 
+async def get_user(session: AsyncSession, telegram_id: int) -> User | None:
+    return await session.scalar(select(User).where(User.telegram_id == telegram_id))
+
+
 async def upsert_user(
     session: AsyncSession,
     telegram_id: int,
     *,
     username: str | None = None,
     full_name: str | None = None,
+    lang: str | None = None,
 ) -> User:
     user = await session.scalar(select(User).where(User.telegram_id == telegram_id))
     if user is None:
         user = User(telegram_id=telegram_id, username=username, full_name=full_name)
+        if lang:
+            user.lang = lang
         session.add(user)
-        await session.flush()
     else:
-        user.username = username or user.username
-        user.full_name = full_name or user.full_name
+        if username is not None:
+            user.username = username
+        if full_name is not None:
+            user.full_name = full_name
+        if lang is not None:
+            user.lang = lang
     return user
 
 

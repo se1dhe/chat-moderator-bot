@@ -40,11 +40,15 @@ async def on_lang_selected(
 ) -> None:
     lang = call.data.split(":")[1]
     
-    # Save user language
-    user = await repo.get_user(session, call.from_user.id)
-    if user:
-        user.lang = lang
-        await session.commit()
+    # Save user language, creating user if it doesn't exist
+    await repo.upsert_user(
+        session,
+        call.from_user.id,
+        username=call.from_user.username,
+        full_name=call.from_user.full_name,
+        lang=lang
+    )
+    await session.commit()
     
     def t(key: str, **kw: object) -> str:
         return _t(lang, key, **kw)
