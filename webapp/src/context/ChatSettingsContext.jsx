@@ -1,4 +1,5 @@
 import { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
 import { api } from '../lib/api'
 import { haptic, openInvoice } from '../lib/telegram'
 
@@ -46,36 +47,43 @@ export function ChatSettingsProvider({ chatId, children }) {
   const openUpgrade = useCallback(() => {
     return new Promise((resolve) => {
       haptic('light')
-      if (window.Telegram?.WebApp?.showPopup) {
-        window.Telegram.WebApp.showPopup({
-          title: 'Choose Payment Method',
-          message: 'How would you like to pay for RedQueen Pro?',
-          buttons: [
-            { id: 'stars', type: 'default', text: 'Telegram Stars' },
-            { id: 'crypto', type: 'default', text: 'Crypto Pay' },
-            { type: 'cancel' }
-          ]
-        }, async (btnId) => {
-          if (!btnId) return resolve(null);
-          
-          try {
-            const { url, method } = await api.invoice(chatId, btnId)
-            if (method === 'crypto') {
-              window.Telegram.WebApp.openTelegramLink(url)
-              resolve('pending')
-            } else {
-              const status = await openInvoice(url)
-              if (status === 'paid') { haptic('success'); loadBilling() }
-              resolve(status)
-            }
-          } catch {
-            haptic('error')
-            resolve(null)
-          }
-        })
-      }
+      setPaymentResolver(() => resolve)
     })
-  }, [chatId, loadBilling])
+  }, [])
+
+  const handlePaymentSelect = useCallback(async (method) => {
+    const resolve = paymentResolver
+    setPaymentResolver(null)
+    if (!method) {
+      resolve?.(null)
+      return
+    }
+
+    try {
+      if (method === 'crypto') {
+        const data = await api.createInvoice(chatId, 'crypto')
+        if (data.url) {
+          window.Telegram?.WebApp?.openLink(data.url)
+          resolve?.('crypto')
+        }
+      } else if (method === 'stars') {
+        const data = await api.createInvoice(chatId, 'stars')
+        if (data.url) {
+          window.Telegram?.WebApp?.openInvoice(data.url, (status) => {
+            if (status === 'paid') {
+              loadBilling()
+              resolve?.('stars')
+            } else {
+              resolve?.(null)
+            }
+          })
+        }
+      }
+    } catch {
+      haptic('error')
+      resolve?.(null)
+    }
+  }, [chatId, loadBilling, paymentResolver])
 
   const flush = useCallback(async () => {
     const payload = patchRef.current
