@@ -431,7 +431,7 @@ def setup_routes(app: web.Application) -> None:
     app.router.add_post("/api/chats/{cid}/quarantine/{vid}", quarantine_decide)
     app.router.add_get("/api/chats/{cid}/stats", stats)
     app.router.add_get("/api/chats/{cid}/billing", billing_status)
-    app.router.add_post("/api/chats/{cid}/billing/invoice", invoice)
+    app.router.add_post("/api/chats/{cid}/billing/invoice", billing_invoice)
     app.router.add_get("/api/chats/{cid}/members", members_search)
     app.router.add_post("/api/chats/{cid}/members/{uid}/action", member_action)
     app.router.add_post("/webhook/cryptopay", cryptopay_webhook)
