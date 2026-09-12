@@ -41,6 +41,9 @@ async def get_or_create_chat(
     stmt = stmt.returning(Chat.id)
     chat_pk = await session.scalar(stmt)
     
+    if chat_pk is None:
+        chat_pk = await session.scalar(select(Chat.id).where(Chat.telegram_id == telegram_id))
+    
     # Eager-load settings: async sessions cannot lazy-load a relationship on access
     chat = await session.scalar(
         select(Chat).where(Chat.id == chat_pk).options(selectinload(Chat.settings))
@@ -119,7 +122,10 @@ async def upsert_user(
         stmt = stmt.on_conflict_do_nothing(index_elements=["telegram_id"])
         
     stmt = stmt.returning(User)
-    return await session.scalar(stmt)
+    user = await session.scalar(stmt)
+    if user is None:
+        user = await session.scalar(select(User).where(User.telegram_id == telegram_id))
+    return user
 
 
 async def add_warn(
