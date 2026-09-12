@@ -21,20 +21,20 @@ export function GlobalOnboarding({ botUsername }) {
   return (
     <div className="content" style={{ display: 'flex', flexDirection: 'column', minHeight: '100%' }}>
       <div className="center-state fade-in" style={{ padding: '0 20px', minHeight: '60vh', justifyContent: 'center' }}>
-        <div className="w-16 h-16 bg-green-500/20 rounded-full flex items-center justify-center mb-6 mt-8 mx-auto">
-          <Plus size={32} className="text-green-500" />
+        <div style={{ width: 64, height: 64, background: 'rgba(34, 197, 94, 0.2)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '32px auto 24px' }}>
+          <Plus size={32} color="#22c55e" />
         </div>
-        <h2 className="text-2xl font-bold mb-4">{t('start.title') || 'Добавление бота'}</h2>
-        <p className="text-[var(--tg-theme-hint-color)] mb-8 leading-relaxed">
+        <h2 style={{ fontSize: '1.5rem', fontWeight: 700, marginBottom: 16 }}>{t('start.title') || 'Добавление бота'}</h2>
+        <p style={{ color: 'var(--text-secondary)', marginBottom: 32, lineHeight: 1.6 }}>
           {t('start.desc') || 'Выберите, куда добавить RedQueen, чтобы начать защиту. Бот автоматически настроится и появится в списке ваших чатов.'}
         </p>
 
-        <button className="btn w-full flex items-center justify-center gap-2 mb-4" onClick={addGroup}>
+        <button className="btn btn-primary btn-block" style={{ marginBottom: 16 }} onClick={addGroup}>
           <ShieldCheck size={20} />
           {t('start.btn.group') || 'Добавить в Группу'}
         </button>
 
-        <button className="btn-secondary w-full flex items-center justify-center gap-2" onClick={addChannel}>
+        <button className="btn btn-block" onClick={addChannel}>
           <Megaphone size={20} />
           {t('start.btn.channel') || 'Добавить в Канал'}
         </button>
