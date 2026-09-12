@@ -1,5 +1,12 @@
 export const LOCALES = {
   en: {
+    'pay.title': 'Choose Payment Method',
+    'pay.subtitle': 'How would you like to pay for RedQueen Pro?',
+    'pay.stars.title': 'Telegram Stars',
+    'pay.stars.desc': 'Fast and native payment',
+    'pay.crypto.title': 'Crypto Pay',
+    'pay.crypto.desc': 'TON, USDT, BTC, ETH',
+
     'tips.captcha': 'Enable Captcha to block bots.',
     'tips.antiflood': 'Enable Anti-Flood to reduce spam.',
     'tips.ai': 'Enable AI moderation for smart filtering.',
@@ -266,6 +273,13 @@ export const LOCALES = {
   },
   
   ru: {
+    'pay.title': 'Выберите способ оплаты',
+    'pay.subtitle': 'Как вы хотите оплатить RedQueen Pro?',
+    'pay.stars.title': 'Telegram Stars',
+    'pay.stars.desc': 'Быстрая и нативная оплата',
+    'pay.crypto.title': 'Crypto Pay',
+    'pay.crypto.desc': 'TON, USDT, BTC, ETH',
+
     'tips.captcha': 'Включите Капчу для защиты от ботов.',
     'tips.antiflood': 'Включите Антифлуд, чтобы уменьшить спам.',
     'tips.ai': 'Включите модерацию ИИ для умной фильтрации.',
@@ -532,6 +546,13 @@ export const LOCALES = {
   },
   
   uk: {
+    'pay.title': 'Виберіть спосіб оплати',
+    'pay.subtitle': 'Як ви хочете оплатити RedQueen Pro?',
+    'pay.stars.title': 'Telegram Stars',
+    'pay.stars.desc': 'Швидка та нативна оплата',
+    'pay.crypto.title': 'Crypto Pay',
+    'pay.crypto.desc': 'TON, USDT, BTC, ETH',
+
     'tips.captcha': 'Увімкніть Капчу для захисту від ботів.',
     'tips.antiflood': 'Увімкніть Антифлуд, щоб зменшити спам.',
     'tips.ai': 'Увімкніть модерацію ШІ для розумної фільтрації.',

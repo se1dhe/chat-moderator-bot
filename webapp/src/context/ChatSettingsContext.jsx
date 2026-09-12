@@ -1,5 +1,6 @@
 import { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
+import { useLang } from './LangContext'
 import { api } from '../lib/api'
 import { haptic, openInvoice } from '../lib/telegram'
 
@@ -12,6 +13,7 @@ const clone = (o) => JSON.parse(JSON.stringify(o))
 // which also kills the floating-bar repaint glitch on fast scroll. On failure we roll the
 // draft back to the last server-confirmed state.
 export function ChatSettingsProvider({ chatId, children }) {
+  const { t } = useLang()
   const [saved, setSaved] = useState(null)
   const [draft, setDraft] = useState(null)
   const [error, setError] = useState(null)
@@ -164,25 +166,25 @@ export function ChatSettingsProvider({ chatId, children }) {
           <motion.div className="modal-overlay" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => handlePaymentSelect(null)}>
             <motion.div className="payment-modal" initial={{ y: '100%' }} animate={{ y: 0 }} exit={{ y: '100%' }} transition={{ type: 'spring', damping: 25, stiffness: 200 }} onClick={e => e.stopPropagation()}>
               <div className="payment-modal-handle" />
-              <h3>Choose Payment Method</h3>
-              <div className="payment-modal-subtitle">How would you like to pay for RedQueen Pro?</div>
+              <h3>{t('pay.title')}</h3>
+              <div className="payment-modal-subtitle">{t("pay.subtitle")}</div>
               <div className="payment-methods">
                 <button className="payment-btn stars" onClick={() => handlePaymentSelect('stars')}>
                   <div className="payment-icon">⭐️</div>
                   <div className="payment-info">
-                    <div className="payment-title">Telegram Stars</div>
-                    <div className="payment-desc">Fast and native payment</div>
+                    <div className="payment-title">{t("pay.stars.title")}</div>
+                    <div className="payment-desc">{t("pay.stars.desc")}</div>
                   </div>
                 </button>
                 <button className="payment-btn crypto" onClick={() => handlePaymentSelect('crypto')}>
                   <div className="payment-icon">💎</div>
                   <div className="payment-info">
-                    <div className="payment-title">Crypto Pay</div>
-                    <div className="payment-desc">TON, USDT, BTC, ETH</div>
+                    <div className="payment-title">{t("pay.crypto.title")}</div>
+                    <div className="payment-desc">{t("pay.crypto.desc")}</div>
                   </div>
                 </button>
               </div>
-              <button className="payment-cancel" onClick={() => handlePaymentSelect(null)}>Cancel</button>
+              <button className="payment-cancel" onClick={() => handlePaymentSelect(null)}>{t("common.cancel")}</button>
             </motion.div>
           </motion.div>
         )}
