@@ -16,7 +16,7 @@ from ..db.models import Payment, Subscription
 PRO_FEATURES = frozenset({"ai_autoban", "raid_shield", "analytics"})
 
 # Default plan pricing/duration (Telegram Stars). Swappable later / per-plan.
-PRO_PRICE_STARS = 150
+PRO_PRICE_STARS = 500
 PRO_PERIOD_DAYS = 30
 
 
