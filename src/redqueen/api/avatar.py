@@ -16,7 +16,9 @@ async def get_avatar(request: web.Request) -> web.Response:
     
     cache_key = f"avatar:{cid}"
     cached = await redis.get(cache_key)
-    if cached:
+    if cached is not None:
+        if cached == b"":
+            raise web.HTTPNotFound(reason="No avatar (cached failure)")
         return web.Response(body=cached, content_type="image/jpeg")
         
     try:
@@ -35,5 +37,9 @@ async def get_avatar(request: web.Request) -> web.Response:
                 
         await redis.setex(cache_key, 3600, data)
         return web.Response(body=data, content_type="image/jpeg")
-    except Exception:
+    except Exception as e:
+        import logging
+        logging.getLogger(__name__).error(f"Failed to fetch avatar for {cid}: {e}")
+        # Cache the failure for 10 minutes to prevent rate-limit loops
+        await redis.setex(cache_key, 600, b"")
         raise web.HTTPNotFound(reason="Failed to fetch avatar")

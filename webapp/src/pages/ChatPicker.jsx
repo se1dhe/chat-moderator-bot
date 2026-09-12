@@ -17,12 +17,14 @@ function ChatAvatar({ cid, type }) {
   return <img src={`/api/chats/${cid}/avatar`} onError={() => setError(true)} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
 }
 
+let globalChatCache = null;
 export function ChatPicker() {
   const { t, lang, setLang } = useLang()
   const navigate = useNavigate()
-  const [state, setState] = useState({ loading: true })
+  const [state, setState] = useState(globalChatCache ? { loading: false, data: globalChatCache } : { loading: true })
 
-  const load = () => {
+  const load = (force = false) => {
+    if (globalChatCache && !force) return;
     setState({ loading: true })
     api.me()
       .then((data) => {
@@ -35,6 +37,7 @@ export function ChatPicker() {
           navigate(`/c/${sp}`, { replace: true })
           return
         }
+        globalChatCache = data;
         setTimeout(() => setState({ loading: false, data }), 800)
       })
       .catch((e) => setState({ loading: false, error: e }))
@@ -77,7 +80,7 @@ export function ChatPicker() {
           <div className="center-state">
             <ServerCrash size={44} className="ico" />
             <h3>{t('common.error')}</h3>
-            <button className="btn" onClick={load}>
+            <button className="btn" onClick={() => load(true)}>
               {t('common.retry')}
             </button>
           </div>

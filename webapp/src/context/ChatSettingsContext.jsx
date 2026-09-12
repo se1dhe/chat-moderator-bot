@@ -156,7 +156,39 @@ export function ChatSettingsProvider({ chatId, children }) {
     chatId, saved, draft, saving, error, updateSection, setSection, reload: load,
     billing, pro, loadBilling, openUpgrade,
   }
-  return <Ctx.Provider value={value}>{children}</Ctx.Provider>
+  return (
+    <Ctx.Provider value={value}>
+      {children}
+      <AnimatePresence>
+        {paymentResolver && (
+          <motion.div className="modal-overlay" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => handlePaymentSelect(null)}>
+            <motion.div className="payment-modal" initial={{ y: '100%' }} animate={{ y: 0 }} exit={{ y: '100%' }} transition={{ type: 'spring', damping: 25, stiffness: 200 }} onClick={e => e.stopPropagation()}>
+              <div className="payment-modal-handle" />
+              <h3>Choose Payment Method</h3>
+              <div className="payment-modal-subtitle">How would you like to pay for RedQueen Pro?</div>
+              <div className="payment-methods">
+                <button className="payment-btn stars" onClick={() => handlePaymentSelect('stars')}>
+                  <div className="payment-icon">⭐️</div>
+                  <div className="payment-info">
+                    <div className="payment-title">Telegram Stars</div>
+                    <div className="payment-desc">Fast and native payment</div>
+                  </div>
+                </button>
+                <button className="payment-btn crypto" onClick={() => handlePaymentSelect('crypto')}>
+                  <div className="payment-icon">💎</div>
+                  <div className="payment-info">
+                    <div className="payment-title">Crypto Pay</div>
+                    <div className="payment-desc">TON, USDT, BTC, ETH</div>
+                  </div>
+                </button>
+              </div>
+              <button className="payment-cancel" onClick={() => handlePaymentSelect(null)}>Cancel</button>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </Ctx.Provider>
+  )
 }
 
 export const useChatSettings = () => useContext(Ctx)
