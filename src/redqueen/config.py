@@ -68,6 +68,7 @@ class Settings(BaseSettings):
     default_lang: str = Field(default="en", alias="DEFAULT_LANG")
     log_level: str = Field(default="INFO", alias="LOG_LEVEL")
     secret_key: str = Field(default="KKFASYFPZEdaRYZcFdhDHBsMCaJhT-tG6F3axLXZuUY=", alias="SECRET_KEY")
+    cryptopay_token: str = Field(default="", alias="CRYPTOPAY_TOKEN")
 
     @computed_field  # type: ignore[prop-decorator]
     @property
@@ -104,6 +105,13 @@ class Settings(BaseSettings):
         return brands[: len(tokens)]
 
 
-@lru_cache
+@lru_cache()
 def get_settings() -> Settings:
-    return Settings()
+    settings = Settings()
+    if settings.secret_key == "KKFASYFPZEdaRYZcFdhDHBsMCaJhT-tG6F3axLXZuUY=":
+        import logging
+        logging.getLogger(__name__).warning(
+            "CRITICAL SECURITY WARNING: Using the default SECRET_KEY. "
+            "Please set a secure SECRET_KEY in your .env file to protect user API keys."
+        )
+    return settings

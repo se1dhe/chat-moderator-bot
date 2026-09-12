@@ -219,7 +219,35 @@ async def billing_invoice(request: web.Request) -> web.Response:
     """Create a Telegram Stars invoice link the Mini App opens via openInvoice()."""
     cid = _chat_id(request)
     await require_chat_admin(request, cid)
+    
+    try:
+        body = await request.json()
+    except Exception:
+        body = {}
+    method = body.get("method", "stars")
+    
     days = billing.PRO_PERIOD_DAYS
+    
+    if method == "crypto":
+        cryptopay_token = request.app["settings"].cryptopay_token
+        if not cryptopay_token:
+            raise web.HTTPBadRequest(reason="CryptoPay is not configured")
+        
+        from aiocryptopay import AioCryptoPay, Networks
+        crypto = AioCryptoPay(token=cryptopay_token, network=Networks.MAIN_NET)
+        try:
+            # We use USDT 5.0 as an equivalent to 500 Stars? Let's say 5 USDT for Pro
+            invoice = await crypto.create_invoice(
+                asset="USDT",
+                amount=5.0,
+                description=f"RedQueen Pro ({days} days) for chat {cid}",
+                payload=f"pro:{cid}:{days}"
+            )
+            return web.json_response({"url": invoice.bot_invoice_url, "method": "crypto"})
+        finally:
+            await crypto.close()
+    
+    # Default: Telegram Stars
     url = await request_bot(request).create_invoice_link(
         title="RedQueen Pro",
         description=f"AI auto-ban, raid shield and advanced analytics for {days} days.",
@@ -228,7 +256,39 @@ async def billing_invoice(request: web.Request) -> web.Response:
         currency="XTR",
         prices=[LabeledPrice(label=f"RedQueen Pro · {days} days", amount=billing.PRO_PRICE_STARS)],
     )
-    return web.json_response({"url": url})
+    return web.json_response({"url": url, "method": "stars"})
+
+
+async def cryptopay_webhook(request: web.Request) -> web.Response:
+    cryptopay_token = request.app["settings"].cryptopay_token
+    if not cryptopay_token:
+        return web.Response(status=400)
+    
+    body = await request.text()
+    signature = request.headers.get("crypto-pay-api-signature", "")
+    
+    import hmac
+    import hashlib
+    secret = hashlib.sha256(cryptopay_token.encode()).digest()
+    expected_sig = hmac.new(secret, body.encode(), hashlib.sha256).hexdigest()
+    
+    if signature != expected_sig:
+        return web.Response(status=401)
+        
+    data = await request.json()
+    if data.get("update_type") == "invoice_paid":
+        payload = data.get("payload", {}).get("payload", "")
+        if payload.startswith("pro:"):
+            parts = payload.split(":")
+            if len(parts) == 3:
+                _, cid, days = parts
+                async with request.app["async_session"]() as session:
+                    await billing.activate_pro(session, int(cid), days=int(days))
+                    await repo.log_action(
+                        session, chat_telegram_id=int(cid), user_telegram_id=0,
+                        actor_id=None, action="pro_grant", reason=f"cryptopay {days}d"
+                    )
+    return web.Response(status=200)
 
 
 async def members_search(request: web.Request) -> web.Response:
@@ -333,9 +393,12 @@ async def rate_limit_middleware(request: web.Request, handler):
         key = request.headers.get("Authorization", request.remote)
         rl_key = f"rl:{key}"
         try:
-            count = await redis.incr(rl_key)
-            if count == 1:
-                await redis.expire(rl_key, 1) # 1 second window
+            async with redis.pipeline() as pipe:
+                pipe.incr(rl_key)
+                pipe.expire(rl_key, 1, nx=True)
+                results = await pipe.execute()
+                
+            count = results[0]
             if count > 30: # 30 requests per second
                 raise web.HTTPTooManyRequests()
         except Exception as e:
@@ -368,6 +431,7 @@ def setup_routes(app: web.Application) -> None:
     app.router.add_post("/api/chats/{cid}/quarantine/{vid}", quarantine_decide)
     app.router.add_get("/api/chats/{cid}/stats", stats)
     app.router.add_get("/api/chats/{cid}/billing", billing_status)
-    app.router.add_post("/api/chats/{cid}/billing/invoice", billing_invoice)
+    app.router.add_post("/api/chats/{cid}/billing/invoice", invoice)
     app.router.add_get("/api/chats/{cid}/members", members_search)
     app.router.add_post("/api/chats/{cid}/members/{uid}/action", member_action)
+    app.router.add_post("/webhook/cryptopay", cryptopay_webhook)

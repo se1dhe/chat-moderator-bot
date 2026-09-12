@@ -1,4 +1,4 @@
-import { NavLink, Outlet, useNavigate, useParams, useLocation } from 'react-router-dom'
+import { NavLink, useNavigate, useParams, useLocation, useOutlet } from 'react-router-dom'
 import { LayoutGrid, Users, ShieldAlert, ScrollText, BarChart3, ChevronLeft, Shield, Check, Loader2 } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useLang } from '../context/LangContext'
@@ -69,6 +69,7 @@ function Nav({ cid }) {
 export function Layout() {
   const { cid } = useParams()
   const location = useLocation()
+  const outlet = useOutlet()
   
   return (
     <ChatSettingsProvider chatId={cid}>
@@ -77,14 +78,14 @@ export function Layout() {
         <AnimatePresence mode="wait">
           <motion.div
             key={location.pathname}
-            initial={{ opacity: 0, x: 15 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -15 }}
-            transition={{ duration: 0.2, ease: "easeOut" }}
+            initial={{ opacity: 0, scale: 0.98, y: 10 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.98, y: -10 }}
+            transition={{ duration: 0.25, ease: "easeOut" }}
             className="flex-1 overflow-y-auto"
-            style={{ display: 'flex', flexDirection: 'column' }}
+            style={{ display: 'flex', flexDirection: 'column', width: '100%', minHeight: 0 }}
           >
-            <Outlet />
+            {outlet}
           </motion.div>
         </AnimatePresence>
         <Nav cid={cid} />

@@ -13,6 +13,7 @@ dependencies = [
     "pydantic-settings>=2.4",
     "aiohttp>=3.10",
     "cryptography>=50.0.1",
+    "aiocryptopay>=0.3.0",
 ]
 
 [project.optional-dependencies]

@@ -43,16 +43,38 @@ export function ChatSettingsProvider({ chatId, children }) {
 
   // Open the Stars invoice for Pro; refresh entitlement on success. Shared by the Pro
   // banner and every Pro-locked control (locked cards, disabled toggles).
-  const openUpgrade = useCallback(async () => {
-    haptic('light')
-    try {
-      const { url } = await api.invoice(chatId)
-      const status = await openInvoice(url)
-      if (status === 'paid') { haptic('success'); loadBilling() }
-      return status
-    } catch {
-      haptic('error')
-    }
+  const openUpgrade = useCallback(() => {
+    return new Promise((resolve) => {
+      haptic('light')
+      if (window.Telegram?.WebApp?.showPopup) {
+        window.Telegram.WebApp.showPopup({
+          title: 'Choose Payment Method',
+          message: 'How would you like to pay for RedQueen Pro?',
+          buttons: [
+            { id: 'stars', type: 'default', text: 'Telegram Stars' },
+            { id: 'crypto', type: 'default', text: 'Crypto Pay' },
+            { type: 'cancel' }
+          ]
+        }, async (btnId) => {
+          if (!btnId) return resolve(null);
+          
+          try {
+            const { url, method } = await api.invoice(chatId, btnId)
+            if (method === 'crypto') {
+              window.Telegram.WebApp.openTelegramLink(url)
+              resolve('pending')
+            } else {
+              const status = await openInvoice(url)
+              if (status === 'paid') { haptic('success'); loadBilling() }
+              resolve(status)
+            }
+          } catch {
+            haptic('error')
+            resolve(null)
+          }
+        })
+      }
+    })
   }, [chatId, loadBilling])
 
   const flush = useCallback(async () => {

@@ -3,6 +3,7 @@ import {
   ShieldCheck, Gauge, Filter, Moon, BrainCircuit, Siren, AlertTriangle, UserCheck,
   ChevronRight, ServerCrash, Lock,
 } from 'lucide-react'
+import { motion } from 'framer-motion'
 import { useLang } from '../context/LangContext'
 import { useChatSettings } from '../context/ChatSettingsContext'
 import { Spinner, Segmented } from '../components/ui'
@@ -68,6 +69,21 @@ export function Dashboard() {
     },
   ]
 
+  const container = {
+    hidden: { opacity: 0 },
+    show: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.05
+      }
+    }
+  }
+
+  const item = {
+    hidden: { opacity: 0, y: 15, scale: 0.95 },
+    show: { opacity: 1, y: 0, scale: 1, transition: { type: "spring", stiffness: 300, damping: 24 } }
+  }
+
   return (
     <div className="content fade-in">
       <ProBanner />
@@ -77,14 +93,16 @@ export function Dashboard() {
       <div className="section-label">{t('dash.chatLang')}</div>
       <Segmented value={draft.lang} onChange={(v) => setSection('lang', v)} options={LANGS} />
 
-      {groups.map((g) => (
-        <div key={g.label}>
+      {groups.map((g, gi) => (
+        <motion.div key={g.label} variants={container} initial="hidden" animate="show">
           <div className="section-label">{g.label}</div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.55rem' }}>
             {g.items.map((it) => {
               const locked = it.pro && !pro
               return (
-                <button
+                <motion.button
+                  variants={item}
+                  whileTap={{ scale: 0.97 }}
                   key={it.key}
                   className="tile"
                   onClick={() => {
@@ -106,7 +124,7 @@ export function Dashboard() {
                     </span>
                   )}
                   <ChevronRight size={16} className="tile-chevron" />
-                </button>
+                </motion.button>
               )
             })}
           </div>

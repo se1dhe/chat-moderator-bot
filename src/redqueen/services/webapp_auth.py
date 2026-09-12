@@ -37,6 +37,9 @@ class InitDataError(Exception):
     """Raised when initData is missing, malformed, forged, or stale."""
 
 
+from functools import lru_cache
+
+@lru_cache(maxsize=128)
 def _secret_key(bot_token: str) -> bytes:
     return hmac.new(b"WebAppData", bot_token.encode(), hashlib.sha256).digest()
 

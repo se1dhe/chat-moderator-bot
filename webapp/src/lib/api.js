@@ -31,7 +31,7 @@ export const api = {
   decide: (cid, vid, action) => request('POST', `/chats/${cid}/quarantine/${vid}`, { action }),
   stats: (cid) => request('GET', `/chats/${cid}/stats`),
   billing: (cid) => request('GET', `/chats/${cid}/billing`),
-  invoice: (cid) => request('POST', `/chats/${cid}/billing/invoice`),
+  invoice: (cid, method = 'stars') => request('POST', `/chats/${cid}/billing/invoice`, { method }),
   members: (cid, q = '', opts = {}) => request('GET', `/chats/${cid}/members?q=${encodeURIComponent(q)}`, undefined, opts),
   memberAction: (cid, uid, action, extra = {}) =>
     request('POST', `/chats/${cid}/members/${uid}/action`, { action, ...extra }),

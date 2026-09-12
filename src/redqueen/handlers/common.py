@@ -27,11 +27,7 @@ async def _send_welcome(
         return _t(lang, key, **kw)
         
     kb = InlineKeyboardBuilder()
-    if bot_username:
-        # Use url button with Direct Link Mini App format — survives forwarding
-        kb.button(text=t("PANEL_BUTTON"), url=f"https://t.me/{bot_username}/app")
-    elif settings.webapp_url:
-        # Fallback: web_app button (stripped on forward, but works without Main Mini App)
+    if settings.webapp_url:
         kb.button(text=t("PANEL_BUTTON"), web_app=WebAppInfo(url=settings.webapp_url))
         
     logo = FSInputFile("webapp/dist/logo.jpg")

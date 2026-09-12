@@ -15,8 +15,7 @@ from .routes import setup_routes
 
 log = logging.getLogger(__name__)
 
-_CORS_HEADERS = {
-    "Access-Control-Allow-Origin": "*",
+_CORS_HEADERS_BASE = {
     "Access-Control-Allow-Methods": "GET, POST, PUT, OPTIONS",
     "Access-Control-Allow-Headers": "Authorization, Content-Type, X-Init-Data",
     "Access-Control-Max-Age": "600",
@@ -27,12 +26,12 @@ _CORS_HEADERS = {
 async def cors_middleware(
     request: web.Request, handler: Callable[[web.Request], Awaitable[web.StreamResponse]]
 ) -> web.StreamResponse:
-    # Auth is initData (not cookies), so a permissive CORS policy is safe and lets the
-    # Vite dev server (different origin) talk to the API during development.
+    origin = request.headers.get("Origin", "*")
+    cors_headers = {**_CORS_HEADERS_BASE, "Access-Control-Allow-Origin": origin}
     if request.method == "OPTIONS":
-        return web.Response(status=204, headers=_CORS_HEADERS)
+        return web.Response(status=204, headers=cors_headers)
     response = await handler(request)
-    response.headers.update(_CORS_HEADERS)
+    response.headers.update(cors_headers)
     return response
 
 

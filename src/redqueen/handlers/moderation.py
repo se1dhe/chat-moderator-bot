@@ -149,7 +149,8 @@ async def cmd_purge(message: Message, bot: Bot, t: Callable[..., str]) -> None:
     if reply is None:
         await message.reply(t("PURGE_NEED_REPLY"))
         return
-    ids = list(range(reply.message_id, message.message_id + 1))
+    start_id = max(reply.message_id, message.message_id - 1000)
+    ids = list(range(start_id, message.message_id + 1))
     deleted = 0
     # delete_messages accepts up to 100 ids per call
     for i in range(0, len(ids), 100):

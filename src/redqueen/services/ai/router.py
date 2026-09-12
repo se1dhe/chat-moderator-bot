@@ -39,9 +39,15 @@ class RouterProvider(AIProvider):
             return self.ollama  # fallback if no key provided
 
         model_name = getattr(chat_settings, "ai_model", None)
-        cache_key = (provider_name, api_key, model_name)
+        import hashlib
+        key_hash = hashlib.sha256(api_key.encode("utf-8")).hexdigest()
+        cache_key = (provider_name, key_hash, model_name)
+        
         if cache_key in self._cache:
-            return self._cache[cache_key]
+            # Move to end to simulate LRU
+            provider = self._cache.pop(cache_key)
+            self._cache[cache_key] = provider
+            return provider
         
         provider = self.ollama
         if provider_name == "openai":
@@ -50,6 +56,13 @@ class RouterProvider(AIProvider):
             provider = GeminiProvider(api_key, model_name, self.fallback)
         elif provider_name == "claude":
             provider = ClaudeProvider(api_key, model_name, self.fallback)
+            
+        if len(self._cache) > 500:
+            # Pop the oldest item (first item in dict)
+            old_key = next(iter(self._cache))
+            old_provider = self._cache.pop(old_key)
+            import asyncio
+            asyncio.create_task(old_provider.close())
             
         self._cache[cache_key] = provider
         return provider
