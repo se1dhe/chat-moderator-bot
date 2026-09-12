@@ -18,6 +18,7 @@ export const LOCALES = {
     'tips.filters': 'Set up filters to block unwanted content.',
     'tips.quarantine': 'You have pending messages in Quarantine.',
 
+    'act.warn': 'Warn',
     'act.ban': 'Ban',
     'act.unban': 'Unban',
     'act.mute': 'Mute',
@@ -295,6 +296,7 @@ export const LOCALES = {
     'tips.filters': 'Настройте фильтры для блокировки контента.',
     'tips.quarantine': 'У вас есть новые сообщения в Карантине.',
 
+    'act.warn': 'Варн',
     'act.ban': 'Забанить',
     'act.unban': 'Разбанить',
     'act.mute': 'Замутить',
@@ -572,6 +574,7 @@ export const LOCALES = {
     'tips.filters': 'Налаштуйте фільтри для блокування контенту.',
     'tips.quarantine': 'У вас є нові повідомлення в Карантині.',
 
+    'act.warn': 'Варн',
     'act.ban': 'Забанити',
     'act.unban': 'Розбанити',
     'act.mute': 'Замутити',

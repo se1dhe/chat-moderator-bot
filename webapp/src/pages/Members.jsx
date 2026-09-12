@@ -114,7 +114,7 @@ export function Members() {
                     {m.state === 'muted' && <span className="badge badge-muted member-state">{t('members.muted')}</span>}
                   </div>
                   <div className="member-meta">
-                    {m.username ? `@${m.username} · ` : ''}<code>{m.user_id}</code> · {t('members.messages', { n: m.message_count })}
+                    {m.username ? `@${m.username} · ` : ''}<code>{m.user_id}</code> · {t('members.messages', { count: m.message_count })}
                   </div>
                 </div>
               </div>
