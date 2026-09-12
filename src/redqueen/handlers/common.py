@@ -3,19 +3,71 @@ from __future__ import annotations
 
 from collections.abc import Callable
 
-from aiogram import Router
+from aiogram import Router, F
 from aiogram.filters import Command, CommandStart
-from aiogram.types import Message, WebAppInfo
+from aiogram.types import Message, WebAppInfo, CallbackQuery
 from aiogram.utils.keyboard import InlineKeyboardBuilder
+from aiogram.types import FSInputFile
 
 from ..config import Settings
+from ..db import repo
+from ..i18n import t as _t
+from sqlalchemy.ext.asyncio import AsyncSession
 
 router = Router(name="common")
 
 
 @router.message(CommandStart())
 async def cmd_start(message: Message, t: Callable[..., str]) -> None:
-    await message.answer(t("START"))
+    kb = InlineKeyboardBuilder()
+    kb.button(text="🇺🇸 English", callback_data="lang:en")
+    kb.button(text="🇷🇺 Русский", callback_data="lang:ru")
+    kb.button(text="🇺🇦 Українська", callback_data="lang:uk")
+    kb.adjust(1)
+    
+    await message.answer(
+        "👋 Welcome to RedQueen Security!\nПожалуйста, выберите ваш язык / Please choose your language:",
+        reply_markup=kb.as_markup()
+    )
+
+
+@router.callback_query(F.data.startswith("lang:"))
+async def on_lang_selected(
+    call: CallbackQuery,
+    session: AsyncSession,
+    settings: Settings,
+    bot_username: str | None = None
+) -> None:
+    lang = call.data.split(":")[1]
+    
+    # Save user language
+    user = await repo.get_user(session, call.from_user.id)
+    if user:
+        user.lang = lang
+        await session.commit()
+    
+    def t(key: str, **kw: object) -> str:
+        return _t(lang, key, **kw)
+        
+    kb = InlineKeyboardBuilder()
+    if settings.webapp_url:
+        kb.button(text=t("PANEL_BUTTON"), web_app=WebAppInfo(url=settings.webapp_url))
+        
+    logo = FSInputFile("webapp/public/logo.jpg")
+    
+    text = (
+        f"👑 *{t('app.title', default='RedQueen Security')}*\n\n"
+        f"{t('app.subtitle', default='Advanced Telegram moderation SaaS.')}\n\n"
+        f"{t('ONBOARDING_WELCOME', default='Нажмите кнопку ниже, чтобы открыть панель управления.')}"
+    )
+    
+    await call.message.delete()
+    await call.message.answer_photo(
+        photo=logo,
+        caption=text,
+        parse_mode="Markdown",
+        reply_markup=kb.as_markup()
+    )
 
 
 @router.message(Command("help"))

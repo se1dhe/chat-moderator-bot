@@ -36,14 +36,20 @@ async def me(request: web.Request) -> web.Response:
     bot, redis = request_bot(request), request.app["redis"]
     owner = user.id in request.app["settings"].owner_id_set
     chats = []
+    
+    db_user_lang = "en"
     async with _session(request) as session:
+        db_user = await repo.get_user(session, user.id)
+        if db_user:
+            db_user_lang = db_user.lang
+            
         for chat in await repo.list_active_chats(session, bot_id=bot.id):
             if owner or await roles.is_admin(bot, redis, chat_id=chat.telegram_id, user_id=user.id):
                 chats.append({"id": chat.telegram_id, "title": chat.title, "type": chat.type,
                               "lang": chat.lang})
     bot_me = await bot.get_me()
     return web.json_response({
-        "user": {"id": user.id, "username": user.username, "name": user.full_name},
+        "user": {"id": user.id, "username": user.username, "name": user.full_name, "lang": db_user_lang},
         "bot": {"username": bot_me.username},
         "chats": chats,
     })

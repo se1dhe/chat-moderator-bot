@@ -20,6 +20,11 @@ export function ChatPicker() {
     api.me()
       .then((data) => {
         if (!alive) return
+        
+        if (data.user?.lang && data.user.lang !== lang) {
+          setLang(data.user.lang)
+        }
+        
         const sp = startParam()
         if (sp && data.chats.some((c) => String(c.id) === sp)) {
           navigate(`/c/${sp}`, { replace: true })

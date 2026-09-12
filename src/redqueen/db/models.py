@@ -74,6 +74,7 @@ class User(TimestampMixin, Base):
     telegram_id: Mapped[int] = mapped_column(BigInteger, unique=True, index=True)
     username: Mapped[str | None] = mapped_column(String(64))
     full_name: Mapped[str | None] = mapped_column(String(256))
+    lang: Mapped[str] = mapped_column(String(8), default="en")
     trust_score: Mapped[int] = mapped_column(Integer, default=50)  # 0..100
 
 
