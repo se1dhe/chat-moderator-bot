@@ -62,13 +62,13 @@ export function ChatSettingsProvider({ chatId, children }) {
 
     try {
       if (method === 'crypto') {
-        const data = await api.createInvoice(chatId, 'crypto')
+        const data = await api.invoice(chatId, 'crypto')
         if (data.url) {
           window.Telegram?.WebApp?.openLink(data.url)
           resolve?.('crypto')
         }
       } else if (method === 'stars') {
-        const data = await api.createInvoice(chatId, 'stars')
+        const data = await api.invoice(chatId, 'stars')
         if (data.url) {
           window.Telegram?.WebApp?.openInvoice(data.url, (status) => {
             if (status === 'paid') {
