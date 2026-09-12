@@ -57,7 +57,7 @@ async def on_lang_selected(
     if settings.webapp_url:
         kb.button(text=t("PANEL_BUTTON"), web_app=WebAppInfo(url=settings.webapp_url))
         
-    logo = FSInputFile("webapp/public/logo.jpg")
+    logo = FSInputFile("webapp/dist/logo.jpg")
     
     if lang == "ru":
         desc = "Продвинутая система модерации и аналитики Telegram-сообществ."
