@@ -29,7 +29,9 @@ function Header() {
           <ChevronLeft size={20} />
         </button>
       ) : (
-        <div className="logo"><Shield size={19} /></div>
+        <div className="logo" style={{ overflow: 'hidden', padding: 0, background: 'none' }}>
+          <img src="/logo.jpg" alt="Logo" style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: 'inherit' }} />
+        </div>
       )}
       <div>
         <div className="title">{t('app.title')}</div>
