@@ -1,7 +1,13 @@
 import aiohttp
 from aiohttp import web
 from aiogram import Bot
-from .auth import _chat_id, request_bot
+from .auth import request_bot
+
+def _chat_id(request: web.Request) -> int:
+    try:
+        return int(request.match_info["cid"])
+    except (KeyError, ValueError) as exc:
+        raise web.HTTPBadRequest(reason="bad chat id") from exc
 
 async def get_avatar(request: web.Request) -> web.Response:
     cid = _chat_id(request)
