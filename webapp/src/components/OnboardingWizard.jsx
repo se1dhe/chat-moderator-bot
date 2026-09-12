@@ -24,70 +24,70 @@ export function OnboardingWizard() {
 
   const s1 = (
     <div className="center-state fade-in">
-      <div className="w-16 h-16 bg-red-500/20 rounded-full flex items-center justify-center mb-4">
+      <div className="w-16 h-16 bg-red-500/20 rounded-full flex items-center justify-center mb-4 mt-8">
         <Rocket size={32} className="text-red-500" />
       </div>
-      <h3>Welcome to Red Queen</h3>
+      <h3>{t('ob.title.1')}</h3>
       <p className="text-sm text-[var(--tg-theme-hint-color)] mb-6 text-center">
-        Let's configure the defense protocols for your group.
+        {t('ob.desc.1')}
       </p>
       
       <div className="card w-full text-left mb-6">
-        <Row title="Basic Protection" subtitle="Anti-flood & Captcha">
+        <Row title={t('ob.card.1')} subtitle={t('ob.card.1.sub')}>
           <Toggle checked={draft.antiflood.enabled} onChange={v => updateSection('antiflood', { enabled: v })} />
         </Row>
       </div>
 
-      <button className="btn" onClick={next}>Continue</button>
+      <button className="btn" onClick={next}>{t('ob.btn.continue')}</button>
     </div>
   )
 
   const s2 = (
     <div className="center-state fade-in">
-      <div className="w-16 h-16 bg-red-500/20 rounded-full flex items-center justify-center mb-4">
+      <div className="w-16 h-16 bg-red-500/20 rounded-full flex items-center justify-center mb-4 mt-8">
         <Filter size={32} className="text-red-500" />
       </div>
-      <h3>Content Moderation</h3>
+      <h3>{t('ob.title.2')}</h3>
       <p className="text-sm text-[var(--tg-theme-hint-color)] mb-6 text-center">
-        Enable AI review and content filters to keep the chat clean.
+        {t('ob.desc.2')}
       </p>
       
       <div className="card w-full text-left mb-6">
-        <Row title="AI Moderation" subtitle="Scan messages using AI">
+        <Row title={t('ob.card.2')} subtitle={t('ob.card.2.sub')}>
           <Toggle checked={draft.core.ai_mode !== 'off'} onChange={v => updateSection('core', { ai_mode: v ? 'quarantine' : 'off' })} />
         </Row>
-        <Row title="Block links" subtitle="Prevent unauthorized links">
+        <Row title={t('ob.card.2.block')} subtitle={t('ob.card.2.block.sub')}>
           <Toggle checked={draft.filters.block_links} onChange={v => updateSection('filters', { block_links: v })} />
         </Row>
       </div>
 
-      <button className="btn" onClick={next}>Continue</button>
+      <button className="btn" onClick={next}>{t('ob.btn.continue')}</button>
     </div>
   )
 
   const s3 = (
     <div className="center-state fade-in">
-      <div className="w-16 h-16 bg-yellow-500/20 rounded-full flex items-center justify-center mb-4">
+      <div className="w-16 h-16 bg-yellow-500/20 rounded-full flex items-center justify-center mb-4 mt-8">
         <ShieldCheck size={32} className="text-yellow-500" />
       </div>
-      <h3>Unlock Pro</h3>
+      <h3>{t('ob.title.3')}</h3>
       <p className="text-sm text-[var(--tg-theme-hint-color)] mb-6 text-center">
-        Upgrade to unlock Raid Shield, Auto-Comment, custom AI models, and unlimited AI scans.
+        {t('ob.desc.3')}
       </p>
       
       {!pro ? (
         <>
           <button className="btn w-full mb-4" style={{ background: '#f59e0b', color: '#fff' }} onClick={openUpgrade}>
-            Unlock Pro for {billing?.price_stars || 500} Stars
+            {t('ob.btn.pro', { stars: billing?.price_stars || 500 })}
           </button>
-          <button className="btn-secondary w-full" onClick={finish}>Skip for now</button>
+          <button className="btn-secondary w-full" onClick={finish}>{t('ob.btn.skip')}</button>
         </>
       ) : (
         <>
           <div className="text-green-500 font-medium mb-4 flex items-center gap-2">
-            <Check size={20} /> Pro Unlocked!
+            <Check size={20} /> {t('ob.pro.unlocked')}
           </div>
-          <button className="btn w-full" onClick={finish}>Finish Setup</button>
+          <button className="btn w-full" onClick={finish}>{t('ob.btn.finish')}</button>
         </>
       )}
     </div>

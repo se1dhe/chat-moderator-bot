@@ -1,10 +1,12 @@
 import { useState, useEffect } from 'react'
 import { Rocket, BrainCircuit, MessageSquare, Filter, Zap, Star } from 'lucide-react'
 import { haptic } from '../lib/telegram'
+import { useLang } from '../context/LangContext'
 
 const CURRENT_VERSION = 'v2.0.1'
 
 export function WhatsNewModal() {
+  const { t } = useLang()
   const [open, setOpen] = useState(false)
   const [slide, setSlide] = useState(0)
 
@@ -31,26 +33,26 @@ export function WhatsNewModal() {
   const slides = [
     {
       icon: <Rocket size={64} className="text-red-500 mb-6 drop-shadow-[0_0_15px_rgba(239,68,68,0.3)]" />,
-      title: 'Red Queen 2.0',
-      desc: 'Мы полностью обновили систему. Встречайте новый интерфейс, улучшенную производительность и мощные новые функции!',
+      title: t('wn.title.1'),
+      desc: t('wn.desc.1'),
       badge: null
     },
     {
       icon: <MessageSquare size={64} className="text-blue-500 mb-6 drop-shadow-[0_0_15px_rgba(59,130,246,0.3)]" />,
-      title: 'Первый комментарий',
-      desc: 'Автоматически публикуйте правила или приветствия первым комментарием под новыми постами в канале. Поддерживает медиа (фото, видео) и markdown.',
+      title: t('wn.title.2'),
+      desc: t('wn.desc.2'),
       badge: 'PRO'
     },
     {
       icon: <BrainCircuit size={64} className="text-purple-500 mb-6 drop-shadow-[0_0_15px_rgba(168,85,247,0.3)]" />,
-      title: 'Облачные ИИ',
-      desc: 'Подключайте собственные API ключи (OpenAI, Gemini, Claude) для идеальной точности модерации без привязки к нашей локальной нейросети.',
+      title: t('wn.title.3'),
+      desc: t('wn.desc.3'),
       badge: 'PRO'
     },
     {
       icon: <Filter size={64} className="text-green-500 mb-6 drop-shadow-[0_0_15px_rgba(34,197,94,0.3)]" />,
-      title: 'Умный Онбординг',
-      desc: 'Новые чаты теперь проходят пошаговый мастер настройки, который помогает включить базовую защиту (Anti-flood, Captcha) с первых минут.',
+      title: t('wn.title.4'),
+      desc: t('wn.desc.4'),
       badge: 'FREE'
     }
   ]
@@ -104,17 +106,17 @@ export function WhatsNewModal() {
         <div className="flex gap-3">
           {slide > 0 && (
             <button className="btn-secondary flex-1 py-4 text-base font-semibold rounded-xl" onClick={() => { haptic('light'); setSlide(s => s - 1) }}>
-              Назад
+              {t('wn.btn.back')}
             </button>
           )}
           
           {slide < slides.length - 1 ? (
             <button className="btn flex-[2] py-4 text-base font-semibold rounded-xl bg-red-600 text-white" onClick={next}>
-              Далее
+              {t('wn.btn.next')}
             </button>
           ) : (
             <button className="btn flex-[2] py-4 text-base font-semibold rounded-xl bg-red-600 text-white" onClick={close}>
-              Начать работу
+              {t('wn.btn.finish')}
             </button>
           )}
         </div>
