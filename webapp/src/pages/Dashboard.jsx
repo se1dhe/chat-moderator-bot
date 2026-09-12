@@ -8,6 +8,7 @@ import { useChatSettings } from '../context/ChatSettingsContext'
 import { Spinner, Segmented } from '../components/ui'
 import { ProBanner } from '../components/ProBanner'
 import { Tips } from '../components/Tips'
+import { OnboardingWizard } from '../components/OnboardingWizard'
 import { haptic } from '../lib/telegram'
 
 const LANGS = [{ value: 'en', label: 'EN' }, { value: 'ru', label: 'RU' }, { value: 'uk', label: 'UK' }]
@@ -31,6 +32,10 @@ export function Dashboard() {
   }
   if (!draft) return <div className="content"><Spinner /></div>
 
+  if (draft.onboarding?.setup_completed === false) {
+    return <OnboardingWizard />
+  }
+
   const f = draft.filters
   const filtersOn = f.block_links || f.block_forwards || f.block_mentions
     || f.banned_words.length > 0 || f.blocked_media.length > 0
@@ -48,6 +53,7 @@ export function Dashboard() {
     {
       label: t('dash.content'),
       items: [
+        { key: 'autocomment', icon: Filter, title: 'Auto-Comment', desc: 'First comment in discussions', on: draft.auto_comment?.enabled, pro: true },
         { key: 'antiflood', icon: Gauge, title: t('sec.antiflood'), desc: t('sec.antiflood.desc'), on: draft.antiflood.enabled },
         { key: 'filters', icon: Filter, title: t('sec.filters'), desc: t('sec.filters.desc'), on: filtersOn },
         { key: 'modes', icon: Moon, title: t('sec.modes'), desc: t('sec.modes.desc'), on: modesOn },

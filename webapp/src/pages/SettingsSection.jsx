@@ -23,6 +23,7 @@ export function SettingsSection() {
     raid: <Raid s={s} t={t} />,
     warns: <Warns s={s} t={t} />,
     exempt: <Exempt s={s} t={t} />,
+    autocomment: <AutoComment s={s} t={t} />,
   }
   return <div className="content fade-in">{map[section] ?? null}</div>
 }
@@ -361,6 +362,48 @@ function Exempt({ s, t }) {
           <button className="btn btn-primary" onClick={add}><Plus size={16} /></button>
         </div>
       </div>
+    </>
+  )
+}
+
+function AutoComment({ s, t }) {
+  const c = s.draft.auto_comment || { enabled: false, text: '', media_url: '' }
+  return (
+    <>
+      <div className="section-label">Auto-Comment</div>
+      <div className="card">
+        <Row title="Enable feature" subtitle="Post comment under new channel posts">
+          <Toggle checked={c.enabled} onChange={(v) => s.updateSection('auto_comment', { enabled: v })} />
+        </Row>
+      </div>
+      
+      {c.enabled && (
+        <>
+          <div className="section-label">Comment Text</div>
+          <div className="card p-4">
+            <textarea 
+              className="w-full bg-transparent border-none outline-none text-[var(--tg-theme-text-color)] resize-none"
+              rows={4}
+              placeholder="Text (Markdown & HTML supported)..."
+              value={c.text}
+              onChange={(e) => s.updateSection('auto_comment', { text: e.target.value })}
+            />
+          </div>
+          <div className="section-label">Media URL (Optional)</div>
+          <div className="card p-4">
+            <input 
+              type="text"
+              className="w-full bg-transparent border-none outline-none text-[var(--tg-theme-text-color)]"
+              placeholder="https://... (Photo, GIF, Video)"
+              value={c.media_url}
+              onChange={(e) => s.updateSection('auto_comment', { media_url: e.target.value })}
+            />
+          </div>
+          <p className="px-4 mt-2 text-[13px] text-[var(--tg-theme-hint-color)]">
+            If a media URL is provided, the text will be used as a caption.
+          </p>
+        </>
+      )}
     </>
   )
 }

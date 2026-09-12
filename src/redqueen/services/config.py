@@ -39,6 +39,14 @@ DEFAULT_DATA: dict[str, Any] = {
         "lock_seconds": 600,
         "locked_until": None,  # epoch seconds, or None when not locked
     },
+    "auto_comment": {
+        "enabled": False,
+        "text": "",
+        "media_url": "",
+    },
+    "onboarding": {
+        "setup_completed": False,
+    },
     "exempt_user_ids": [],
 }
 
@@ -134,6 +142,8 @@ def full_view(settings: ChatSettings) -> dict[str, Any]:
         "ai": cfg["ai"],
         "raid": {k: v for k, v in cfg["raid"].items() if k != "locked_until"}
         | {"locked": bool(cfg["raid"].get("locked_until"))},
+        "auto_comment": cfg["auto_comment"],
+        "onboarding": cfg["onboarding"],
         "exempt_user_ids": cfg["exempt_user_ids"],
     }
 
@@ -243,6 +253,20 @@ def apply_patch(settings: ChatSettings, patch: dict[str, Any]) -> dict[str, Any]
         # The Mini App may only *clear* an active lock, never set one.
         if r.get("locked") is False:
             cfg["raid"]["locked_until"] = None
+
+    if "auto_comment" in patch:
+        ac, cur = patch["auto_comment"], cfg["auto_comment"]
+        cfg["auto_comment"] = {
+            "enabled": _as_bool(ac.get("enabled"), cur["enabled"]),
+            "text": str(ac.get("text", cur["text"]))[:4000],
+            "media_url": str(ac.get("media_url", cur["media_url"]))[:1000],
+        }
+
+    if "onboarding" in patch:
+        ob, cur = patch["onboarding"], cfg["onboarding"]
+        cfg["onboarding"] = {
+            "setup_completed": _as_bool(ob.get("setup_completed"), cur["setup_completed"]),
+        }
 
     if isinstance(patch.get("exempt_user_ids"), list):
         cleaned: list[int] = []
