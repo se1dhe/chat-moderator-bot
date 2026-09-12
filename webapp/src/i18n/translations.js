@@ -206,6 +206,11 @@ export const EN = {
   'ob.btn.pro': 'Unlock Pro for {stars} Stars',
   'ob.pro.unlocked': 'Pro Unlocked!',
 
+  'start.title': 'Add RedQueen',
+  'start.desc': 'Choose where to add RedQueen to start protection. The bot will automatically configure itself and appear in your chat list.',
+  'start.btn.group': 'Add to Group',
+  'start.btn.channel': 'Add to Channel',
+
 }
 
 const RU = {
@@ -341,6 +346,11 @@ const RU = {
   'ob.btn.finish': 'Завершить',
   'ob.btn.pro': 'Купить Pro за {stars} Звезд',
   'ob.pro.unlocked': 'Pro активен!',
+
+  'start.title': 'Добавление бота',
+  'start.desc': 'Выберите, куда добавить RedQueen, чтобы начать защиту. Бот автоматически настроится и появится в списке ваших чатов.',
+  'start.btn.group': 'Добавить в Группу',
+  'start.btn.channel': 'Добавить в Канал',
 }
 
 const UK = {
@@ -474,6 +484,11 @@ const UK = {
   'ob.btn.finish': 'Завершити',
   'ob.btn.pro': 'Придбати Pro за {stars} Зірок',
   'ob.pro.unlocked': 'Pro активовано!',
+
+  'start.title': 'Додавання бота',
+  'start.desc': 'Виберіть, куди додати RedQueen, щоб почати захист. Бот автоматично налаштується та зʼявиться у списку ваших чатів.',
+  'start.btn.group': 'Додати в Групу',
+  'start.btn.channel': 'Додати в Канал',
 }
 
 export const LOCALES = { en: EN, ru: { ...EN, ...RU }, uk: { ...EN, ...UK } }

@@ -41,8 +41,10 @@ async def me(request: web.Request) -> web.Response:
             if owner or await roles.is_admin(bot, redis, chat_id=chat.telegram_id, user_id=user.id):
                 chats.append({"id": chat.telegram_id, "title": chat.title, "type": chat.type,
                               "lang": chat.lang})
+    bot_me = await bot.get_me()
     return web.json_response({
         "user": {"id": user.id, "username": user.username, "name": user.full_name},
+        "bot": {"username": bot_me.username},
         "chats": chats,
     })
 

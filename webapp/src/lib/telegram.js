@@ -54,4 +54,9 @@ export function openInvoice(url) {
   })
 }
 
+export function openTelegramLink(url) {
+  if (tg?.openTelegramLink) tg.openTelegramLink(url)
+  else window.open(url, '_blank')
+}
+
 export const isTelegram = Boolean(tg && tg.initData)

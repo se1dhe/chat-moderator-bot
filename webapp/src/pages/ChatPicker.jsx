@@ -5,6 +5,7 @@ import { useLang } from '../context/LangContext'
 import { api } from '../lib/api'
 import { startParam, haptic } from '../lib/telegram'
 import { Spinner } from '../components/ui'
+import { GlobalOnboarding } from '../components/GlobalOnboarding'
 
 const typeIcon = (type) => (type === 'channel' ? Megaphone : Users)
 
@@ -38,7 +39,7 @@ export function ChatPicker() {
     <div className="shell">
       <header className="app-header">
         <div className="logo" style={{ overflow: 'hidden', padding: 0, background: 'none' }}>
-          <img src="/logo.jpg" alt="Logo" style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: 'inherit' }} />
+          <img src="/app/logo.jpg" alt="Logo" style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: 'inherit' }} />
         </div>
         <div>
           <div className="title">{t('app.title')}</div>
@@ -58,11 +59,7 @@ export function ChatPicker() {
             </button>
           </div>
         ) : !state.data.chats.length ? (
-          <div className="center-state">
-            <Inbox size={44} className="ico" />
-            <h3>{t('chats.title')}</h3>
-            <p>{t('chats.empty')}</p>
-          </div>
+          <GlobalOnboarding botUsername={state.data.bot?.username} />
         ) : (
           <>
             <div className="section-label">{t('chats.subtitle')}</div>

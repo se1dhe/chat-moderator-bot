@@ -30,7 +30,7 @@ function Header() {
         </button>
       ) : (
         <div className="logo" style={{ overflow: 'hidden', padding: 0, background: 'none' }}>
-          <img src="/logo.jpg" alt="Logo" style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: 'inherit' }} />
+          <img src="/app/logo.jpg" alt="Logo" style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: 'inherit' }} />
         </div>
       )}
       <div>
