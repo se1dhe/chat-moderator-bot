@@ -59,10 +59,20 @@ async def on_lang_selected(
         
     logo = FSInputFile("webapp/public/logo.jpg")
     
+    if lang == "ru":
+        desc = "Продвинутая система модерации и аналитики Telegram-сообществ."
+        prompt = "Нажмите на кнопку ниже, чтобы открыть панель управления и добавить бота в свои чаты."
+    elif lang == "uk":
+        desc = "Просунута система модерації та аналітики Telegram-спільнот."
+        prompt = "Натисніть на кнопку нижче, щоб відкрити панель керування та додати бота у свої чати."
+    else:
+        desc = "Advanced Telegram moderation SaaS and analytics."
+        prompt = "Click the button below to open the dashboard and add the bot to your chats."
+
     text = (
         f"👑 *{t('app.title', default='RedQueen Security')}*\n\n"
-        f"{t('app.subtitle', default='Advanced Telegram moderation SaaS.')}\n\n"
-        f"{t('ONBOARDING_WELCOME', default='Нажмите кнопку ниже, чтобы открыть панель управления.')}"
+        f"_{desc}_\n\n"
+        f"{prompt}"
     )
     
     await call.message.delete()
