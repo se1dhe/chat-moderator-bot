@@ -1,5 +1,12 @@
 export const LOCALES = {
   en: {
+    'tips.captcha': 'Enable Captcha to block bots.',
+    'tips.antiflood': 'Enable Anti-Flood to reduce spam.',
+    'tips.ai': 'Enable AI moderation for smart filtering.',
+    'tips.raid': 'Anti-Raid is off, your group is vulnerable.',
+    'tips.filters': 'Set up filters to block unwanted content.',
+    'tips.quarantine': 'You have pending messages in Quarantine.',
+
     'act.ban': 'Ban',
     'act.unban': 'Unban',
     'act.mute': 'Mute',
@@ -259,6 +266,13 @@ export const LOCALES = {
   },
   
   ru: {
+    'tips.captcha': 'Включите Капчу для защиты от ботов.',
+    'tips.antiflood': 'Включите Антифлуд, чтобы уменьшить спам.',
+    'tips.ai': 'Включите модерацию ИИ для умной фильтрации.',
+    'tips.raid': 'Анти-Рейд выключен, ваша группа уязвима.',
+    'tips.filters': 'Настройте фильтры для блокировки контента.',
+    'tips.quarantine': 'У вас есть новые сообщения в Карантине.',
+
     'act.ban': 'Забанить',
     'act.unban': 'Разбанить',
     'act.mute': 'Замутить',
@@ -518,6 +532,13 @@ export const LOCALES = {
   },
   
   uk: {
+    'tips.captcha': 'Увімкніть Капчу для захисту від ботів.',
+    'tips.antiflood': 'Увімкніть Антифлуд, щоб зменшити спам.',
+    'tips.ai': 'Увімкніть модерацію ШІ для розумної фільтрації.',
+    'tips.raid': 'Анти-Рейд вимкнений, ваша група вразлива.',
+    'tips.filters': 'Налаштуйте фільтри для блокування контенту.',
+    'tips.quarantine': 'У вас є нові повідомлення в Карантині.',
+
     'act.ban': 'Забанити',
     'act.unban': 'Розбанити',
     'act.mute': 'Замутити',

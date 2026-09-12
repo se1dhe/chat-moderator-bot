@@ -54,7 +54,7 @@ export function Dashboard() {
     {
       label: t('dash.content'),
       items: [
-        { key: 'autocomment', icon: Filter, title: 'Auto-Comment', desc: 'First comment in discussions', on: draft.auto_comment?.enabled, pro: true },
+        { key: 'autocomment', icon: Filter, title: t('sec.autocomment'), desc: t('sec.autocomment.desc'), on: draft.auto_comment?.enabled, pro: true },
         { key: 'antiflood', icon: Gauge, title: t('sec.antiflood'), desc: t('sec.antiflood.desc'), on: draft.antiflood.enabled },
         { key: 'filters', icon: Filter, title: t('sec.filters'), desc: t('sec.filters.desc'), on: filtersOn },
         { key: 'modes', icon: Moon, title: t('sec.modes'), desc: t('sec.modes.desc'), on: modesOn },
