@@ -62,7 +62,7 @@ def create_api_app(
     sessionmaker: async_sessionmaker,
     redis: Redis,
 ) -> web.Application:
-    app = web.Application(middlewares=[cors_middleware])
+    app = web.Application(middlewares=[cors_middleware], client_max_size=1024**2 * 10)  # 10MB
     # `bots` is keyed by the bot's Telegram id; a request is bound to whichever bot's
     # token validates its initData. `bot` is the primary (first) for legacy references.
     app["bots"] = bots

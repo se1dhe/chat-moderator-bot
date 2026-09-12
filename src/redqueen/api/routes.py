@@ -425,10 +425,9 @@ async def error_handling_middleware(request: web.Request, handler):
 
 async def upload_media(request: web.Request) -> web.Response:
     """Accept multipart upload, send to admin's PM to get a permanent file_id."""
-    init = _init_data(request)
-    uid = init.user.id
     cid = _chat_id(request)
-    await require_chat_admin(request, cid)
+    user = await require_chat_admin(request, cid)
+    uid = user.id
 
     reader = await request.multipart()
     field = await reader.next()
