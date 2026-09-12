@@ -3,7 +3,6 @@ import { LayoutGrid, Users, ShieldAlert, ScrollText, BarChart3, ChevronLeft, Shi
 import { useLang } from '../context/LangContext'
 import { ChatSettingsProvider, useChatSettings } from '../context/ChatSettingsContext'
 import { haptic } from '../lib/telegram'
-import { WhatsNewModal } from './WhatsNewModal'
 
 // Tiny in-flow autosave hint (no fixed bar → no scroll repaint glitch).
 function SaveHint() {
@@ -74,7 +73,6 @@ export function Layout() {
         <Header />
         <Outlet />
         <Nav cid={cid} />
-        <WhatsNewModal />
       </div>
     </ChatSettingsProvider>
   )
