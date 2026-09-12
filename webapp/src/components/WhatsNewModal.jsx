@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react'
-import { Rocket, BrainCircuit, MessageSquare, Filter } from 'lucide-react'
+import { Rocket, BrainCircuit, MessageSquare, Filter, Zap, Star } from 'lucide-react'
 import { haptic } from '../lib/telegram'
 
-const CURRENT_VERSION = 'v2.0.0'
+const CURRENT_VERSION = 'v2.0.1'
 
 export function WhatsNewModal() {
   const [open, setOpen] = useState(false)
@@ -30,53 +30,92 @@ export function WhatsNewModal() {
 
   const slides = [
     {
-      icon: <Rocket size={48} className="text-red-500 mb-4" />,
-      title: 'Welcome to Red Queen 2.0',
-      desc: 'We have completely overhauled the system. Enjoy the new interface, better performance, and powerful new features!'
+      icon: <Rocket size={64} className="text-red-500 mb-6 drop-shadow-[0_0_15px_rgba(239,68,68,0.3)]" />,
+      title: 'Red Queen 2.0',
+      desc: 'Мы полностью обновили систему. Встречайте новый интерфейс, улучшенную производительность и мощные новые функции!',
+      badge: null
     },
     {
-      icon: <MessageSquare size={48} className="text-blue-500 mb-4" />,
-      title: 'Auto-Comment',
-      desc: 'Automatically post rules or welcome messages as the first comment in discussion groups, with support for media and markdown.'
+      icon: <MessageSquare size={64} className="text-blue-500 mb-6 drop-shadow-[0_0_15px_rgba(59,130,246,0.3)]" />,
+      title: 'Первый комментарий',
+      desc: 'Автоматически публикуйте правила или приветствия первым комментарием под новыми постами в канале. Поддерживает медиа (фото, видео) и markdown.',
+      badge: 'PRO'
     },
     {
-      icon: <BrainCircuit size={48} className="text-purple-500 mb-4" />,
-      title: 'Cloud AI Models',
-      desc: 'Bring your own API keys for OpenAI, Gemini, or Claude to unlock cutting-edge moderation precision without relying on local hardware.'
+      icon: <BrainCircuit size={64} className="text-purple-500 mb-6 drop-shadow-[0_0_15px_rgba(168,85,247,0.3)]" />,
+      title: 'Облачные ИИ',
+      desc: 'Подключайте собственные API ключи (OpenAI, Gemini, Claude) для идеальной точности модерации без привязки к нашей локальной нейросети.',
+      badge: 'PRO'
     },
     {
-      icon: <Filter size={48} className="text-green-500 mb-4" />,
-      title: 'Setup Wizard',
-      desc: 'New chats now go through a streamlined onboarding wizard to ensure basic protections are configured right from the start.'
+      icon: <Filter size={64} className="text-green-500 mb-6 drop-shadow-[0_0_15px_rgba(34,197,94,0.3)]" />,
+      title: 'Умный Онбординг',
+      desc: 'Новые чаты теперь проходят пошаговый мастер настройки, который помогает включить базовую защиту (Anti-flood, Captcha) с первых минут.',
+      badge: 'FREE'
     }
   ]
 
   const current = slides[slide]
 
   return (
-    <div className="fixed inset-0 z-[100] bg-black/80 flex items-center justify-center p-4 backdrop-blur-sm animate-in fade-in duration-200">
-      <div className="bg-[var(--tg-theme-bg-color)] w-full max-w-sm rounded-2xl p-6 flex flex-col items-center text-center shadow-2xl relative">
-        <div className="absolute top-4 right-4 text-xs text-[var(--tg-theme-hint-color)]">
-          {slide + 1} / {slides.length}
+    <div className="fixed inset-0 z-[100] bg-[var(--tg-theme-bg-color)] flex flex-col animate-in fade-in duration-300">
+      <div className="flex-1 flex flex-col items-center justify-center p-6 text-center relative overflow-hidden">
+        
+        {/* Background glow effects */}
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-[var(--tg-theme-hint-color)] opacity-[0.03] rounded-full blur-3xl pointer-events-none"></div>
+
+        <div className="mb-4">
+          {current.badge === 'PRO' && (
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-amber-500/10 text-amber-500 border border-amber-500/20 mb-6">
+              <Star size={14} fill="currentColor" /> Pro Feature
+            </span>
+          )}
+          {current.badge === 'FREE' && (
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-green-500/10 text-green-500 border border-green-500/20 mb-6">
+              <Zap size={14} fill="currentColor" /> Free
+            </span>
+          )}
         </div>
         
-        <div className="mt-4">{current.icon}</div>
-        <h3 className="text-xl font-bold mb-2 text-[var(--tg-theme-text-color)]">{current.title}</h3>
-        <p className="text-[var(--tg-theme-hint-color)] mb-8 text-sm leading-relaxed">
+        <div className="transform transition-all duration-300 scale-100">
+          {current.icon}
+        </div>
+        
+        <h2 className="text-3xl font-bold mb-4 text-[var(--tg-theme-text-color)] tracking-tight">
+          {current.title}
+        </h2>
+        
+        <p className="text-[var(--tg-theme-hint-color)] mb-8 text-base leading-relaxed max-w-sm">
           {current.desc}
         </p>
 
-        <div className="w-full flex gap-3">
+        {/* Slide Indicators */}
+        <div className="flex gap-2 mb-12">
+          {slides.map((_, i) => (
+            <div 
+              key={i} 
+              className={`h-1.5 rounded-full transition-all duration-300 ${i === slide ? 'w-8 bg-red-500' : 'w-2 bg-[var(--tg-theme-hint-color)] opacity-30'}`}
+            />
+          ))}
+        </div>
+      </div>
+
+      <div className="p-6 bg-[var(--tg-theme-bg-color)] pb-[max(env(safe-area-inset-bottom),1.5rem)] shadow-[0_-10px_40px_rgba(0,0,0,0.05)]">
+        <div className="flex gap-3">
           {slide > 0 && (
-            <button className="btn-secondary flex-1" onClick={() => { haptic('light'); setSlide(s => s - 1) }}>
-              Back
+            <button className="btn-secondary flex-1 py-4 text-base font-semibold rounded-xl" onClick={() => { haptic('light'); setSlide(s => s - 1) }}>
+              Назад
             </button>
           )}
           
           {slide < slides.length - 1 ? (
-            <button className="btn flex-1" onClick={next}>Next</button>
+            <button className="btn flex-[2] py-4 text-base font-semibold rounded-xl bg-red-600 text-white" onClick={next}>
+              Далее
+            </button>
           ) : (
-            <button className="btn flex-1" onClick={close}>Let's go!</button>
+            <button className="btn flex-[2] py-4 text-base font-semibold rounded-xl bg-red-600 text-white" onClick={close}>
+              Начать работу
+            </button>
           )}
         </div>
       </div>
