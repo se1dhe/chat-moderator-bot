@@ -27,31 +27,29 @@ async def _send_welcome(
         return _t(lang, key, **kw)
         
     kb = InlineKeyboardBuilder()
-    if settings.webapp_url:
+    if bot_username:
+        # Use url button with Direct Link Mini App format — survives forwarding
+        kb.button(text=t("PANEL_BUTTON"), url=f"https://t.me/{bot_username}/app")
+    elif settings.webapp_url:
+        # Fallback: web_app button (stripped on forward, but works without Main Mini App)
         kb.button(text=t("PANEL_BUTTON"), web_app=WebAppInfo(url=settings.webapp_url))
         
     logo = FSInputFile("webapp/dist/logo.jpg")
-
-    # Build a deep-link that survives forwarding (inline keyboards are stripped)
-    bot_link = f"https://t.me/{bot_username}" if bot_username else ""
     
     if lang == "ru":
         desc = "Продвинутая система модерации и аналитики Telegram-сообществ."
         prompt = "Нажмите на кнопку ниже, чтобы открыть панель управления и добавить бота в свои чаты."
-        fwd_hint = f"\n\n🔗 [Открыть RedQueen]({bot_link})" if bot_link else ""
     elif lang == "uk":
         desc = "Просунута система модерації та аналітики Telegram-спільнот."
         prompt = "Натисніть на кнопку нижче, щоб відкрити панель керування та додати бота у свої чати."
-        fwd_hint = f"\n\n🔗 [Відкрити RedQueen]({bot_link})" if bot_link else ""
     else:
         desc = "Advanced Telegram moderation SaaS and analytics."
         prompt = "Click the button below to open the dashboard and add the bot to your chats."
-        fwd_hint = f"\n\n🔗 [Open RedQueen]({bot_link})" if bot_link else ""
 
     text = (
         f"👑 *RedQueen Security*\n\n"
         f"_{desc}_\n\n"
-        f"{prompt}{fwd_hint}"
+        f"{prompt}"
     )
     
     msg = message if isinstance(message, Message) else message.message
