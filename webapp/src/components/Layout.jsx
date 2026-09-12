@@ -1,5 +1,6 @@
-import { NavLink, Outlet, useNavigate, useParams } from 'react-router-dom'
+import { NavLink, Outlet, useNavigate, useParams, useLocation } from 'react-router-dom'
 import { LayoutGrid, Users, ShieldAlert, ScrollText, BarChart3, ChevronLeft, Shield, Check, Loader2 } from 'lucide-react'
+import { motion, AnimatePresence } from 'framer-motion'
 import { useLang } from '../context/LangContext'
 import { ChatSettingsProvider, useChatSettings } from '../context/ChatSettingsContext'
 import { haptic } from '../lib/telegram'
@@ -67,11 +68,25 @@ function Nav({ cid }) {
 
 export function Layout() {
   const { cid } = useParams()
+  const location = useLocation()
+  
   return (
     <ChatSettingsProvider chatId={cid}>
       <div className="shell">
         <Header />
-        <Outlet />
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={location.pathname}
+            initial={{ opacity: 0, x: 15 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -15 }}
+            transition={{ duration: 0.2, ease: "easeOut" }}
+            className="flex-1 overflow-y-auto"
+            style={{ display: 'flex', flexDirection: 'column' }}
+          >
+            <Outlet />
+          </motion.div>
+        </AnimatePresence>
         <Nav cid={cid} />
       </div>
     </ChatSettingsProvider>
