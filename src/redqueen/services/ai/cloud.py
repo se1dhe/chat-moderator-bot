@@ -31,6 +31,17 @@ class CloudAIProvider(AIProvider):
             self._session = None
 
     @staticmethod
+    def _parse_json(content: str) -> dict:
+        content = content.strip()
+        if content.startswith("```json"):
+            content = content[7:]
+        elif content.startswith("```"):
+            content = content[3:]
+        if content.endswith("```"):
+            content = content[:-3]
+        return json.loads(content.strip())
+
+    @staticmethod
     def _to_verdict(parsed: dict) -> Verdict:
         category = str(parsed.get("category", "ok")).lower().strip()
         if category not in CATEGORIES:
@@ -74,7 +85,7 @@ class OpenAIProvider(CloudAIProvider):
                     return await self.fallback.classify_text(text, context=context, lang=lang)
                 data = await resp.json()
                 content = data["choices"][0]["message"]["content"]
-                return self._to_verdict(json.loads(content))
+                return self._to_verdict(self._parse_json(content))
         except Exception as exc:
             log.warning(f"OpenAI fallback: {exc}")
             return await self.fallback.classify_text(text, context=context, lang=lang)
@@ -106,7 +117,7 @@ class GeminiProvider(CloudAIProvider):
                     return await self.fallback.classify_text(text, context=context, lang=lang)
                 data = await resp.json()
                 content = data["candidates"][0]["content"]["parts"][0]["text"]
-                return self._to_verdict(json.loads(content))
+                return self._to_verdict(self._parse_json(content))
         except Exception as exc:
             log.warning(f"Gemini fallback: {exc}")
             return await self.fallback.classify_text(text, context=context, lang=lang)
@@ -147,7 +158,7 @@ class ClaudeProvider(CloudAIProvider):
                     return await self.fallback.classify_text(text, context=context, lang=lang)
                 data = await resp.json()
                 content = data["content"][0]["text"]
-                return self._to_verdict(json.loads(content))
+                return self._to_verdict(self._parse_json(content))
         except Exception as exc:
             log.warning(f"Claude fallback: {exc}")
             return await self.fallback.classify_text(text, context=context, lang=lang)
