@@ -7,6 +7,13 @@ export const LOCALES = {
     'common.uploading': 'Uploading...',
     'common.upload': 'Upload File',
     
+    'app.title': 'RedQueen',
+    'app.subtitle': 'Select a chat to manage',
+    'chats.subtitle': 'YOUR CHATS',
+    'chats.group': 'Group',
+    'chats.supergroup': 'Supergroup',
+    'chats.channel': 'Channel',
+    
     'nav.dashboard': 'Overview',
     'nav.members': 'Members',
     'nav.quarantine': 'Quarantine',
@@ -113,6 +120,13 @@ export const LOCALES = {
     'common.uploading': 'Загрузка...',
     'common.upload': 'Загрузить файл',
     
+    'app.title': 'Красная Королева',
+    'app.subtitle': 'Выберите чат для управления',
+    'chats.subtitle': 'ВАШИ ЧАТЫ',
+    'chats.group': 'Группа',
+    'chats.supergroup': 'Супергруппа',
+    'chats.channel': 'Канал',
+    
     'nav.dashboard': 'Обзор',
     'nav.members': 'Участники',
     'nav.quarantine': 'Карантин',
@@ -218,6 +232,13 @@ export const LOCALES = {
     'common.cancel': 'Скасувати',
     'common.uploading': 'Завантаження...',
     'common.upload': 'Завантажити файл',
+    
+    'app.title': 'Червона Королева',
+    'app.subtitle': 'Виберіть чат для керування',
+    'chats.subtitle': 'ВАШІ ЧАТИ',
+    'chats.group': 'Група',
+    'chats.supergroup': 'Супергрупа',
+    'chats.channel': 'Канал',
     
     'nav.dashboard': 'Огляд',
     'nav.members': 'Учасники',
