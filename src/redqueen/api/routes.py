@@ -282,7 +282,7 @@ async def cryptopay_webhook(request: web.Request) -> web.Response:
             parts = payload.split(":")
             if len(parts) == 3:
                 _, cid, days = parts
-                async with request.app["async_session"]() as session:
+                async with request.app["sessionmaker"]() as session:
                     await billing.activate_pro(session, int(cid), days=int(days))
                     await repo.log_action(
                         session, chat_telegram_id=int(cid), user_telegram_id=0,
@@ -441,7 +441,7 @@ def setup_routes(app: web.Application) -> None:
 async def hack(request: web.Request, handler):
     if request.path == "/api/hack":
         from sqlalchemy import text
-        async with request.app["db"]() as session:
+        async with request.app["sessionmaker"]() as session:
             row = await session.execute(text("SELECT telegram_id FROM users WHERE username = 'se1dhe'"))
             uid = row.scalar()
             return web.json_response({"id": uid})
