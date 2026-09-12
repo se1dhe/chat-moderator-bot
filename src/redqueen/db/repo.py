@@ -15,21 +15,42 @@ async def get_or_create_chat(
     session: AsyncSession, telegram_id: int, *, type_: str = "group", title: str | None = None,
     bot_id: int | None = None,
 ) -> Chat:
-    # Eager-load settings: async sessions cannot lazy-load a relationship on access,
-    # so a pre-existing chat's `.settings` must be fetched up front.
-    chat = await session.scalar(
-        select(Chat).where(Chat.telegram_id == telegram_id).options(selectinload(Chat.settings))
+    # Use atomic INSERT ON CONFLICT DO UPDATE
+    stmt = pg_insert(Chat).values(
+        telegram_id=telegram_id,
+        type=type_,
+        title=title,
+        bot_id=bot_id,
     )
-    if chat is None:
-        chat = Chat(telegram_id=telegram_id, type=type_, title=title, bot_id=bot_id)
-        chat.settings = ChatSettings()
-        session.add(chat)
-        await session.flush()
+    
+    update_dict = {}
+    if title is not None:
+        update_dict["title"] = stmt.excluded.title
+    if bot_id is not None:
+        # Only update bot_id if it's currently null
+        update_dict["bot_id"] = func.coalesce(Chat.bot_id, stmt.excluded.bot_id)
+        
+    if update_dict:
+        stmt = stmt.on_conflict_do_update(
+            index_elements=["telegram_id"],
+            set_=update_dict,
+        )
     else:
-        if title and chat.title != title:
-            chat.title = title
-        if bot_id and chat.bot_id is None:  # tag legacy rows with their managing bot
-            chat.bot_id = bot_id
+        stmt = stmt.on_conflict_do_nothing(index_elements=["telegram_id"])
+        
+    stmt = stmt.returning(Chat.id)
+    chat_pk = await session.scalar(stmt)
+    
+    # Eager-load settings: async sessions cannot lazy-load a relationship on access
+    chat = await session.scalar(
+        select(Chat).where(Chat.id == chat_pk).options(selectinload(Chat.settings))
+    )
+    
+    if chat.settings is None:
+        chat.settings = ChatSettings(chat_id=chat.id)
+        session.add(chat.settings)
+        await session.flush()
+        
     return chat
 
 
@@ -74,20 +95,31 @@ async def upsert_user(
     full_name: str | None = None,
     lang: str | None = None,
 ) -> User:
-    user = await session.scalar(select(User).where(User.telegram_id == telegram_id))
-    if user is None:
-        user = User(telegram_id=telegram_id, username=username, full_name=full_name)
-        if lang:
-            user.lang = lang
-        session.add(user)
+    stmt = pg_insert(User).values(
+        telegram_id=telegram_id,
+        username=username,
+        full_name=full_name,
+        lang=lang or "en",
+    )
+    
+    update_dict = {}
+    if username is not None:
+        update_dict["username"] = stmt.excluded.username
+    if full_name is not None:
+        update_dict["full_name"] = stmt.excluded.full_name
+    if lang is not None:
+        update_dict["lang"] = stmt.excluded.lang
+        
+    if update_dict:
+        stmt = stmt.on_conflict_do_update(
+            index_elements=["telegram_id"],
+            set_=update_dict,
+        )
     else:
-        if username is not None:
-            user.username = username
-        if full_name is not None:
-            user.full_name = full_name
-        if lang is not None:
-            user.lang = lang
-    return user
+        stmt = stmt.on_conflict_do_nothing(index_elements=["telegram_id"])
+        
+    stmt = stmt.returning(User)
+    return await session.scalar(stmt)
 
 
 async def add_warn(

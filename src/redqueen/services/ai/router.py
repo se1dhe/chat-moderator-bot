@@ -13,11 +13,9 @@ class RouterProvider(AIProvider):
     def __init__(self, ollama_provider: AIProvider, fallback: AIProvider, secret_key: str):
         self.ollama = ollama_provider
         self.fallback = fallback
-        try:
-            self.fernet = Fernet(secret_key)
-        except Exception as e:
-            log.error(f"Invalid SECRET_KEY: {e}")
-            self.fernet = None
+        # Fail fast if SECRET_KEY is invalid (BUG-3)
+        self.fernet = Fernet(secret_key) if secret_key else None
+        self._cache: dict[tuple, AIProvider] = {}
 
     def _decrypt_key(self, encrypted: str | None) -> str | None:
         if not encrypted or not self.fernet:
@@ -41,15 +39,20 @@ class RouterProvider(AIProvider):
             return self.ollama  # fallback if no key provided
 
         model_name = getattr(chat_settings, "ai_model", None)
+        cache_key = (provider_name, api_key, model_name)
+        if cache_key in self._cache:
+            return self._cache[cache_key]
         
+        provider = self.ollama
         if provider_name == "openai":
-            return OpenAIProvider(api_key, model_name, self.fallback)
+            provider = OpenAIProvider(api_key, model_name, self.fallback)
         elif provider_name == "gemini":
-            return GeminiProvider(api_key, model_name, self.fallback)
+            provider = GeminiProvider(api_key, model_name, self.fallback)
         elif provider_name == "claude":
-            return ClaudeProvider(api_key, model_name, self.fallback)
+            provider = ClaudeProvider(api_key, model_name, self.fallback)
             
-        return self.ollama
+        self._cache[cache_key] = provider
+        return provider
 
     async def classify_text(
         self, text: str, *, context: str | None = None, lang: str | None = None, chat_settings = None
@@ -70,3 +73,7 @@ class RouterProvider(AIProvider):
 
     async def close(self) -> None:
         await self.ollama.close()
+        for provider in self._cache.values():
+            if hasattr(provider, "close"):
+                await provider.close()
+        self._cache.clear()

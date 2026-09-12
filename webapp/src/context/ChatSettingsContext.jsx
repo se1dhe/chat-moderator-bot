@@ -96,20 +96,23 @@ export function ChatSettingsProvider({ chatId, children }) {
   }, [flush])
 
   const updateSection = useCallback((section, patch) => {
+    patchRef.current = { 
+      ...patchRef.current, 
+      [section]: { ...(patchRef.current[section] || {}), ...patch } 
+    }
     setDraft((d) => {
       const next = { ...d, [section]: { ...d[section], ...patch } }
       draftRef.current = next
-      patchRef.current = { ...patchRef.current, [section]: { ...patchRef.current[section], ...patch } }
       return next
     })
     schedule()
   }, [schedule])
 
   const setSection = useCallback((section, value) => {
+    patchRef.current = { ...patchRef.current, [section]: value }
     setDraft((d) => {
       const next = { ...d, [section]: value }
       draftRef.current = next
-      patchRef.current = { ...patchRef.current, [section]: value }
       return next
     })
     schedule()

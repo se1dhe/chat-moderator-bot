@@ -37,11 +37,19 @@ async def me(request: web.Request) -> web.Response:
     owner = user.id in request.app["settings"].owner_id_set
     chats = []
     
-    db_user_lang = "en"
     async with _session(request) as session:
+        # Auto-create user if they opened TMA without ever sending /start
         db_user = await repo.get_user(session, user.id)
-        if db_user:
-            db_user_lang = db_user.lang
+        if db_user is None:
+            db_user = await repo.upsert_user(
+                session,
+                telegram_id=user.id,
+                username=user.username,
+                full_name=user.full_name,
+                lang=user.language_code or "en",
+            )
+            await session.commit()
+        db_user_lang = db_user.lang or "en"
             
         for chat in await repo.list_active_chats(session, bot_id=bot.id):
             if owner or await roles.is_admin(bot, redis, chat_id=chat.telegram_id, user_id=user.id):

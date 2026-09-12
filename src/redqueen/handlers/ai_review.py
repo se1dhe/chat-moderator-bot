@@ -175,6 +175,10 @@ async def scan_visual(
     source = _visual_source(message)
     if source is None:
         raise SkipHandler
+        
+    if source.file_size and source.file_size > 20_000_000:
+        log.info(f"Skipping large visual media: {source.file_size} bytes")
+        raise SkipHandler
 
     ai_cfg = get_config(settings)["ai"]
     if not await ai_budget.allow(redis, chat_id=message.chat.id, limit=ai_cfg["max_per_minute"]):
@@ -262,6 +266,10 @@ async def scan_voice(
         raise SkipHandler
 
     media = message.voice or message.video_note
+    if media.file_size and media.file_size > 20_000_000:
+        log.info(f"Skipping large voice/video note: {media.file_size} bytes")
+        raise SkipHandler
+
     try:
         buf = await bot.download(media)
         audio = buf.read()
