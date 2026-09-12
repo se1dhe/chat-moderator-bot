@@ -1,10 +1,11 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Shield, Users, Megaphone, ChevronRight, ServerCrash, Inbox } from 'lucide-react'
+import { motion, AnimatePresence } from 'framer-motion'
 import { useLang } from '../context/LangContext'
 import { api } from '../lib/api'
 import { startParam, haptic } from '../lib/telegram'
-import { Spinner } from '../components/ui'
+import { Preloader } from '../components/Preloader'
 import { GlobalOnboarding } from '../components/GlobalOnboarding'
 
 const typeIcon = (type) => (type === 'channel' ? Megaphone : Users)
@@ -19,24 +20,33 @@ export function ChatPicker() {
     api.me()
       .then((data) => {
         if (!alive) return
-        // Deep-linked straight to one chat → skip the picker.
         const sp = startParam()
         if (sp && data.chats.some((c) => String(c.id) === sp)) {
           navigate(`/c/${sp}`, { replace: true })
           return
         }
-        setState({ loading: false, data })
+        // Give the preloader a minimum of 1s to show off the animation
+        setTimeout(() => setState({ loading: false, data }), 800)
       })
       .catch((e) => alive && setState({ loading: false, error: e }))
     return () => { alive = false }
   }, [navigate])
 
-  if (state.loading) return <div className="shell"><Spinner /></div>
-
   const cycle = { en: 'ru', ru: 'uk', uk: 'en' }
 
   return (
-    <div className="shell">
+    <>
+      <AnimatePresence>
+        {state.loading && <Preloader key="preloader" />}
+      </AnimatePresence>
+
+      {!state.loading && (
+        <motion.div 
+          className="shell"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4, ease: 'easeOut' }}
+        >
       <header className="app-header">
         <div className="logo" style={{ overflow: 'hidden', padding: 0, background: 'none' }}>
           <img src="/app/logo.jpg" alt="Logo" style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: 'inherit' }} />
@@ -79,6 +89,7 @@ export function ChatPicker() {
           </>
         )}
       </div>
-    </div>
+    </motion.div>
+    </>
   )
 }
