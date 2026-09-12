@@ -128,7 +128,7 @@ export function Dashboard() {
               )
             })}
           </div>
-        </div>
+        </motion.div>
       ))}
     </div>
   )
