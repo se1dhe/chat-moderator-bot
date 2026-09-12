@@ -89,7 +89,8 @@ export function ChatPicker() {
           </>
         )}
       </div>
-    </motion.div>
+        </motion.div>
+      )}
     </>
   )
 }
