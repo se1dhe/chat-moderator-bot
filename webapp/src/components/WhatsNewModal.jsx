@@ -32,25 +32,25 @@ export function WhatsNewModal() {
 
   const slides = [
     {
-      icon: <Rocket size={64} className="text-red-500 mb-6 drop-shadow-[0_0_15px_rgba(239,68,68,0.3)]" />,
+      icon: <Rocket size={64} color="#ef4444" style={{ marginBottom: 24, filter: 'drop-shadow(0 0 15px rgba(239,68,68,0.3))' }} />,
       title: t('wn.title.1'),
       desc: t('wn.desc.1'),
       badge: null
     },
     {
-      icon: <MessageSquare size={64} className="text-blue-500 mb-6 drop-shadow-[0_0_15px_rgba(59,130,246,0.3)]" />,
+      icon: <MessageSquare size={64} color="#3b82f6" style={{ marginBottom: 24, filter: 'drop-shadow(0 0 15px rgba(59,130,246,0.3))' }} />,
       title: t('wn.title.2'),
       desc: t('wn.desc.2'),
       badge: 'PRO'
     },
     {
-      icon: <BrainCircuit size={64} className="text-purple-500 mb-6 drop-shadow-[0_0_15px_rgba(168,85,247,0.3)]" />,
+      icon: <BrainCircuit size={64} color="#a855f7" style={{ marginBottom: 24, filter: 'drop-shadow(0 0 15px rgba(168,85,247,0.3))' }} />,
       title: t('wn.title.3'),
       desc: t('wn.desc.3'),
       badge: 'PRO'
     },
     {
-      icon: <Filter size={64} className="text-green-500 mb-6 drop-shadow-[0_0_15px_rgba(34,197,94,0.3)]" />,
+      icon: <Filter size={64} color="#22c55e" style={{ marginBottom: 24, filter: 'drop-shadow(0 0 15px rgba(34,197,94,0.3))' }} />,
       title: t('wn.title.4'),
       desc: t('wn.desc.4'),
       badge: 'FREE'
@@ -60,62 +60,59 @@ export function WhatsNewModal() {
   const current = slides[slide]
 
   return (
-    <div className="fixed inset-0 z-[100] bg-[var(--tg-theme-bg-color)] flex flex-col animate-in fade-in duration-300">
-      <div className="flex-1 flex flex-col items-center justify-center p-6 text-center relative overflow-hidden">
+    <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, zIndex: 100, backgroundColor: 'var(--tg-theme-bg-color, #000)', display: 'flex', flexDirection: 'column' }}>
+      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '24px', textAlign: 'center', position: 'relative', overflow: 'hidden' }}>
         
-        {/* Background glow effects */}
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-[var(--tg-theme-hint-color)] opacity-[0.03] rounded-full blur-3xl pointer-events-none"></div>
-
-        <div className="mb-4">
+        <div style={{ marginBottom: 16 }}>
           {current.badge === 'PRO' && (
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-amber-500/10 text-amber-500 border border-amber-500/20 mb-6">
+            <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '4px 12px', borderRadius: 99, fontSize: 12, fontWeight: 'bold', textTransform: 'uppercase', background: 'rgba(245,158,11,0.1)', color: '#f59e0b', border: '1px solid rgba(245,158,11,0.2)', marginBottom: 24 }}>
               <Star size={14} fill="currentColor" /> Pro Feature
             </span>
           )}
           {current.badge === 'FREE' && (
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-green-500/10 text-green-500 border border-green-500/20 mb-6">
+            <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '4px 12px', borderRadius: 99, fontSize: 12, fontWeight: 'bold', textTransform: 'uppercase', background: 'rgba(34,197,94,0.1)', color: '#22c55e', border: '1px solid rgba(34,197,94,0.2)', marginBottom: 24 }}>
               <Zap size={14} fill="currentColor" /> Free
             </span>
           )}
         </div>
         
-        <div className="transform transition-all duration-300 scale-100">
+        <div>
           {current.icon}
         </div>
         
-        <h2 className="text-3xl font-bold mb-4 text-[var(--tg-theme-text-color)] tracking-tight">
+        <h2 style={{ fontSize: '1.75rem', fontWeight: 700, marginBottom: 16, color: 'var(--tg-theme-text-color)' }}>
           {current.title}
         </h2>
         
-        <p className="text-[var(--tg-theme-hint-color)] mb-8 text-base leading-relaxed max-w-sm">
+        <p style={{ color: 'var(--tg-theme-hint-color)', marginBottom: 32, fontSize: '1rem', lineHeight: 1.5, maxWidth: 320 }}>
           {current.desc}
         </p>
 
         {/* Slide Indicators */}
-        <div className="flex gap-2 mb-12">
+        <div style={{ display: 'flex', gap: 8, marginBottom: 48 }}>
           {slides.map((_, i) => (
             <div 
               key={i} 
-              className={`h-1.5 rounded-full transition-all duration-300 ${i === slide ? 'w-8 bg-red-500' : 'w-2 bg-[var(--tg-theme-hint-color)] opacity-30'}`}
+              style={{ height: 6, borderRadius: 99, transition: 'all 0.3s', width: i === slide ? 32 : 8, backgroundColor: i === slide ? '#ef4444' : 'var(--tg-theme-hint-color)', opacity: i === slide ? 1 : 0.3 }}
             />
           ))}
         </div>
       </div>
 
-      <div className="p-6 bg-[var(--tg-theme-bg-color)] pb-[max(env(safe-area-inset-bottom),1.5rem)] shadow-[0_-10px_40px_rgba(0,0,0,0.05)]">
-        <div className="flex gap-3">
+      <div style={{ padding: '24px', backgroundColor: 'var(--tg-theme-bg-color)', paddingBottom: 'max(env(safe-area-inset-bottom), 24px)', boxShadow: '0 -10px 40px rgba(0,0,0,0.05)' }}>
+        <div style={{ display: 'flex', gap: 12 }}>
           {slide > 0 && (
-            <button className="btn-secondary flex-1 py-4 text-base font-semibold rounded-xl" onClick={() => { haptic('light'); setSlide(s => s - 1) }}>
+            <button className="btn" style={{ flex: 1, padding: '16px', fontSize: '1rem', background: 'transparent', border: '1px solid var(--border)' }} onClick={() => { haptic('light'); setSlide(s => s - 1) }}>
               {t('wn.btn.back')}
             </button>
           )}
           
           {slide < slides.length - 1 ? (
-            <button className="btn flex-[2] py-4 text-base font-semibold rounded-xl bg-red-600 text-white" onClick={next}>
+            <button className="btn btn-primary" style={{ flex: 2, padding: '16px', fontSize: '1rem' }} onClick={next}>
               {t('wn.btn.next')}
             </button>
           ) : (
-            <button className="btn flex-[2] py-4 text-base font-semibold rounded-xl bg-red-600 text-white" onClick={close}>
+            <button className="btn btn-primary" style={{ flex: 2, padding: '16px', fontSize: '1rem' }} onClick={close}>
               {t('wn.btn.finish')}
             </button>
           )}
