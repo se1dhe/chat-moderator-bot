@@ -28,6 +28,9 @@ class DbSessionMiddleware(BaseMiddleware):
                 result = await handler(event, data)
                 await session.commit()
                 return result
+            except SkipHandler:
+                await session.commit()
+                raise
             except Exception:
                 await session.rollback()
                 raise
