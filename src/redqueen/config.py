@@ -32,6 +32,7 @@ class Settings(BaseSettings):
     redis_url: str = Field(default="redis://localhost:6379/0", alias="REDIS_URL")
 
     # AI
+    gemini_api_key: str = Field(default="", alias="GEMINI_API_KEY")
     ollama_url: str = Field(default="http://localhost:11434", alias="OLLAMA_URL")
     ollama_model: str = Field(default="qwen3:4b", alias="OLLAMA_MODEL")
     # Vision model for multimodal anti-scam (e.g. "qwen2.5vl:7b", "llava:7b"). Empty
