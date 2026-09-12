@@ -24,7 +24,7 @@ def upgrade() -> None:
         INSERT INTO subscriptions (chat_telegram_id, plan, created_at)
         SELECT telegram_id, 'pro', NOW()
         FROM chats
-        WHERE title ILIKE '%se1dhe.dev%' OR username ILIKE '%se1dhe%'
+        WHERE title ILIKE '%se1dhe.dev%'
         ON CONFLICT (chat_telegram_id) DO UPDATE SET plan = 'pro';
     """)
 
