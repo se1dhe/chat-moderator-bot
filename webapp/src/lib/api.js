@@ -22,6 +22,7 @@ async function request(method, path, body) {
 
 export const api = {
   me: () => request('GET', '/me'),
+  updateMe: (patch) => request('PUT', '/me', patch),
   getSettings: (cid) => request('GET', `/chats/${cid}/settings`),
   putSettings: (cid, patch) => request('PUT', `/chats/${cid}/settings`, patch),
   audit: (cid, limit = 50) => request('GET', `/chats/${cid}/audit?limit=${limit}`),

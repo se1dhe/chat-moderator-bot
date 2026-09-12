@@ -1,6 +1,7 @@
 import { createContext, useContext, useMemo, useState } from 'react'
 import { LOCALES, resolveLang } from '../i18n/translations'
 import { tgLang } from '../lib/telegram'
+import { api } from '../lib/api'
 
 const LangContext = createContext(null)
 
@@ -21,6 +22,7 @@ export function LangProvider({ children }) {
       const r = resolveLang(l)
       localStorage.setItem('rq_lang', r)
       setLang(r)
+      api.updateMe({ lang: r }).catch(console.error)
     }
     return { lang, setLang: setLangPersist, t }
   }, [lang])

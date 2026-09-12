@@ -17,39 +17,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 router = Router(name="common")
 
 
-@router.message(CommandStart())
-async def cmd_start(message: Message, t: Callable[..., str]) -> None:
-    kb = InlineKeyboardBuilder()
-    kb.button(text="🇺🇸 English", callback_data="lang:en")
-    kb.button(text="🇷🇺 Русский", callback_data="lang:ru")
-    kb.button(text="🇺🇦 Українська", callback_data="lang:uk")
-    kb.adjust(1)
-    
-    await message.answer(
-        "👋 Welcome to RedQueen Security!\nПожалуйста, выберите ваш язык / Please choose your language:",
-        reply_markup=kb.as_markup()
-    )
-
-
-@router.callback_query(F.data.startswith("lang:"))
-async def on_lang_selected(
-    call: CallbackQuery,
-    session: AsyncSession,
-    settings: Settings,
-    bot_username: str | None = None
-) -> None:
-    lang = call.data.split(":")[1]
-    
-    # Save user language, creating user if it doesn't exist
-    await repo.upsert_user(
-        session,
-        call.from_user.id,
-        username=call.from_user.username,
-        full_name=call.from_user.full_name,
-        lang=lang
-    )
-    await session.commit()
-    
+async def _send_welcome(message: Message | CallbackQuery, lang: str, settings: Settings) -> None:
     def t(key: str, **kw: object) -> str:
         return _t(lang, key, **kw)
         
@@ -70,18 +38,64 @@ async def on_lang_selected(
         prompt = "Click the button below to open the dashboard and add the bot to your chats."
 
     text = (
-        f"👑 *{t('app.title', default='RedQueen Security')}*\n\n"
+        f"👑 *RedQueen Security*\n\n"
         f"_{desc}_\n\n"
         f"{prompt}"
     )
     
-    await call.message.delete()
-    await call.message.answer_photo(
+    msg = message if isinstance(message, Message) else message.message
+    await msg.answer_photo(
         photo=logo,
         caption=text,
         parse_mode="Markdown",
         reply_markup=kb.as_markup()
     )
+
+
+@router.message(CommandStart())
+async def cmd_start(
+    message: Message,
+    session: AsyncSession,
+    settings: Settings,
+) -> None:
+    # Check if user already exists in DB
+    user = await repo.get_user(session, message.from_user.id)
+    if user and user.lang:
+        await _send_welcome(message, user.lang, settings)
+        return
+
+    kb = InlineKeyboardBuilder()
+    kb.button(text="🇺🇸 English", callback_data="lang:en")
+    kb.button(text="🇷🇺 Русский", callback_data="lang:ru")
+    kb.button(text="🇺🇦 Українська", callback_data="lang:uk")
+    kb.adjust(1)
+    
+    await message.answer(
+        "👋 Welcome to RedQueen Security!\nПожалуйста, выберите ваш язык / Please choose your language:",
+        reply_markup=kb.as_markup()
+    )
+
+
+@router.callback_query(F.data.startswith("lang:"))
+async def on_lang_selected(
+    call: CallbackQuery,
+    session: AsyncSession,
+    settings: Settings,
+) -> None:
+    lang = call.data.split(":")[1]
+    
+    # Save user language, creating user if it doesn't exist
+    await repo.upsert_user(
+        session,
+        call.from_user.id,
+        username=call.from_user.username,
+        full_name=call.from_user.full_name,
+        lang=lang
+    )
+    await session.commit()
+    
+    await call.message.delete()
+    await _send_welcome(call, lang, settings)
 
 
 @router.message(Command("help"))

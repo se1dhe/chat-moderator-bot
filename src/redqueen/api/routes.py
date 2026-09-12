@@ -55,6 +55,28 @@ async def me(request: web.Request) -> web.Response:
     })
 
 
+async def put_me(request: web.Request) -> web.Response:
+    user = await get_user(request)
+    try:
+        body = await request.json()
+    except Exception as exc:
+        raise web.HTTPBadRequest(reason="invalid JSON body") from exc
+        
+    lang = body.get("lang")
+    if lang and isinstance(lang, str):
+        async with _session(request) as session:
+            await repo.upsert_user(
+                session, 
+                telegram_id=user.id,
+                username=user.username,
+                full_name=user.full_name,
+                lang=lang[:8]
+            )
+            await session.commit()
+    
+    return web.json_response({"ok": True})
+
+
 async def get_settings(request: web.Request) -> web.Response:
     cid = _chat_id(request)
     await require_chat_admin(request, cid)
@@ -329,6 +351,7 @@ def setup_routes(app: web.Application) -> None:
     app.middlewares.append(rate_limit_middleware)
     app.router.add_get("/api/health", health)
     app.router.add_get("/api/me", me)
+    app.router.add_put("/api/me", put_me)
     app.router.add_get("/api/chats/{cid}/settings", get_settings)
     app.router.add_put("/api/chats/{cid}/settings", put_settings)
     app.router.add_get("/api/chats/{cid}/audit", audit)
