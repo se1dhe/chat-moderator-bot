@@ -50,19 +50,25 @@ async def on_bot_membership_changed(
         return _t(lang, key, **kw)
 
     chat_name = event.chat.title or str(event.chat.id)
+    
+    async def notify(text: str) -> None:
+        try:
+            await bot.send_message(event.from_user.id, text)
+        except Exception:
+            try:
+                await bot.send_message(event.chat.id, text)
+            except Exception:
+                pass
+
     if new_status != "administrator":
-        await bot.send_message(
-            event.chat.id, t("ONBOARDING_MISSING_RIGHTS", chat=chat_name, missing="administrator")
-        )
+        await notify(t("ONBOARDING_MISSING_RIGHTS", chat=chat_name, missing="administrator"))
         return
 
     missing = _missing_rights(event.new_chat_member)
     if missing:
-        await bot.send_message(
-            event.chat.id, t("ONBOARDING_MISSING_RIGHTS", chat=chat_name, missing=", ".join(missing))
-        )
+        await notify(t("ONBOARDING_MISSING_RIGHTS", chat=chat_name, missing=", ".join(missing)))
     else:
-        await bot.send_message(event.chat.id, t("ONBOARDING_WELCOME", chat=chat_name))
+        await notify(t("ONBOARDING_WELCOME", chat=chat_name))
 
 
 @router.message(Command("checksetup"), F.chat.type.in_(_CHAT_SCOPED_TYPES), IsChatAdmin())

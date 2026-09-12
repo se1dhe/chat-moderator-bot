@@ -84,7 +84,10 @@ async def cmd_grantpro(
         session, chat_telegram_id=message.chat.id, user_telegram_id=message.from_user.id,
         actor_id=message.from_user.id, action="pro_grant", reason=f"owner comp {days}d",
     )
-    await message.reply(t("PRO_ACTIVATED", until=_fmt(until)))
+    try:
+        await message.bot.send_message(message.from_user.id, t("PRO_ACTIVATED", until=_fmt(until)))
+    except Exception:
+        await message.reply(t("PRO_ACTIVATED", until=_fmt(until)))
 
 
 @router.pre_checkout_query()
@@ -117,4 +120,7 @@ async def on_successful_payment(
     )
     log.info("Pro payment: chat=%s payer=%s stars=%s until=%s",
              chat_id, message.from_user.id, sp.total_amount, until)
-    await message.answer(t("PRO_ACTIVATED", until=_fmt(until)))
+    try:
+        await message.bot.send_message(message.from_user.id, t("PRO_ACTIVATED", until=_fmt(until)))
+    except Exception:
+        await message.answer(t("PRO_ACTIVATED", until=_fmt(until)))
