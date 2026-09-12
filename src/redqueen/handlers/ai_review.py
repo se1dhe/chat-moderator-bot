@@ -157,9 +157,7 @@ async def _act_on_verdict(message, bot, session, settings, verdict, t, *, flagge
             if admin.user.is_bot:
                 continue
             try:
-                await bot.send_message(admin.user.id, f"<b>Chat: {message.chat.title}</b>
-
-" + card, reply_markup=markup)
+                await bot.send_message(admin.user.id, f"<b>Chat: {message.chat.title}</b>\n\n" + card, reply_markup=markup)
             except Exception:
                 pass  # Admin hasn't started the bot in PM, ignore
     except Exception as exc:
