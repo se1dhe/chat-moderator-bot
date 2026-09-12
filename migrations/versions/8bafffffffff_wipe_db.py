@@ -21,8 +21,7 @@ depends_on: str | Sequence[str] | None = None
 def upgrade() -> None:
     # WIPE the database
     op.execute("""
-        TRUNCATE chats CASCADE;
-        TRUNCATE users CASCADE;
+        TRUNCATE chats, users CASCADE;
     """)
 
 
