@@ -10,10 +10,12 @@ import { Stats } from './pages/Stats'
 import { WhatsNewModal } from './components/WhatsNewModal'
 import { Landing } from './pages/Landing'
 import { isTelegram } from './lib/telegram'
+import { TelegramBackButton } from './components/TelegramBackButton'
 
 export default function App() {
   return (
     <>
+      <TelegramBackButton />
       <Routes>
         <Route path="/" element={isTelegram ? <ChatPicker /> : <Landing />} />
         <Route path="/c/:cid" element={<Layout />}>
