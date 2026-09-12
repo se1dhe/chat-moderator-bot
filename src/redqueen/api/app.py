@@ -46,9 +46,10 @@ def _mount_static(app: web.Application, dist: Path) -> None:
             return web.FileResponse(candidate)
         return web.FileResponse(index)
 
+    app.router.add_get("/", spa)
     app.router.add_get("/app", spa)
-    app.router.add_get("/app/{tail:.*}", spa)
-    log.info("Serving Mini App from %s at /app", dist)
+    app.router.add_get("/{tail:.*}", spa)
+    log.info("Serving Mini App from %s", dist)
 
 
 def create_api_app(
