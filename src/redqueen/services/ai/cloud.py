@@ -90,7 +90,7 @@ class GeminiProvider(CloudAIProvider):
             parts.append(f"Context: \"{context[:500]}\"")
         parts.append(f"Message: \"{text[:4000]}\"")
         
-        model_name = self.model or "gemini-2.5-flash"
+        model_name = self.model or "gemini-1.5-flash"
         payload = {
             "contents": [{"parts": [{"text": "\n".join(parts)}]}],
             "generationConfig": {
