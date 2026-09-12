@@ -460,6 +460,8 @@ def setup_routes(app: web.Application) -> None:
     app.middlewares.append(rate_limit_middleware)
     app.router.add_get("/api/health", health)
     app.router.add_get("/api/me", me)
+    from .avatar import get_avatar
+    app.router.add_get("/api/chats/{cid}/avatar", get_avatar)
     app.router.add_put("/api/me", put_me)
     app.router.add_get("/api/chats/{cid}/settings", get_settings)
     app.router.add_put("/api/chats/{cid}/settings", put_settings)

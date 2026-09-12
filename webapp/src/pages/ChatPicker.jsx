@@ -10,6 +10,13 @@ import { GlobalOnboarding } from '../components/GlobalOnboarding'
 
 const typeIcon = (type) => (type === 'channel' ? Megaphone : Users)
 
+function ChatAvatar({ cid, type }) {
+  const [error, setError] = useState(false)
+  const Ico = typeIcon(type)
+  if (error) return <Ico size={20} />
+  return <img src={`/api/chats/${cid}/avatar`} onError={() => setError(true)} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+}
+
 export function ChatPicker() {
   const { t, lang, setLang } = useLang()
   const navigate = useNavigate()
@@ -80,10 +87,9 @@ export function ChatPicker() {
           <>
             <div className="section-label">{t('chats.subtitle')}</div>
             {state.data.chats.map((c) => {
-              const Ico = typeIcon(c.type)
               return (
                 <button key={c.id} className="tile fade-in" onClick={() => { haptic('light'); navigate(`/c/${c.id}`) }}>
-                  <div className="tile-icon"><Ico size={20} /></div>
+                  <div className="tile-icon" style={{ overflow: 'hidden', padding: 0 }}><ChatAvatar cid={c.id} type={c.type} /></div>
                   <div className="tile-body">
                     <div className="tile-title">{c.title || `#${c.id}`}</div>
                     <div className="tile-desc">{t(`chats.${c.type}`)}</div>
