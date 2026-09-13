@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useParams } from 'react-router-dom'
 import { Plus, Lock } from 'lucide-react'
 import { useLang } from '../context/LangContext'
@@ -162,7 +162,7 @@ function Modes({ s, t }) {
         </Row>
       </div>
       <div className="card">
-        <Row title="Cross-Chat Blacklist" desc="Instantly ban users who were banned in your other chats.">
+        <Row title={t('settings.crossChatTitle')} desc={t('settings.crossChatDesc')}>
           <Toggle checked={m.use_global_bans || false} onChange={(v) => s.updateSection('modes', { use_global_bans: v })} />
         </Row>
 
@@ -192,33 +192,33 @@ function AI({ s, t }) {
         ]} />
       {!s.pro && <div className="row-desc" style={{ margin: '0.5rem 0.2rem 0' }}>{t('pro.autobanNote')}</div>}
 
-      <div className="section-label">AI Provider</div>
+      <div className="section-label">{t('settings.aiProvider')}</div>
       <Segmented value={core.ai_provider || 'ollama'} onChange={(v) => s.updateSection('core', { ai_provider: v })}
         options={[
-          { value: 'ollama', label: 'Local (Ollama)' },
-          { value: 'openai', label: 'OpenAI' },
-          { value: 'gemini', label: 'Gemini' },
-          { value: 'claude', label: 'Claude' },
+          { value: 'ollama', label: t('settings.aiProvider.local') },
+          { value: 'openai', label: t('settings.aiProvider.openai') },
+          { value: 'gemini', label: t('settings.aiProvider.gemini') },
+          { value: 'claude', label: t('settings.aiProvider.claude') },
         ]} />
         
       {(core.ai_provider && core.ai_provider !== 'ollama') && (
         <div className="card" style={{ marginTop: '0.75rem', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
           <div style={{ padding: '0.75rem 1rem' }}>
-            <div style={{ fontSize: '0.85rem', fontWeight: 600, marginBottom: '0.25rem' }}>API Key {core.ai_has_key && '(Saved)'}</div>
+            <div style={{ fontSize: '0.85rem', fontWeight: 600, marginBottom: '0.25rem' }}>{t('settings.apiKey')} {core.ai_has_key && t('settings.apiKeySaved')}</div>
             <input 
               className="input" 
               type="password"
-              placeholder={core.ai_has_key ? "••••••••••••••••" : "Enter API Key"}
+              placeholder={core.ai_has_key ? "••••••••••••••••" : t('settings.enterApiKey')}
               onChange={(e) => s.updateSection('core', { ai_api_key: e.target.value })}
               style={{ width: '100%' }}
             />
           </div>
           <div style={{ padding: '0 1rem 0.75rem' }}>
-            <div style={{ fontSize: '0.85rem', fontWeight: 600, marginBottom: '0.25rem' }}>Model</div>
+            <div style={{ fontSize: '0.85rem', fontWeight: 600, marginBottom: '0.25rem' }}>{t('settings.model')}</div>
             <input 
               className="input" 
               type="text"
-              placeholder="e.g. gpt-4o-mini"
+              placeholder={t('settings.modelPlaceholder')}
               value={core.ai_model || ''}
               onChange={(e) => s.updateSection('core', { ai_model: e.target.value })}
               style={{ width: '100%' }}
@@ -377,6 +377,8 @@ function Exempt({ s, t }) {
 function AutoComment({ s, t }) {
   const c = s.draft.auto_comment || { enabled: false, text: '', media_url: '' }
   const [uploading, setUploading] = useState(false)
+  const mountedRef = useRef(true)
+  useEffect(() => { return () => { mountedRef.current = false } }, [])
   
   const handleUpload = async (e) => {
     const file = e.target.files?.[0]
@@ -388,7 +390,7 @@ function AutoComment({ s, t }) {
     } catch (err) {
       showAlert(t('common.error') + ': ' + err.message)
     } finally {
-      setUploading(false)
+      if (mountedRef.current) setUploading(false)
       e.target.value = ''
     }
   }
@@ -427,7 +429,7 @@ function AutoComment({ s, t }) {
           {c.media_url && (
             <div className="px-4 mt-2 mb-1 text-right">
               <button className="text-[13px] text-red-500" onClick={() => s.updateSection('auto_comment', { media_url: '' })}>
-                Remove Media
+                {t('settings.removeMedia')}
               </button>
             </div>
           )}

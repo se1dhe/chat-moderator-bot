@@ -37,11 +37,11 @@ export function LiveFeed() {
 
   const getActionText = (action) => {
     switch (action) {
-      case 'ban': return 'Banned';
-      case 'warn': return 'Warned';
-      case 'mute': return 'Muted';
-      case 'kick': return 'Kicked';
-      case 'unban': return 'Unbanned';
+      case 'ban': return t('live.banned');
+      case 'warn': return t('live.warned');
+      case 'mute': return t('live.muted');
+      case 'kick': return t('live.kicked');
+      case 'unban': return t('live.unbanned');
       default: return action;
     }
   };
@@ -51,7 +51,7 @@ export function LiveFeed() {
       <div className="card p-6 text-center opacity-70" style={{ height: '280px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
         <div className="flex flex-col items-center gap-3">
           <div className="spinner border-2" style={{ width: '24px', height: '24px', opacity: 0.5 }} />
-          <span>Waiting for live events...</span>
+          <span>{t('live.waiting')}</span>
         </div>
       </div>
     );
@@ -61,7 +61,7 @@ export function LiveFeed() {
     <div className="card" style={{ height: '360px', overflow: 'hidden', position: 'relative' }}>
       <div style={{ position: 'absolute', top: 0, left: 0, right: 0, padding: '12px 16px', background: 'rgba(25,25,25,0.8)', backdropFilter: 'blur(10px)', zIndex: 10, borderBottom: '1px solid var(--tg-theme-hint-color, #ffffff11)', display: 'flex', alignItems: 'center', gap: '8px', fontSize: '13px', fontWeight: 600, color: 'var(--tg-theme-hint-color, #888)' }}>
         <div style={{ width: 8, height: 8, borderRadius: '50%', background: '#ef4444', boxShadow: '0 0 8px #ef4444' }} />
-        LIVE MODERATION FEED
+        {t('live.feedTitle')}
       </div>
       <div style={{ padding: '50px 12px 12px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
         <AnimatePresence>
@@ -84,7 +84,7 @@ export function LiveFeed() {
                     {ev.user_name}
                   </span>
                   <span style={{ fontSize: '12px', color: 'var(--tg-theme-hint-color, #888)' }}>
-                    in {ev.chat_title}
+                    {t('live.inChat').replace('{chat}', ev.chat_title)}
                   </span>
                 </div>
                 <div style={{ fontSize: '13px', color: 'var(--tg-theme-hint-color, #bbb)', display: 'flex', alignItems: 'center', gap: '6px' }}>

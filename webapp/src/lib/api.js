@@ -40,6 +40,9 @@ export const api = {
   members: (cid, q = '', opts = {}) => request('GET', `/chats/${cid}/members?q=${encodeURIComponent(q)}`, undefined, opts),
   memberAction: (cid, uid, action, extra = {}) =>
     request('POST', `/chats/${cid}/members/${uid}/action`, { action, ...extra }),
+  triggers: (cid) => request('GET', `/chats/${cid}/triggers`),
+  createTrigger: (cid, data) => request('POST', `/chats/${cid}/triggers`, data),
+  deleteTrigger: (cid, tid) => request('DELETE', `/chats/${cid}/triggers/${tid}`),
   uploadMedia: async (cid, file) => {
     const formData = new FormData()
     formData.append('file', file)

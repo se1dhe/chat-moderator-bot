@@ -1,6 +1,7 @@
 import React from 'react';
 import { AlertTriangle, RefreshCcw } from 'lucide-react';
 import { haptic } from '../lib/telegram';
+import { LOCALES } from '../i18n/translations';
 
 export class ErrorBoundary extends React.Component {
   constructor(props) {
@@ -23,6 +24,11 @@ export class ErrorBoundary extends React.Component {
 
   render() {
     if (this.state.hasError) {
+      const code = window.Telegram?.WebApp?.initDataUnsafe?.user?.language_code || 'en';
+      const c = (code).toLowerCase().slice(0, 2);
+      const lang = LOCALES[c] ? c : 'en';
+      const t = (k) => LOCALES[lang][k] || k;
+
       return (
         <div style={{
           minHeight: '100vh',
@@ -36,9 +42,9 @@ export class ErrorBoundary extends React.Component {
           textAlign: 'center'
         }}>
           <AlertTriangle size={64} style={{ color: '#ef4444', marginBottom: '16px' }} />
-          <h2 style={{ fontSize: '20px', fontWeight: 'bold', marginBottom: '12px' }}>Oops, something broke!</h2>
+          <h2 style={{ fontSize: '20px', fontWeight: 'bold', marginBottom: '12px' }}>{t('error.title')}</h2>
           <p style={{ color: 'var(--tg-theme-hint-color, #888)', fontSize: '14px', marginBottom: '24px', maxWidth: '300px' }}>
-            A critical error occurred in the interface. Please reload the application.
+            {t('error.desc')}
           </p>
           <div style={{
             background: 'var(--tg-theme-secondary-bg-color, #1a1a1a)',
@@ -61,7 +67,7 @@ export class ErrorBoundary extends React.Component {
             onClick={this.handleReload}
             style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '12px 24px', borderRadius: '12px' }}
           >
-            <RefreshCcw size={18} /> Reload App
+            <RefreshCcw size={18} /> {t('error.reload')}
           </button>
         </div>
       );

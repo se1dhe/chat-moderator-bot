@@ -293,7 +293,36 @@ export const LOCALES = {
     'landing.plan.cta.free': 'Get Started',
     'landing.plan.cta.pro': 'Upgrade Now',
     
-    'landing.footer.rights': 'All rights reserved.'
+    'landing.footer.rights': 'All rights reserved.',
+
+    'settings.crossChatTitle': 'Cross-Chat Blacklist',
+    'settings.crossChatDesc': 'Instantly ban users who were banned in your other chats.',
+    'settings.aiProvider': 'AI Provider',
+    'settings.aiProvider.local': 'Local (Ollama)',
+    'settings.aiProvider.openai': 'OpenAI',
+    'settings.aiProvider.gemini': 'Gemini',
+    'settings.aiProvider.claude': 'Claude',
+    'settings.apiKey': 'API Key',
+    'settings.apiKeySaved': '(Saved)',
+    'settings.enterApiKey': 'Enter API Key',
+    'settings.model': 'Model',
+    'settings.modelPlaceholder': 'e.g. gpt-4o-mini',
+    'settings.removeMedia': 'Remove Media',
+    
+    'live.feedTitle': 'LIVE MODERATION FEED',
+    'live.waiting': 'Waiting for live events...',
+    'live.banned': 'Banned',
+    'live.warned': 'Warned',
+    'live.muted': 'Muted',
+    'live.kicked': 'Kicked',
+    'live.unbanned': 'Unbanned',
+    'live.inChat': 'in {chat}',
+    
+    'error.title': 'Oops, something broke!',
+    'error.desc': 'A critical error occurred in the interface. Please reload the application.',
+    'error.reload': 'Reload App',
+    
+    'triggers.regexBadge': 'REGEX'
   },
   
   ru: {
@@ -590,7 +619,36 @@ export const LOCALES = {
     'landing.plan.cta.free': 'Начать',
     'landing.plan.cta.pro': 'Перейти на Pro',
     
-    'landing.footer.rights': 'Все права защищены.'
+    'landing.footer.rights': 'Все права защищены.',
+
+    'settings.crossChatTitle': 'Кросс-чат Черный список',
+    'settings.crossChatDesc': 'Мгновенно банит пользователей, которые были забанены в других ваших чатах.',
+    'settings.aiProvider': 'Провайдер ИИ',
+    'settings.aiProvider.local': 'Локальный (Ollama)',
+    'settings.aiProvider.openai': 'OpenAI',
+    'settings.aiProvider.gemini': 'Gemini',
+    'settings.aiProvider.claude': 'Claude',
+    'settings.apiKey': 'API Ключ',
+    'settings.apiKeySaved': '(Сохранен)',
+    'settings.enterApiKey': 'Введите API Ключ',
+    'settings.model': 'Модель',
+    'settings.modelPlaceholder': 'напр. gpt-4o-mini',
+    'settings.removeMedia': 'Удалить медиа',
+    
+    'live.feedTitle': 'ЛЕНТА МОДЕРАЦИИ В РЕАЛЬНОМ ВРЕМЕНИ',
+    'live.waiting': 'Ожидание новых событий...',
+    'live.banned': 'Забанен',
+    'live.warned': 'Варн',
+    'live.muted': 'Мут',
+    'live.kicked': 'Кик',
+    'live.unbanned': 'Разбанен',
+    'live.inChat': 'в {chat}',
+    
+    'error.title': 'Упс, что-то сломалось!',
+    'error.desc': 'Произошла критическая ошибка в интерфейсе. Пожалуйста, перезагрузите приложение.',
+    'error.reload': 'Перезагрузить',
+    
+    'triggers.regexBadge': 'REGEX'
   },
   
   uk: {
@@ -887,7 +945,36 @@ export const LOCALES = {
     'landing.plan.cta.free': 'Почати',
     'landing.plan.cta.pro': 'Перейти на Pro',
     
-    'landing.footer.rights': 'Всі права захищені.'
+    'landing.footer.rights': 'Всі права захищені.',
+
+    'settings.crossChatTitle': 'Крос-чат Чорний список',
+    'settings.crossChatDesc': 'Миттєво банить користувачів, які були забанені в інших ваших чатах.',
+    'settings.aiProvider': 'Провайдер ШІ',
+    'settings.aiProvider.local': 'Локальний (Ollama)',
+    'settings.aiProvider.openai': 'OpenAI',
+    'settings.aiProvider.gemini': 'Gemini',
+    'settings.aiProvider.claude': 'Claude',
+    'settings.apiKey': 'API Ключ',
+    'settings.apiKeySaved': '(Збережено)',
+    'settings.enterApiKey': 'Введіть API Ключ',
+    'settings.model': 'Модель',
+    'settings.modelPlaceholder': 'напр. gpt-4o-mini',
+    'settings.removeMedia': 'Видалити медіа',
+    
+    'live.feedTitle': 'СТРІЧКА МОДЕРАЦІЇ В РЕАЛЬНОМУ ЧАСІ',
+    'live.waiting': 'Очікування нових подій...',
+    'live.banned': 'Забанений',
+    'live.warned': 'Варн',
+    'live.muted': 'Мут',
+    'live.kicked': 'Кік',
+    'live.unbanned': 'Розбанений',
+    'live.inChat': 'у {chat}',
+    
+    'error.title': 'Ой, щось зламалося!',
+    'error.desc': 'Сталася критична помилка в інтерфейсі. Будь ласка, перезавантажте програму.',
+    'error.reload': 'Перезавантажити',
+    
+    'triggers.regexBadge': 'REGEX'
   }
 }
 

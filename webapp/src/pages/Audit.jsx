@@ -37,7 +37,7 @@ export function Audit() {
       <div className="content fade-in">
         <div className="center-state">
           <div style={{ color: '#ef4444', marginBottom: 16 }}>{error}</div>
-          <button className="btn btn-secondary" onClick={() => { setError(null); setRows(null); api.audit(cid, 100).then(setRows).catch(e => setError(e.message)) }}>Retry</button>
+          <button className="btn btn-secondary" onClick={() => { setError(null); setRows(null); api.audit(cid, 100).then(setRows).catch(e => setError(e.message)) }}>{t('common.retry')}</button>
         </div>
       </div>
     )

@@ -95,7 +95,7 @@ export function Dashboard() {
       <div className="section-label">{t('dash.chatLang')}</div>
       <Segmented value={draft.lang} onChange={(v) => setSection('lang', v)} options={LANGS} />
 
-      <div className="section-label">Privacy</div>
+      <div className="section-label">{t('dash.privacy')}</div>
       <div className="card">
         <Row title={t('dash.privacy')} desc={t('dash.privacy.desc')}>
           <Toggle 

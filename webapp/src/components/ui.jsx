@@ -54,9 +54,9 @@ export function Stepper({ value, min, max, step = 1, onChange }) {
   const clamp = (v) => Math.max(min, Math.min(max, v))
   return (
     <div className="stepper">
-      <button onClick={() => { haptic('light'); onChange(clamp(value - step)) }}>−</button>
+      <button style={{ width: 44, height: 44, display: 'flex', alignItems: 'center', justifyContent: 'center' }} onClick={() => { haptic('light'); onChange(clamp(value - step)) }}>−</button>
       <span className="val">{value}</span>
-      <button onClick={() => { haptic('light'); onChange(clamp(value + step)) }}>+</button>
+      <button style={{ width: 44, height: 44, display: 'flex', alignItems: 'center', justifyContent: 'center' }} onClick={() => { haptic('light'); onChange(clamp(value + step)) }}>+</button>
     </div>
   )
 }

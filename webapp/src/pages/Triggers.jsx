@@ -12,7 +12,7 @@ export default function Triggers({ chatId, t }) {
 
   const fetchTriggers = async () => {
     try {
-      const res = await api.get(`/chats/${chatId}/triggers`);
+      const res = await api.triggers(chatId);
       setTriggers(res);
     } catch (e) {
       setError(e.message);
@@ -28,7 +28,7 @@ export default function Triggers({ chatId, t }) {
   const handleCreate = async () => {
     if (!word || !reply) return;
     try {
-      await api.post(`/chats/${chatId}/triggers`, { trigger_word: word, reply_text: reply, is_regex: isRegex });
+      await api.createTrigger(chatId, { trigger_word: word, reply_text: reply, is_regex: isRegex });
       setWord('');
       setReply('');
       fetchTriggers();
@@ -43,7 +43,7 @@ export default function Triggers({ chatId, t }) {
 
   const handleDelete = async (tid) => {
     try {
-      await api.del(`/chats/${chatId}/triggers/${tid}`);
+      await api.deleteTrigger(chatId, tid);
       fetchTriggers();
     } catch (e) {
       if (window.Telegram?.WebApp) {
@@ -88,7 +88,7 @@ export default function Triggers({ chatId, t }) {
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <div style={{ fontFamily: 'monospace', color: 'var(--tg-theme-accent-color)', fontWeight: 600 }}>
                   {trig.trigger_word}
-                  {trig.is_regex && <span className="badge badge-gold" style={{ marginLeft: '6px' }}>REGEX</span>}
+                  {trig.is_regex && <span className="badge badge-gold" style={{ marginLeft: '6px' }}>{t("triggers.regexBadge")}</span>}
                 </div>
                 <button className="btn btn-danger" style={{ padding: '4px 10px', fontSize: '13px' }} onClick={() => handleDelete(trig.id)}>
                   {t("triggers.btn.delete")}
