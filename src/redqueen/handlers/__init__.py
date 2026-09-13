@@ -15,6 +15,8 @@ from . import (
     onboarding,
     payments,
     raid,
+    welcome,
+    triggers,
     settings,
     auto_comment,
 )
@@ -33,6 +35,8 @@ def setup_routers(dp: Dispatcher) -> None:
     # catch-all stage).
     dp.include_router(captcha.router)
     dp.include_router(raid.router)
+    dp.include_router(welcome.router)
+    dp.include_router(triggers.router)
     dp.include_router(members.router)  # records the sender, then defers to the scanners
     dp.include_router(auto_comment.router)
     dp.include_router(antiflood.router)

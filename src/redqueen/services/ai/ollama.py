@@ -149,7 +149,7 @@ class OllamaProvider(AIProvider):
             parts.append(f"Chat language: {lang}.")
         if context:
             parts.append(f"Context (message being replied to): \"{context[:500]}\"")
-        parts.append(f"Message: \"{text[:4000]}\"")
+        parts.append(f"\n---BEGIN USER MESSAGE---\n{text[:4000]}\n---END USER MESSAGE---\n")
         user_content = "\n".join(parts)
 
         payload = {

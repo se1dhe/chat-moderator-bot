@@ -27,6 +27,7 @@ DEFAULT_DATA: dict[str, Any] = {
     "modes": {
         "night": {"enabled": False, "start": 23, "end": 7},
         "silent": False,
+        "use_global_bans": False,
         "slow_seconds": 0,
     },
     # `thresholds`: optional per-category overrides (0..100), e.g. {"scam": 60}.
@@ -46,6 +47,7 @@ DEFAULT_DATA: dict[str, Any] = {
     },
     "onboarding": {
         "setup_completed": False,
+        "welcome_message": "",
     },
     "exempt_user_ids": [],
 }
@@ -227,6 +229,7 @@ def apply_patch(settings: ChatSettings, patch: dict[str, Any]) -> dict[str, Any]
         cfg["modes"] = {
             "night": night,
             "silent": _as_bool(m.get("silent"), cur["silent"]),
+            "use_global_bans": _as_bool(m.get("use_global_bans"), cur.get("use_global_bans", False)),
             "slow_seconds": _clamp(m.get("slow_seconds"), 0, 3600, cur["slow_seconds"]),
         }
 
@@ -269,6 +272,7 @@ def apply_patch(settings: ChatSettings, patch: dict[str, Any]) -> dict[str, Any]
         ob, cur = patch["onboarding"], cfg["onboarding"]
         cfg["onboarding"] = {
             "setup_completed": _as_bool(ob.get("setup_completed"), cur["setup_completed"]),
+            "welcome_message": str(ob.get("welcome_message", cur.get("welcome_message", "")))[:1000],
         }
 
     if isinstance(patch.get("exempt_user_ids"), list):

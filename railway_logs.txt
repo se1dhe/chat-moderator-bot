@@ -1,0 +1,177 @@
+Starting Container
+INFO  [alembic.runtime.migration] Will assume transactional DDL.
+WARNI [redqueen.config] CRITICAL SECURITY WARNING: Using the default SECRET_KEY. Please set a secure SECRET_KEY in your .env file to protect user API keys.
+INFO  [alembic.runtime.migration] Context impl PostgresqlImpl.
+Traceback (most recent call last):
+  File "/usr/local/bin/redqueen", line 3, in <module>
+    from redqueen.__main__ import main
+  File "/usr/local/lib/python3.12/site-packages/redqueen/__main__.py", line 14, in <module>
+    from .bot import create_bot, create_dispatcher, create_redis
+  File "/usr/local/lib/python3.12/site-packages/redqueen/bot.py", line 13, in <module>
+    from .handlers import setup_routers
+  File "/usr/local/lib/python3.12/site-packages/redqueen/handlers/__init__.py", line 6, in <module>
+    from . import (
+  File "/usr/local/lib/python3.12/site-packages/redqueen/handlers/ai_review.py", line 160
+    await bot.send_message(admin.user.id, f"<b>Chat: {message.chat.title}</b>
+                                          ^
+SyntaxError: unterminated f-string literal (detected at line 160)
+WARNI [redqueen.config] CRITICAL SECURITY WARNING: Using the default SECRET_KEY. Please set a secure SECRET_KEY in your .env file to protect user API keys.
+INFO  [alembic.runtime.migration] Context impl PostgresqlImpl.
+INFO  [alembic.runtime.migration] Will assume transactional DDL.
+Traceback (most recent call last):
+  File "/usr/local/bin/redqueen", line 3, in <module>
+    from redqueen.__main__ import main
+  File "/usr/local/lib/python3.12/site-packages/redqueen/__main__.py", line 14, in <module>
+    from .bot import create_bot, create_dispatcher, create_redis
+  File "/usr/local/lib/python3.12/site-packages/redqueen/bot.py", line 13, in <module>
+    from .handlers import setup_routers
+  File "/usr/local/lib/python3.12/site-packages/redqueen/handlers/__init__.py", line 6, in <module>
+    from . import (
+  File "/usr/local/lib/python3.12/site-packages/redqueen/handlers/ai_review.py", line 160
+    await bot.send_message(admin.user.id, f"<b>Chat: {message.chat.title}</b>
+                                          ^
+SyntaxError: unterminated f-string literal (detected at line 160)
+WARNI [redqueen.config] CRITICAL SECURITY WARNING: Using the default SECRET_KEY. Please set a secure SECRET_KEY in your .env file to protect user API keys.
+INFO  [alembic.runtime.migration] Context impl PostgresqlImpl.
+INFO  [alembic.runtime.migration] Will assume transactional DDL.
+Traceback (most recent call last):
+  File "/usr/local/bin/redqueen", line 3, in <module>
+    from redqueen.__main__ import main
+  File "/usr/local/lib/python3.12/site-packages/redqueen/__main__.py", line 14, in <module>
+    from .bot import create_bot, create_dispatcher, create_redis
+  File "/usr/local/lib/python3.12/site-packages/redqueen/bot.py", line 13, in <module>
+    from .handlers import setup_routers
+  File "/usr/local/lib/python3.12/site-packages/redqueen/handlers/__init__.py", line 6, in <module>
+    from . import (
+  File "/usr/local/lib/python3.12/site-packages/redqueen/handlers/ai_review.py", line 160
+    await bot.send_message(admin.user.id, f"<b>Chat: {message.chat.title}</b>
+                                          ^
+SyntaxError: unterminated f-string literal (detected at line 160)
+WARNI [redqueen.config] CRITICAL SECURITY WARNING: Using the default SECRET_KEY. Please set a secure SECRET_KEY in your .env file to protect user API keys.
+INFO  [alembic.runtime.migration] Context impl PostgresqlImpl.
+INFO  [alembic.runtime.migration] Will assume transactional DDL.
+Traceback (most recent call last):
+  File "/usr/local/bin/redqueen", line 3, in <module>
+    from redqueen.__main__ import main
+  File "/usr/local/lib/python3.12/site-packages/redqueen/__main__.py", line 14, in <module>
+    from .bot import create_bot, create_dispatcher, create_redis
+  File "/usr/local/lib/python3.12/site-packages/redqueen/bot.py", line 13, in <module>
+    from .handlers import setup_routers
+  File "/usr/local/lib/python3.12/site-packages/redqueen/handlers/__init__.py", line 6, in <module>
+    from . import (
+  File "/usr/local/lib/python3.12/site-packages/redqueen/handlers/ai_review.py", line 160
+    await bot.send_message(admin.user.id, f"<b>Chat: {message.chat.title}</b>
+                                          ^
+SyntaxError: unterminated f-string literal (detected at line 160)
+WARNI [redqueen.config] CRITICAL SECURITY WARNING: Using the default SECRET_KEY. Please set a secure SECRET_KEY in your .env file to protect user API keys.
+INFO  [alembic.runtime.migration] Context impl PostgresqlImpl.
+INFO  [alembic.runtime.migration] Will assume transactional DDL.
+Traceback (most recent call last):
+  File "/usr/local/bin/redqueen", line 3, in <module>
+    from redqueen.__main__ import main
+  File "/usr/local/lib/python3.12/site-packages/redqueen/__main__.py", line 14, in <module>
+    from .bot import create_bot, create_dispatcher, create_redis
+  File "/usr/local/lib/python3.12/site-packages/redqueen/bot.py", line 13, in <module>
+    from .handlers import setup_routers
+  File "/usr/local/lib/python3.12/site-packages/redqueen/handlers/__init__.py", line 6, in <module>
+    from . import (
+  File "/usr/local/lib/python3.12/site-packages/redqueen/handlers/ai_review.py", line 160
+    await bot.send_message(admin.user.id, f"<b>Chat: {message.chat.title}</b>
+                                          ^
+SyntaxError: unterminated f-string literal (detected at line 160)
+WARNI [redqueen.config] CRITICAL SECURITY WARNING: Using the default SECRET_KEY. Please set a secure SECRET_KEY in your .env file to protect user API keys.
+INFO  [alembic.runtime.migration] Context impl PostgresqlImpl.
+INFO  [alembic.runtime.migration] Will assume transactional DDL.
+Traceback (most recent call last):
+  File "/usr/local/bin/redqueen", line 3, in <module>
+    from redqueen.__main__ import main
+  File "/usr/local/lib/python3.12/site-packages/redqueen/__main__.py", line 14, in <module>
+    from .bot import create_bot, create_dispatcher, create_redis
+  File "/usr/local/lib/python3.12/site-packages/redqueen/bot.py", line 13, in <module>
+    from .handlers import setup_routers
+  File "/usr/local/lib/python3.12/site-packages/redqueen/handlers/__init__.py", line 6, in <module>
+    from . import (
+  File "/usr/local/lib/python3.12/site-packages/redqueen/handlers/ai_review.py", line 160
+    await bot.send_message(admin.user.id, f"<b>Chat: {message.chat.title}</b>
+                                          ^
+SyntaxError: unterminated f-string literal (detected at line 160)
+WARNI [redqueen.config] CRITICAL SECURITY WARNING: Using the default SECRET_KEY. Please set a secure SECRET_KEY in your .env file to protect user API keys.
+INFO  [alembic.runtime.migration] Context impl PostgresqlImpl.
+INFO  [alembic.runtime.migration] Will assume transactional DDL.
+  File "/usr/local/lib/python3.12/site-packages/redqueen/__main__.py", line 14, in <module>
+    from .bot import create_bot, create_dispatcher, create_redis
+  File "/usr/local/lib/python3.12/site-packages/redqueen/bot.py", line 13, in <module>
+    from .handlers import setup_routers
+  File "/usr/local/lib/python3.12/site-packages/redqueen/handlers/__init__.py", line 6, in <module>
+    from . import (
+  File "/usr/local/lib/python3.12/site-packages/redqueen/handlers/ai_review.py", line 160
+Traceback (most recent call last):
+  File "/usr/local/bin/redqueen", line 3, in <module>
+    from redqueen.__main__ import main
+    await bot.send_message(admin.user.id, f"<b>Chat: {message.chat.title}</b>
+                                          ^
+SyntaxError: unterminated f-string literal (detected at line 160)
+WARNI [redqueen.config] CRITICAL SECURITY WARNING: Using the default SECRET_KEY. Please set a secure SECRET_KEY in your .env file to protect user API keys.
+INFO  [alembic.runtime.migration] Context impl PostgresqlImpl.
+INFO  [alembic.runtime.migration] Will assume transactional DDL.
+Traceback (most recent call last):
+  File "/usr/local/bin/redqueen", line 3, in <module>
+    from redqueen.__main__ import main
+  File "/usr/local/lib/python3.12/site-packages/redqueen/__main__.py", line 14, in <module>
+    from .bot import create_bot, create_dispatcher, create_redis
+  File "/usr/local/lib/python3.12/site-packages/redqueen/bot.py", line 13, in <module>
+    from .handlers import setup_routers
+  File "/usr/local/lib/python3.12/site-packages/redqueen/handlers/__init__.py", line 6, in <module>
+    from . import (
+  File "/usr/local/lib/python3.12/site-packages/redqueen/handlers/ai_review.py", line 160
+    await bot.send_message(admin.user.id, f"<b>Chat: {message.chat.title}</b>
+                                          ^
+SyntaxError: unterminated f-string literal (detected at line 160)
+WARNI [redqueen.config] CRITICAL SECURITY WARNING: Using the default SECRET_KEY. Please set a secure SECRET_KEY in your .env file to protect user API keys.
+INFO  [alembic.runtime.migration] Context impl PostgresqlImpl.
+INFO  [alembic.runtime.migration] Will assume transactional DDL.
+  File "/usr/local/lib/python3.12/site-packages/redqueen/bot.py", line 13, in <module>
+    from .handlers import setup_routers
+  File "/usr/local/lib/python3.12/site-packages/redqueen/handlers/__init__.py", line 6, in <module>
+    from . import (
+  File "/usr/local/lib/python3.12/site-packages/redqueen/handlers/ai_review.py", line 160
+    await bot.send_message(admin.user.id, f"<b>Chat: {message.chat.title}</b>
+                                          ^
+SyntaxError: unterminated f-string literal (detected at line 160)
+Traceback (most recent call last):
+  File "/usr/local/bin/redqueen", line 3, in <module>
+    from redqueen.__main__ import main
+  File "/usr/local/lib/python3.12/site-packages/redqueen/__main__.py", line 14, in <module>
+    from .bot import create_bot, create_dispatcher, create_redis
+WARNI [redqueen.config] CRITICAL SECURITY WARNING: Using the default SECRET_KEY. Please set a secure SECRET_KEY in your .env file to protect user API keys.
+INFO  [alembic.runtime.migration] Context impl PostgresqlImpl.
+INFO  [alembic.runtime.migration] Will assume transactional DDL.
+  File "/usr/local/lib/python3.12/site-packages/redqueen/handlers/__init__.py", line 6, in <module>
+    from . import (
+  File "/usr/local/lib/python3.12/site-packages/redqueen/handlers/ai_review.py", line 160
+    await bot.send_message(admin.user.id, f"<b>Chat: {message.chat.title}</b>
+                                          ^
+SyntaxError: unterminated f-string literal (detected at line 160)
+Traceback (most recent call last):
+  File "/usr/local/bin/redqueen", line 3, in <module>
+    from redqueen.__main__ import main
+  File "/usr/local/lib/python3.12/site-packages/redqueen/__main__.py", line 14, in <module>
+    from .bot import create_bot, create_dispatcher, create_redis
+  File "/usr/local/lib/python3.12/site-packages/redqueen/bot.py", line 13, in <module>
+    from .handlers import setup_routers
+WARNI [redqueen.config] CRITICAL SECURITY WARNING: Using the default SECRET_KEY. Please set a secure SECRET_KEY in your .env file to protect user API keys.
+INFO  [alembic.runtime.migration] Context impl PostgresqlImpl.
+INFO  [alembic.runtime.migration] Will assume transactional DDL.
+Traceback (most recent call last):
+  File "/usr/local/bin/redqueen", line 3, in <module>
+    from redqueen.__main__ import main
+  File "/usr/local/lib/python3.12/site-packages/redqueen/__main__.py", line 14, in <module>
+    from .bot import create_bot, create_dispatcher, create_redis
+  File "/usr/local/lib/python3.12/site-packages/redqueen/bot.py", line 13, in <module>
+    from .handlers import setup_routers
+  File "/usr/local/lib/python3.12/site-packages/redqueen/handlers/__init__.py", line 6, in <module>
+    from . import (
+  File "/usr/local/lib/python3.12/site-packages/redqueen/handlers/ai_review.py", line 160
+    await bot.send_message(admin.user.id, f"<b>Chat: {message.chat.title}</b>
+                                          ^
+SyntaxError: unterminated f-string literal (detected at line 160)

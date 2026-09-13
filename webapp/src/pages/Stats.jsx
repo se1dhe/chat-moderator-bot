@@ -23,11 +23,19 @@ export function Stats() {
   const { t } = useLang()
   const { pro, billing, openUpgrade } = useChatSettings()
   const [data, setData] = useState(null)
+  const [error, setError] = useState(null)
 
   useEffect(() => {
     if (!pro) return  // analytics is a Pro feature — don't fetch when locked
     let alive = true
-    api.stats(cid).then((d) => alive && setData(d)).catch(() => alive && setData({ actions: {}, pending_quarantine: 0, timeline: {}, categories: {}, members: 0 }))
+    api.stats(cid)
+      .then((d) => alive && setData(d))
+      .catch((err) => {
+        if (alive) {
+          setError(err.message)
+          setData({ actions: {}, pending_quarantine: 0, timeline: {}, categories: {}, members: 0 })
+        }
+      })
     return () => { alive = false }
   }, [cid, pro])
 
@@ -48,7 +56,18 @@ export function Stats() {
     )
   }
 
-  if (!data) return <div className="content"><Spinner /></div>
+  if (!data && !error) return <div className="content"><Spinner /></div>
+
+  if (error) {
+    return (
+      <div className="content fade-in">
+        <div className="center-state">
+          <div style={{ color: '#ef4444', marginBottom: 16 }}>{error}</div>
+          <button className="btn btn-secondary" onClick={() => { setError(null); setData(null); api.stats(cid).then(setData).catch(e => setError(e.message)) }}>Retry</button>
+        </div>
+      </div>
+    )
+  }
 
   const actions = Object.entries(data.actions).sort((a, b) => b[1] - a[1])
   const total = actions.reduce((n, [, v]) => n + v, 0)

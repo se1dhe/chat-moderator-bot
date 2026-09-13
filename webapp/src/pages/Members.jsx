@@ -4,7 +4,7 @@ import { Users, Search, TriangleAlert, VolumeX, Volume2, UserMinus, Ban, RotateC
 import { useLang } from '../context/LangContext'
 import { api } from '../lib/api'
 import { Spinner } from '../components/ui'
-import { haptic, showConfirm } from '../lib/telegram'
+import { haptic, showConfirm, showAlert } from '../lib/telegram'
 
 // Action metadata. `duration: true` means the action takes a length (mute/ban).
 const META = {
@@ -77,8 +77,9 @@ export function Members() {
       await api.memberAction(cid, m.user_id, key, { ...extra, reason })
       haptic('success')
       load(q)  // refresh so the member's state (and available actions) update
-    } catch {
+    } catch (err) {
       haptic('error')
+      showAlert(t('common.error') + ': ' + err.message)
     } finally {
       setBusy(null)
     }

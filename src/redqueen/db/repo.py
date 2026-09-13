@@ -60,17 +60,20 @@ async def get_or_create_chat(
 async def upsert_bot_instance(
     session: AsyncSession, *, bot_telegram_id: int, username: str | None, brand: str
 ) -> BotInstance:
-    inst = await session.scalar(
-        select(BotInstance).where(BotInstance.bot_telegram_id == bot_telegram_id)
-    )
-    if inst is None:
-        inst = BotInstance(bot_telegram_id=bot_telegram_id, username=username, brand=brand)
-        session.add(inst)
-    else:
-        inst.username = username
-        inst.brand = brand
-        inst.is_active = True
-    return inst
+    stmt = pg_insert(BotInstance).values(
+        bot_telegram_id=bot_telegram_id,
+        username=username,
+        brand=brand,
+        is_active=True,
+    ).on_conflict_do_update(
+        index_elements=["bot_telegram_id"],
+        set_={
+            "username": username,
+            "brand": brand,
+            "is_active": True,
+        },
+    ).returning(BotInstance)
+    return await session.scalar(stmt)
 
 
 async def get_settings(session: AsyncSession, telegram_id: int) -> ChatSettings:
@@ -353,13 +356,17 @@ async def count_members(session: AsyncSession, chat_telegram_id: int) -> int:
     return int(result or 0)
 
 
+def _escape_like(q: str) -> str:
+    return q.replace("%", "\\%").replace("_", "\\_")
+
 async def search_members(
     session: AsyncSession, chat_telegram_id: int, *, query: str = "", limit: int = 30
 ) -> list[ChatMember]:
     stmt = select(ChatMember).where(ChatMember.chat_telegram_id == chat_telegram_id)
     q = query.strip().lstrip("@")
     if q:
-        like = f"%{q}%"
+        escaped_q = _escape_like(q)
+        like = f"%{escaped_q}%"
         conds = [ChatMember.username.ilike(like), ChatMember.full_name.ilike(like)]
         if q.isdigit():
             conds.append(ChatMember.user_telegram_id == int(q))

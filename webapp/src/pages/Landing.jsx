@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { ShieldCheck, Activity, Zap, Check, Menu, X, ArrowRight } from 'lucide-react';
 import { LiveFeed } from '../components/LiveFeed';
 import { useLang } from '../context/LangContext';
+import { API_BASE } from '../lib/api';
 
 export function Landing() {
   const { t, lang, setLang } = useLang();
@@ -10,10 +11,14 @@ export function Landing() {
   const [menuOpen, setMenuOpen] = useState(false);
 
   useEffect(() => {
-    fetch('/api/stats/global')
+    const ctrl = new AbortController();
+    fetch(`${API_BASE}/stats/global`, { signal: ctrl.signal })
       .then(res => res.json())
       .then(data => setStats(data))
-      .catch(console.error);
+      .catch(err => {
+        if (err.name !== 'AbortError') console.error(err);
+      });
+    return () => ctrl.abort();
   }, []);
 
   const cycle = { en: 'ru', ru: 'uk', uk: 'en' };
@@ -218,15 +223,6 @@ export function Landing() {
           <p>© 2026 RedQueen. {t('landing.footer.rights')}</p>
         </div>
       </footer>
-      
-      <style dangerouslySetInnerHTML={{__html: `
-        html { scroll-behavior: smooth; }
-        @media (max-width: 768px) {
-          .desktop-nav { display: none !important; }
-          .mobile-menu-btn { display: block !important; }
-        }
-        .feature-card:hover { transform: translateY(-5px); border-color: rgba(239,68,68,0.3) !important; }
-      `}} />
     </div>
   );
-}
+

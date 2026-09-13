@@ -1,6 +1,5 @@
 import aiohttp
 from aiohttp import web
-from aiogram import Bot
 from .auth import request_bot
 
 def _chat_id(request: web.Request) -> int:

@@ -15,14 +15,33 @@ export function Audit() {
   const { cid } = useParams()
   const { t } = useLang()
   const [rows, setRows] = useState(null)
+  const [error, setError] = useState(null)
 
   useEffect(() => {
     let alive = true
-    api.audit(cid, 100).then((d) => alive && setRows(d)).catch(() => alive && setRows([]))
+    api.audit(cid, 100)
+      .then((d) => alive && setRows(d))
+      .catch((err) => {
+        if (alive) {
+          setError(err.message)
+          setRows([]) // keep it as empty so it stops spinning, but we have error state
+        }
+      })
     return () => { alive = false }
   }, [cid])
 
-  if (!rows) return <div className="content"><Spinner /></div>
+  if (!rows && !error) return <div className="content"><Spinner /></div>
+
+  if (error) {
+    return (
+      <div className="content fade-in">
+        <div className="center-state">
+          <div style={{ color: '#ef4444', marginBottom: 16 }}>{error}</div>
+          <button className="btn btn-secondary" onClick={() => { setError(null); setRows(null); api.audit(cid, 100).then(setRows).catch(e => setError(e.message)) }}>Retry</button>
+        </div>
+      </div>
+    )
+  }
 
   if (!rows.length) {
     return (

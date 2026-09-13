@@ -24,4 +24,7 @@ RUN pip install --upgrade pip && pip install .
 # Built Mini App, served by aiohttp at /app (WEBAPP_DIST=webapp/dist).
 COPY --from=webapp /webapp/dist ./webapp/dist
 
+RUN adduser --disabled-password --gecos '' appuser
+USER appuser
+
 CMD ["sh", "-c", "alembic upgrade head && redqueen"]

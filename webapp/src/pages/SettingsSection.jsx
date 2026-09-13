@@ -4,7 +4,7 @@ import { Plus, Lock } from 'lucide-react'
 import { useLang } from '../context/LangContext'
 import { useChatSettings } from '../context/ChatSettingsContext'
 import { Toggle, Row, Segmented, Stepper, Slider, Chips, Spinner } from '../components/ui'
-import { haptic } from '../lib/telegram'
+import { haptic, showAlert } from '../lib/telegram'
 import { api } from '../lib/api'
 
 const CATEGORIES = ['spam', 'scam', 'toxicity', 'nsfw', 'flood']
@@ -25,6 +25,7 @@ export function SettingsSection() {
     warns: <Warns s={s} t={t} />,
     exempt: <Exempt s={s} t={t} />,
     autocomment: <AutoComment s={s} t={t} />,
+    triggers: <Triggers chatId={s.cid} t={t} />,
   }
   return <div className="content fade-in">{map[section] ?? null}</div>
 }
@@ -159,6 +160,10 @@ function Modes({ s, t }) {
         </Row>
       </div>
       <div className="card">
+        <Row title="Cross-Chat Blacklist" desc="Instantly ban users who were banned in your other chats.">
+          <Toggle checked={m.use_global_bans || false} onChange={(v) => s.updateSection('modes', { use_global_bans: v })} />
+        </Row>
+
         <Row title={t('modes.silent')} desc={t('modes.silentDesc')}>
           <Toggle checked={m.silent} onChange={(v) => s.updateSection('modes', { silent: v })} />
         </Row>
@@ -379,7 +384,7 @@ function AutoComment({ s, t }) {
       const { file_id } = await api.uploadMedia(s.chatId, file)
       s.updateSection('auto_comment', { media_url: file_id })
     } catch (err) {
-      alert(t('common.error') + ': ' + err.message)
+      showAlert(t('common.error') + ': ' + err.message)
     } finally {
       setUploading(false)
       e.target.value = ''

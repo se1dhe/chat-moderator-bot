@@ -20,10 +20,11 @@ PRO_PRICE_STARS = 500
 PRO_PERIOD_DAYS = 30
 
 
-async def get_subscription(session: AsyncSession, chat_id: int) -> Subscription | None:
-    return await session.scalar(
-        select(Subscription).where(Subscription.chat_telegram_id == chat_id)
-    )
+async def get_subscription(session: AsyncSession, chat_id: int, lock: bool = False) -> Subscription | None:
+    stmt = select(Subscription).where(Subscription.chat_telegram_id == chat_id)
+    if lock:
+        stmt = stmt.with_for_update()
+    return await session.scalar(stmt)
 
 
 def _active(sub: Subscription | None, *, now: datetime | None = None) -> bool:
@@ -41,7 +42,7 @@ async def activate_pro(session: AsyncSession, chat_id: int, *, days: int = PRO_P
     """Start or extend Pro for `chat_id`. Extends from the later of now / current expiry
     so stacked payments accumulate. Returns the new expiry."""
     now = datetime.now(UTC)
-    sub = await get_subscription(session, chat_id)
+    sub = await get_subscription(session, chat_id, lock=True)
     if sub is None:
         sub = Subscription(chat_telegram_id=chat_id)
         session.add(sub)
@@ -66,7 +67,7 @@ async def record_payment(
             select(Payment).where(Payment.telegram_payment_charge_id == charge_id)
         )
         if existing is not None:
-            sub = await get_subscription(session, chat_id)
+            sub = await get_subscription(session, chat_id, lock=True)
             return sub.active_until if sub and sub.active_until else datetime.now(UTC)
 
     session.add(Payment(

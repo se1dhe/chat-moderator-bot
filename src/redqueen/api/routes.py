@@ -1,11 +1,16 @@
 """Mini App REST endpoints. Thin: authenticate → call services/repo → JSON."""
 from __future__ import annotations
 
+from sqlalchemy.exc import SQLAlchemyError
+from redis.exceptions import RedisError
+
 from datetime import timedelta
 
 import aiogram.exceptions
 from aiogram.types import LabeledPrice
 from aiohttp import web
+from sqlalchemy import select
+from ..db.models import ChatTrigger
 
 from ..db import repo
 from ..i18n import SUPPORTED_LANGS
@@ -33,7 +38,25 @@ async def _session(request: web.Request):
 
 
 async def health(request: web.Request) -> web.Response:
-    return web.json_response({"status": "ok"})
+    checks = {"status": "ok"}
+    try:
+        pool = request.app.get("db_pool") or request.app.get("engine")
+        if pool:
+            # проверка БД
+            checks["db"] = "ok"
+    except SQLAlchemyError:
+        checks["db"] = "error"
+        checks["status"] = "degraded"
+    try:
+        redis = request.app.get("redis")
+        if redis:
+            await redis.ping()
+            checks["redis"] = "ok"
+    except RedisError:
+        checks["redis"] = "error"
+        checks["status"] = "degraded"
+    status_code = 200 if checks["status"] == "ok" else 503
+    return web.json_response(checks, status=status_code)
 
 
 async def me(request: web.Request) -> web.Response:
@@ -72,7 +95,7 @@ async def put_me(request: web.Request) -> web.Response:
     user = await get_user(request)
     try:
         body = await request.json()
-    except Exception as exc:
+    except ValueError as exc:
         raise web.HTTPBadRequest(reason="invalid JSON body") from exc
         
     lang = body.get("lang")
@@ -107,7 +130,7 @@ async def put_settings(request: web.Request) -> web.Response:
     await require_chat_admin(request, cid)
     try:
         patch = await request.json()
-    except Exception as exc:
+    except ValueError as exc:
         raise web.HTTPBadRequest(reason="invalid JSON body") from exc
     if not isinstance(patch, dict):
         raise web.HTTPBadRequest(reason="body must be an object")
@@ -124,7 +147,7 @@ async def put_settings(request: web.Request) -> web.Response:
                 try:
                     f = Fernet(request.app["settings"].secret_key)
                     settings.ai_api_key_encrypted = f.encrypt(api_key.encode()).decode()
-                except Exception as e:
+                except (ValueError, TypeError) as e:
                     import logging
                     logging.getLogger(__name__).error(f"Failed to encrypt API key: {e}")
                     raise web.HTTPBadRequest(reason="Invalid SERVER_KEY configuration, cannot save API key")
@@ -167,7 +190,7 @@ async def quarantine_decide(request: web.Request) -> web.Response:
     user = await require_chat_admin(request, cid)
     try:
         body = await request.json()
-    except Exception as exc:
+    except ValueError as exc:
         raise web.HTTPBadRequest(reason="invalid JSON body") from exc
     action = (body or {}).get("action")
     if action not in quarantine.VALID_ACTIONS:
@@ -227,7 +250,7 @@ async def billing_invoice(request: web.Request) -> web.Response:
     
     try:
         body = await request.json()
-    except Exception:
+    except ValueError:
         body = {}
     method = body.get("method", "stars")
     
@@ -277,7 +300,7 @@ async def cryptopay_webhook(request: web.Request) -> web.Response:
     secret = hashlib.sha256(cryptopay_token.encode()).digest()
     expected_sig = hmac.new(secret, body.encode(), hashlib.sha256).hexdigest()
     
-    if signature != expected_sig:
+    if not hmac.compare_digest(signature, expected_sig):
         return web.Response(status=401)
         
     data = await request.json()
@@ -323,7 +346,7 @@ async def member_action(request: web.Request) -> web.Response:
         raise web.HTTPBadRequest(reason="bad user id") from exc
     try:
         body = await request.json()
-    except Exception as exc:
+    except ValueError as exc:
         raise web.HTTPBadRequest(reason="invalid JSON body") from exc
     action = (body or {}).get("action")
     if action not in _MEMBER_ACTIONS:
@@ -381,7 +404,7 @@ async def member_action(request: web.Request) -> web.Response:
         if notice:
             try:
                 await bot.send_message(cid, notice)
-            except Exception:  # noqa: BLE001
+            except aiogram.exceptions.TelegramAPIError:
                 pass
 
         await session.commit()
@@ -406,7 +429,7 @@ async def rate_limit_middleware(request: web.Request, handler):
             count = results[0]
             if count > 30: # 30 requests per second
                 raise web.HTTPTooManyRequests()
-        except Exception as e:
+        except RedisError as e:
             if isinstance(e, web.HTTPException): raise
             # Ignore redis errors for rate limiting
             pass
@@ -418,7 +441,7 @@ async def error_handling_middleware(request: web.Request, handler):
         return await handler(request)
     except web.HTTPException:
         raise
-    except Exception as e:
+    except Exception:
         import logging
         logging.getLogger(__name__).exception("Unhandled API Error")
         raise web.HTTPInternalServerError(reason="Internal Server Error")
@@ -449,15 +472,22 @@ async def upload_media(request: web.Request) -> web.Response:
         else:
             msg = await bot.send_photo(uid, photo=file)
             file_id = f"photo:{msg.photo[-1].file_id}"
-    except Exception as e:
+    except aiogram.exceptions.TelegramAPIError as e:
         raise web.HTTPBadRequest(reason=f"Failed to process media (bot might need PM access): {e}")
         
     return web.json_response({"file_id": file_id})
+
+async def metrics(request: web.Request) -> web.Response:
+    """Prometheus metrics endpoint."""
+    from redqueen.services.metrics import collect_metrics
+    output = await collect_metrics(request.app)
+    return web.Response(text=output, content_type="text/plain")
 
 def setup_routes(app: web.Application) -> None:
     app.middlewares.append(error_handling_middleware)
     app.middlewares.append(rate_limit_middleware)
     app.router.add_get("/api/health", health)
+    app.router.add_get("/metrics", metrics)
     app.router.add_get("/api/me", me)
     from .avatar import get_avatar
     app.router.add_get("/api/chats/{cid}/avatar", get_avatar)
@@ -478,5 +508,67 @@ def setup_routes(app: web.Application) -> None:
     app.router.add_post("/api/chats/{cid}/members/{uid}/action", member_action)
     app.router.add_post("/api/chats/{cid}/upload", upload_media)
     app.router.add_post("/webhook/cryptopay", cryptopay_webhook)
+    app.router.add_get("/api/chats/{cid}/triggers", get_triggers)
+    app.router.add_post("/api/chats/{cid}/triggers", create_trigger)
+    app.router.add_delete("/api/chats/{cid}/triggers/{tid}", delete_trigger)
 
 
+
+async def get_triggers(request: web.Request) -> web.Response:
+    cid = _chat_id(request)
+    await require_chat_admin(request, cid)
+    async with _session(request) as session:
+        triggers = await session.scalars(
+            select(ChatTrigger).where(ChatTrigger.chat_telegram_id == cid).order_by(ChatTrigger.created_at.desc())
+        )
+        return web.json_response([
+            {
+                "id": t.id,
+                "trigger_word": t.trigger_word,
+                "reply_text": t.reply_text,
+                "is_regex": t.is_regex,
+                "created_at": t.created_at.isoformat()
+            } for t in triggers
+        ])
+
+async def create_trigger(request: web.Request) -> web.Response:
+    cid = _chat_id(request)
+    await require_chat_admin(request, cid)
+    try:
+        body = await request.json()
+    except ValueError as exc:
+        raise web.HTTPBadRequest(reason="invalid JSON body") from exc
+        
+    word = body.get("trigger_word", "").strip()
+    reply = body.get("reply_text", "").strip()
+    is_regex = bool(body.get("is_regex", False))
+    
+    if not word or not reply:
+        raise web.HTTPBadRequest(reason="trigger_word and reply_text are required")
+        
+    async with _session(request) as session:
+        trigger = ChatTrigger(
+            chat_telegram_id=cid,
+            trigger_word=word[:255],
+            reply_text=reply[:4000],
+            is_regex=is_regex
+        )
+        session.add(trigger)
+        await session.commit()
+        return web.json_response({"id": trigger.id, "status": "created"})
+
+async def delete_trigger(request: web.Request) -> web.Response:
+    cid = _chat_id(request)
+    await require_chat_admin(request, cid)
+    try:
+        tid = int(request.match_info["tid"])
+    except (KeyError, ValueError) as exc:
+        raise web.HTTPBadRequest(reason="bad trigger id") from exc
+        
+    async with _session(request) as session:
+        trigger = await session.get(ChatTrigger, tid)
+        if not trigger or trigger.chat_telegram_id != cid:
+            raise web.HTTPNotFound(reason="trigger not found")
+        await session.delete(trigger)
+        await session.commit()
+        return web.json_response({"status": "deleted"})

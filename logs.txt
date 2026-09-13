@@ -1,0 +1,55 @@
+WARNI [redqueen.config] CRITICAL SECURITY WARNING: Using the default SECRET_KEY. Please set a secure SECRET_KEY in your .env file to protect user API keys.
+INFO  [alembic.runtime.migration] Context impl PostgresqlImpl.
+INFO  [alembic.runtime.migration] Will assume transactional DDL.
+Starting Container
+CRITICAL SECURITY WARNING: Using the default SECRET_KEY. Please set a secure SECRET_KEY in your .env file to protect user API keys.
+2026-09-12 19:18:00,401 INFO     redqueen: Authorized as @RedQueenSecurity_Bot (brand: RedQueen)
+2026-09-12 19:18:00,565 INFO     redqueen: Menu button wired to Mini App at https://redqueen.telonyx.app/app
+2026-09-12 19:18:00,871 INFO     redqueen: Bot command menu registered (en/ru/uk)
+2026-09-12 19:18:00,874 INFO     redqueen.api.app: Serving Mini App from webapp/dist
+2026-09-12 19:18:00,874 INFO     redqueen: AI disabled — using rule-based moderation
+2026-09-12 19:18:01,307 INFO     redqueen: Webhook set to https://redqueen.telonyx.app/webhook
+2026-09-12 19:18:01,307 INFO     redqueen: Webhook + Mini App API listening on 0.0.0.0:8080
+2026-09-12 19:19:27,518 INFO     aiohttp.access: 100.64.0.2 [12/Sep/2026:19:19:27 +0000] "POST /webhook HTTP/1.1" 200 348 "-" "-"
+2026-09-12 19:19:27,595 INFO     aiogram.event: Update id=804609721 is handled. Duration 76 ms by bot id=1616567756
+2026-09-12 19:19:29,445 INFO     aiohttp.access: 100.64.0.2 [12/Sep/2026:19:19:29 +0000] "GET /app HTTP/1.1" 200 424 "-" "Mozilla/5.0 (iPhone; CPU iPhone OS 18_7 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148"
+2026-09-12 19:19:29,506 INFO     aiohttp.access: 100.64.0.3 [12/Sep/2026:19:19:29 +0000] "GET /assets/index-BVGRW3iB.css HTTP/1.1" 200 453 "https://redqueen.telonyx.app/app" "Mozilla/5.0 (iPhone; CPU iPhone OS 18_7 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148"
+2026-09-12 19:19:29,512 INFO     aiohttp.access: 100.64.0.3 [12/Sep/2026:19:19:29 +0000] "GET /assets/index-DaYU3FZs.js HTTP/1.1" 200 462 "https://redqueen.telonyx.app/app" "Mozilla/5.0 (iPhone; CPU iPhone OS 18_7 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148"
+2026-09-12 19:19:29,729 INFO     aiohttp.access: 100.64.0.5 [12/Sep/2026:19:19:29 +0000] "GET /app/logo.jpg HTTP/1.1" 200 430 "https://redqueen.telonyx.app/app" "Mozilla/5.0 (iPhone; CPU iPhone OS 18_7 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148"
+2026-09-12 19:19:29,746 INFO     aiohttp.access: 100.64.0.4 [12/Sep/2026:19:19:29 +0000] "GET /api/me HTTP/1.1" 200 779 "https://redqueen.telonyx.app/app" "Mozilla/5.0 (iPhone; CPU iPhone OS 18_7 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148"
+2026-09-12 19:19:30,679 INFO     aiohttp.access: 100.64.0.6 [12/Sep/2026:19:19:30 +0000] "GET /api/chats/-1003970500113/avatar HTTP/1.1" 200 12945 "https://redqueen.telonyx.app/app" "Mozilla/5.0 (iPhone; CPU iPhone OS 18_7 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148"
+2026-09-12 19:19:30,686 INFO     aiohttp.access: 100.64.0.4 [12/Sep/2026:19:19:30 +0000] "GET /api/chats/-1003588832673/avatar HTTP/1.1" 200 10688 "https://redqueen.telonyx.app/app" "Mozilla/5.0 (iPhone; CPU iPhone OS 18_7 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148"
+2026-09-12 19:19:30,726 ERROR    redqueen.api.avatar: Failed to fetch avatar for -1002838145731: No avatar
+2026-09-12 19:19:30,727 INFO     aiohttp.access: 100.64.0.2 [12/Sep/2026:19:19:30 +0000] "GET /api/chats/-1002838145731/avatar HTTP/1.1" 404 200 "https://redqueen.telonyx.app/app" "Mozilla/5.0 (iPhone; CPU iPhone OS 18_7 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148"
+2026-09-12 19:19:33,119 INFO     aiohttp.access: 100.64.0.3 [12/Sep/2026:19:19:33 +0000] "GET /api/chats/-1002838145731/settings HTTP/1.1" 200 1469 "https://redqueen.telonyx.app/app" "Mozilla/5.0 (iPhone; CPU iPhone OS 18_7 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148"
+2026-09-12 19:19:33,126 INFO     aiohttp.access: 100.64.0.7 [12/Sep/2026:19:19:33 +0000] "GET /api/chats/-1002838145731/billing HTTP/1.1" 200 508 "https://redqueen.telonyx.app/app" "Mozilla/5.0 (iPhone; CPU iPhone OS 18_7 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148"
+2026-09-12 19:19:33,310 INFO     aiohttp.access: 100.64.0.6 [12/Sep/2026:19:19:33 +0000] "GET /api/chats/-1002838145731/stats HTTP/1.1" 200 542 "https://redqueen.telonyx.app/app" "Mozilla/5.0 (iPhone; CPU iPhone OS 18_7 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148"
+2026-09-12 19:19:37,389 INFO     aiohttp.access: 100.64.0.8 [12/Sep/2026:19:19:37 +0000] "GET /api/chats/-1002838145731/quarantine HTTP/1.1" 200 937 "https://redqueen.telonyx.app/app" "Mozilla/5.0 (iPhone; CPU iPhone OS 18_7 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148"
+2026-09-12 19:19:49,192 INFO     aiohttp.access: 100.64.0.5 [12/Sep/2026:19:19:49 +0000] "GET /api/chats/-1002838145731/avatar HTTP/1.1" 404 208 "https://redqueen.telonyx.app/app" "Mozilla/5.0 (iPhone; CPU iPhone OS 18_7 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148"
+2026-09-12 19:25:43,854 INFO     aiohttp.access: 100.64.0.9 [12/Sep/2026:19:25:43 +0000] "POST /webhook HTTP/1.1" 200 348 "-" "-"
+2026-09-12 19:25:43,942 INFO     aiogram.event: Update id=804609722 is handled. Duration 88 ms by bot id=1616567756
+2026-09-12 19:26:35,415 INFO     aiohttp.access: 100.64.0.2 [12/Sep/2026:19:26:35 +0000] "POST /webhook HTTP/1.1" 200 348 "-" "-"
+2026-09-12 19:26:40,632 WARNING  redqueen.handlers.ai_review: AI timeout for chat -1002838145731, falling back to rules
+2026-09-12 19:26:40,637 INFO     aiogram.event: Update id=804609723 is not handled. Duration 5221 ms by bot id=1616567756
+2026-09-12 19:26:42,373 INFO     aiohttp.access: 100.64.0.10 [12/Sep/2026:19:26:42 +0000] "GET /app HTTP/1.1" 304 366 "-" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko)"
+2026-09-12 19:26:42,429 INFO     aiohttp.access: 100.64.0.10 [12/Sep/2026:19:26:42 +0000] "GET /assets/index-BVGRW3iB.css HTTP/1.1" 304 394 "https://redqueen.telonyx.app/app" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko)"
+2026-09-12 19:26:42,438 INFO     aiohttp.access: 100.64.0.11 [12/Sep/2026:19:26:42 +0000] "GET /assets/index-DaYU3FZs.js HTTP/1.1" 304 395 "https://redqueen.telonyx.app/app" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko)"
+2026-09-12 19:26:42,565 INFO     aiohttp.access: 100.64.0.10 [12/Sep/2026:19:26:42 +0000] "GET /app/logo.jpg HTTP/1.1" 304 368 "https://redqueen.telonyx.app/app" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko)"
+2026-09-12 19:26:42,589 INFO     aiohttp.access: 100.64.0.12 [12/Sep/2026:19:26:42 +0000] "GET /api/me HTTP/1.1" 200 779 "https://redqueen.telonyx.app/app" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko)"
+2026-09-12 19:26:43,453 INFO     aiohttp.access: 100.64.0.13 [12/Sep/2026:19:26:43 +0000] "GET /api/chats/-1002838145731/avatar HTTP/1.1" 404 208 "https://redqueen.telonyx.app/app" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko)"
+2026-09-12 19:26:44,230 INFO     aiohttp.access: 100.64.0.8 [12/Sep/2026:19:26:43 +0000] "GET /api/chats/-1003588832673/avatar HTTP/1.1" 200 10688 "https://redqueen.telonyx.app/app" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko)"
+2026-09-12 19:26:44,230 INFO     aiohttp.access: 100.64.0.10 [12/Sep/2026:19:26:43 +0000] "GET /api/chats/-1003970500113/avatar HTTP/1.1" 200 12945 "https://redqueen.telonyx.app/app" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko)"
+2026-09-12 19:26:48,208 INFO     aiohttp.access: 100.64.0.14 [12/Sep/2026:19:26:48 +0000] "POST /webhook HTTP/1.1" 200 348 "-" "-"
+2026-09-12 19:26:49,308 WARNING  redqueen.services.ai.cloud: Gemini error: {
+  "error": {
+    "code": 503,
+    "message": "This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.",
+    "status": "UNAVAILABLE"
+  }
+}
+
+2026-09-12 19:26:49,314 INFO     aiogram.event: Update id=804609724 is not handled. Duration 1105 ms by bot id=1616567756
+2026-09-12 19:26:53,421 INFO     aiohttp.access: 100.64.0.14 [12/Sep/2026:19:26:53 +0000] "GET /api/chats/-1002838145731/billing HTTP/1.1" 200 508 "https://redqueen.telonyx.app/app" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko)"
+2026-09-12 19:26:53,424 INFO     aiohttp.access: 100.64.0.13 [12/Sep/2026:19:26:53 +0000] "GET /api/chats/-1002838145731/settings HTTP/1.1" 200 1469 "https://redqueen.telonyx.app/app" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko)"
+2026-09-12 19:26:53,514 INFO     aiohttp.access: 100.64.0.2 [12/Sep/2026:19:26:53 +0000] "GET /api/chats/-1002838145731/stats HTTP/1.1" 200 542 "https://redqueen.telonyx.app/app" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko)"
+2026-09-12 19:26:57,520 INFO     aiohttp.access: 100.64.0.14 [12/Sep/2026:19:26:57 +0000] "GET /api/chats/-1002838145731/quarantine HTTP/1.1" 200 937 "https://redqueen.telonyx.app/app" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko)"

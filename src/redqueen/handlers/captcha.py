@@ -9,6 +9,8 @@ from aiogram.filters import Command, CommandObject
 from aiogram.filters.callback_data import CallbackData
 from aiogram.filters.chat_member_updated import JOIN_TRANSITION, ChatMemberUpdatedFilter
 from aiogram.types import CallbackQuery, ChatJoinRequest, ChatMemberUpdated, Message
+from aiogram.exceptions import TelegramAPIError
+
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 from redis.asyncio import Redis
 from sqlalchemy import select
@@ -111,7 +113,7 @@ async def on_join_request(
             event.from_user.id, dm_text, reply_markup=_keyboard(row.id, challenge, t).as_markup()
         )
         row.prompt_message_id = sent.message_id
-    except Exception:  # noqa: BLE001
+    except TelegramAPIError:
         # Can't reach the user by DM — decline rather than leave the request stuck.
         await bot.decline_chat_join_request(event.chat.id, event.from_user.id)
         row.status = "failed"
@@ -119,7 +121,7 @@ async def on_join_request(
 
 @router.callback_query(CaptchaCB.filter())
 async def on_answer(
-    query: CallbackQuery, callback_data: CaptchaCB, bot: Bot, session: AsyncSession, t: Callable[..., str]
+    query: CallbackQuery, callback_data: CaptchaCB, bot: Bot, session: AsyncSession, redis: Redis, t: Callable[..., str]
 ) -> None:
     row = await session.scalar(
         select(CaptchaSession).where(CaptchaSession.id == callback_data.session_id)
@@ -136,7 +138,7 @@ async def on_answer(
 
     row.status = "passed"
     name = query.from_user.full_name
-    await trust.adjust(session, row.user_telegram_id, trust.CAPTCHA_PASS)
+    await trust.adjust(session, row.user_telegram_id, trust.CAPTCHA_PASS, redis)
 
     if row.is_join_request:
         await bot.approve_chat_join_request(row.chat_telegram_id, row.user_telegram_id)

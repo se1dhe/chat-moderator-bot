@@ -19,5 +19,8 @@ class IsChatAdmin(BaseFilter):
             return False
         if user.id in get_settings().owner_id_set:
             return True
-        member = await message.chat.get_member(user.id)
+        try:
+            member = await message.chat.get_member(user.id)
+        except Exception:
+            return False
         return member.status in _ADMIN_STATUSES

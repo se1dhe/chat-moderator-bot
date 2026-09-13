@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import logging
+import os
 from collections.abc import Awaitable, Callable
 from pathlib import Path
 
@@ -19,6 +20,7 @@ _CORS_HEADERS_BASE = {
     "Access-Control-Allow-Methods": "GET, POST, PUT, OPTIONS",
     "Access-Control-Allow-Headers": "Authorization, Content-Type, X-Init-Data",
     "Access-Control-Max-Age": "600",
+    "Content-Security-Policy": "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://telegram.org; style-src 'self' 'unsafe-inline'; connect-src 'self' wss: https:; img-src 'self' data: blob: https:;",
 }
 
 
@@ -26,8 +28,13 @@ _CORS_HEADERS_BASE = {
 async def cors_middleware(
     request: web.Request, handler: Callable[[web.Request], Awaitable[web.StreamResponse]]
 ) -> web.StreamResponse:
-    origin = request.headers.get("Origin", "*")
-    cors_headers = {**_CORS_HEADERS_BASE, "Access-Control-Allow-Origin": origin}
+    ALLOWED_ORIGINS = os.environ.get("CORS_ORIGINS", "").split(",")
+    origin = request.headers.get("Origin", "")
+    cors_headers = {**_CORS_HEADERS_BASE}
+    if origin and (origin in ALLOWED_ORIGINS or "*" in ALLOWED_ORIGINS):
+        cors_headers["Access-Control-Allow-Origin"] = origin
+    else:
+        cors_headers["Access-Control-Allow-Origin"] = ALLOWED_ORIGINS[0] if ALLOWED_ORIGINS else ""
     if request.method == "OPTIONS":
         return web.Response(status=204, headers=cors_headers)
     response = await handler(request)

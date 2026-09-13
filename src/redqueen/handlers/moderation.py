@@ -11,6 +11,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from ..db import repo
 from ..filters import IsChatAdmin
+from aiogram.exceptions import TelegramAPIError
+
 from ..services import moderation, warns
 from ..utils.duration import humanize, parse_duration, until_from_now
 from ..utils.targets import resolve_target
@@ -24,7 +26,7 @@ _PROTECTED = {ChatMemberStatus.ADMINISTRATOR, ChatMemberStatus.CREATOR}
 async def _target_is_admin(message: Message, user_id: int) -> bool:
     try:
         member = await message.chat.get_member(user_id)
-    except Exception:  # noqa: BLE001
+    except TelegramAPIError:  # noqa: BLE001
         return False
     return member.status in _PROTECTED
 
@@ -158,7 +160,7 @@ async def cmd_purge(message: Message, bot: Bot, t: Callable[..., str]) -> None:
         try:
             await bot.delete_messages(message.chat.id, chunk)
             deleted += len(chunk)
-        except Exception:  # noqa: BLE001
+        except TelegramAPIError:  # noqa: BLE001
             pass
     await message.answer(t("PURGED", count=deleted))
 

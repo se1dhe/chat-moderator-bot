@@ -222,3 +222,27 @@ class RaidEvent(TimestampMixin, Base):
     window_seconds: Mapped[int] = mapped_column(Integer)
     locked_until: Mapped[datetime] = mapped_column(DateTime(timezone=True))
     resolved_by: Mapped[int | None] = mapped_column(BigInteger)  # admin who ran /unlock early, if any
+
+class ChatTrigger(TimestampMixin, Base):
+    """Auto-reply trigger configured via Mini App."""
+    
+    __tablename__ = "chat_triggers"
+    __table_args__ = (Index("ix_chat_triggers_chat", "chat_telegram_id"),)
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    chat_telegram_id: Mapped[int] = mapped_column(BigInteger)
+    trigger_word: Mapped[str] = mapped_column(String(255))
+    reply_text: Mapped[str] = mapped_column(Text)
+    is_regex: Mapped[bool] = mapped_column(Boolean, default=False, server_default="false")
+
+
+class GlobalBan(TimestampMixin, Base):
+    """Cross-chat blacklist entry (Network of Trust)."""
+    
+    __tablename__ = "global_bans"
+    __table_args__ = (Index("ix_global_bans_admin", "admin_telegram_id", "user_telegram_id", unique=True),)
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    admin_telegram_id: Mapped[int] = mapped_column(BigInteger)
+    user_telegram_id: Mapped[int] = mapped_column(BigInteger)
+    reason: Mapped[str | None] = mapped_column(String(255))

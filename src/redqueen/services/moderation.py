@@ -5,6 +5,7 @@ from datetime import datetime
 
 from aiogram import Bot
 from aiogram.types import ChatPermissions
+import sqlalchemy as sa
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from ..db import repo
@@ -47,6 +48,25 @@ async def ban(
         action="ban", reason=reason,
         meta={"until": until.isoformat()} if until else {},
     )
+
+    # Check if global ban is enabled
+    settings = await session.scalar(
+        sa.select(repo.ChatSettings).where(repo.ChatSettings.chat_telegram_id == chat_id)
+    )
+    if settings and settings.data.get("modes", {}).get("use_global_bans", False):
+        # Insert or update GlobalBan
+        from redqueen.db.models import GlobalBan
+        from sqlalchemy.dialects.postgresql import insert as pg_insert
+        
+        stmt = pg_insert(GlobalBan).values(
+            admin_telegram_id=actor_id,
+            user_telegram_id=user_id,
+            reason=reason
+        ).on_conflict_do_update(
+            index_elements=['admin_telegram_id', 'user_telegram_id'],
+            set_={'reason': reason}
+        )
+        await session.execute(stmt)
     await repo.set_member_state(session, chat_id, user_id, state="banned")
     await trust.adjust(session, user_id, trust.BAN)
 

@@ -566,3 +566,11 @@ input { font-family: inherit; }
 .payment-cancel:active {
   background: rgba(255,255,255,0.05);
 }
+
+/* Landing page styles */
+html { scroll-behavior: smooth; }
+@media (max-width: 768px) {
+  .desktop-nav { display: none !important; }
+  .mobile-menu-btn { display: block !important; }
+}
+.feature-card:hover { transform: translateY(-5px); border-color: rgba(239,68,68,0.3) !important; }

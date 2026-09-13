@@ -11,7 +11,9 @@ from redis.asyncio import Redis
 
 async def allow(redis: Redis, *, chat_id: int, limit: int, window_seconds: int = 60) -> bool:
     key = f"rq:aicalls:{chat_id}"
-    count = await redis.incr(key)
-    if count == 1:
-        await redis.expire(key, window_seconds)
+    pipe = redis.pipeline()
+    pipe.incr(key)
+    pipe.expire(key, window_seconds)
+    results = await pipe.execute()
+    count = results[0]
     return count <= limit

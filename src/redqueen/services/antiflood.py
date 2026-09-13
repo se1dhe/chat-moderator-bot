@@ -7,9 +7,11 @@ from redis.asyncio import Redis
 async def register_hit(redis: Redis, *, chat_id: int, user_id: int, window_seconds: int) -> int:
     """Increment the message counter for this chat/user window; return the new count."""
     key = f"rq:af:{chat_id}:{user_id}"
-    count = await redis.incr(key)
-    if count == 1:
-        await redis.expire(key, window_seconds)
+    pipe = redis.pipeline()
+    pipe.incr(key)
+    pipe.expire(key, window_seconds)
+    results = await pipe.execute()
+    count = results[0]
     return count
 
 

@@ -50,6 +50,13 @@ export function showConfirm(message) {
   })
 }
 
+export function showAlert(message) {
+  return new Promise((resolve) => {
+    if (tg?.showAlert) tg.showAlert(message, resolve)
+    else { window.alert(message); resolve() }
+  })
+}
+
 export function openInvoice(url) {
   return new Promise((resolve) => {
     if (tg?.openInvoice) tg.openInvoice(url, resolve)

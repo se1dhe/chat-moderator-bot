@@ -13,6 +13,11 @@ export default defineConfig({
       '/api': { target: 'http://localhost:8080', changeOrigin: true },
     },
   },
+  test: {
+    globals: true,
+    environment: 'jsdom',
+    setupFiles: './tests/setup.js',
+  },
   build: {
     outDir: 'dist',
     emptyOutDir: true,

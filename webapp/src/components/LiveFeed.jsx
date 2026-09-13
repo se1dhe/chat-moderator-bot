@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ShieldAlert, ShieldBan, Shield } from 'lucide-react';
 import { useLang } from '../context/LangContext';
+import { API_BASE } from '../lib/api';
 
 export function LiveFeed() {
   const [events, setEvents] = useState([]);
@@ -9,7 +10,7 @@ export function LiveFeed() {
 
   useEffect(() => {
     // connect to SSE
-    const evtSource = new EventSource("/api/live/feed");
+    const evtSource = new EventSource(`${API_BASE}/live/feed`);
     
     evtSource.onmessage = (event) => {
       try {

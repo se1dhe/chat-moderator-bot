@@ -7,6 +7,7 @@ more readily, a high-trust member gets more benefit of the doubt.
 from __future__ import annotations
 
 from sqlalchemy.ext.asyncio import AsyncSession
+from redis.asyncio import Redis
 
 from ..db import repo
 
@@ -29,8 +30,23 @@ def should_bypass_captcha(trust_score: int) -> bool:
     return trust_score >= CAPTCHA_BYPASS_SCORE
 
 
-async def adjust(session: AsyncSession, user_id: int, delta: int) -> int:
+async def adjust(session: AsyncSession, user_id: int, delta: int, redis: Redis | None = None) -> int:
+    if delta > 0 and redis is not None:
+        key = f"trust_rl:{user_id}"
+        current = await redis.get(key)
+        current_val = int(current) if current else 0
+        if current_val + delta > 10:
+            delta = max(0, 10 - current_val)
+        
+        if delta > 0:
+            await redis.incrby(key, delta)
+            if not current:
+                await redis.expire(key, 3600)
+    
     user = await repo.upsert_user(session, user_id)
+    if delta == 0:
+        return user.trust_score
+
     user.trust_score = max(0, min(100, user.trust_score + delta))
     return user.trust_score
 

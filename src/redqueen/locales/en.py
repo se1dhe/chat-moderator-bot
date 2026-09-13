@@ -205,3 +205,8 @@ EXEMPT_ADDED = "<b>{name}</b> is now exempt from automated protocols."
 EXEMPT_REMOVED = "<b>{name}</b> is no longer exempt."
 EXEMPT_LIST = "<b>Exempt members</b> ({count}):\n{names}"
 EXEMPT_EMPTY = "No exemptions configured."
+
+# --- New Features ---
+GLOBAL_BANNED = "🛑 <b>{name}</b> was automatically removed due to being on your global blacklist."
+GLOBAL_BANNED_REASON = "🛑 <b>{name}</b> was automatically removed due to being on your global blacklist (Reason: {reason})."
+WELCOME_DEFAULT = "Welcome, <b>{name}</b>!"

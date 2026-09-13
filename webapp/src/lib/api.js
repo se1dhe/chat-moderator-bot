@@ -1,10 +1,12 @@
 // API client — every request carries the Telegram initData for auth.
 import { initData } from './telegram'
 
+export const API_BASE = '/api'
+
 async function request(method, path, body, opts = {}) {
   const headers = { Authorization: `tma ${initData}` }
   if (body !== undefined) headers['Content-Type'] = 'application/json'
-  const resp = await fetch(`/api${path}`, {
+  const resp = await fetch(`${API_BASE}${path}`, {
     method,
     headers,
     body: body !== undefined ? JSON.stringify(body) : undefined,
@@ -22,7 +24,10 @@ async function request(method, path, body, opts = {}) {
 }
 
 export const api = {
-  me: () => request('GET', '/me'),
+  me: () => request("GET", "/me"),
+  get: (path, opts) => request("GET", path, undefined, opts),
+  post: (path, body, opts) => request("POST", path, body, opts),
+  del: (path, opts) => request("DELETE", path, undefined, opts),
   updateMe: (patch) => request('PUT', '/me', patch),
   getSettings: (cid) => request('GET', `/chats/${cid}/settings`),
   putSettings: (cid, patch) => request('PUT', `/chats/${cid}/settings`, patch),
@@ -38,7 +43,7 @@ export const api = {
   uploadMedia: async (cid, file) => {
     const formData = new FormData()
     formData.append('file', file)
-    const resp = await fetch(`/api/chats/${cid}/upload`, {
+    const resp = await fetch(`${API_BASE}/chats/${cid}/upload`, {
       method: 'POST',
       headers: { Authorization: `tma ${initData}` },
       body: formData,

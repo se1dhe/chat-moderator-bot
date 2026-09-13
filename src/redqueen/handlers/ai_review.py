@@ -13,6 +13,7 @@ from aiogram.utils.keyboard import InlineKeyboardBuilder
 from redis.asyncio import Redis
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
+from aiogram.exceptions import TelegramAPIError
 
 from ..db import repo
 from ..db.models import AIVerdict
@@ -130,14 +131,14 @@ async def _act_on_verdict(message, bot, session, settings, verdict, t, *, flagge
     # 1. Hide the offending message immediately
     try:
         await message.delete()
-    except Exception as exc:
+    except (TelegramAPIError, asyncio.TimeoutError) as exc:
         log.warning("Could not delete flagged message: %s", exc)
 
     # Auto-ban is a Pro capability; free chats fall back to the quarantine card.
     if settings.ai_mode == "autoban" and await billing.is_pro(session, message.chat.id):
         try:
             await quarantine.decide(bot, session, row, actor_id=None, action="ban")
-        except Exception as exc:  # noqa: BLE001
+        except (TelegramAPIError, asyncio.TimeoutError) as exc:  # noqa: BLE001
             log.warning("autoban failed: %s", exc)
         return
 
@@ -158,9 +159,9 @@ async def _act_on_verdict(message, bot, session, settings, verdict, t, *, flagge
                 continue
             try:
                 await bot.send_message(admin.user.id, f"<b>Chat: {message.chat.title}</b>\n\n" + card, reply_markup=markup)
-            except Exception:
+            except TelegramAPIError:
                 pass  # Admin hasn't started the bot in PM, ignore
-    except Exception as exc:
+    except (TelegramAPIError, asyncio.TimeoutError) as exc:
         log.warning("Could not fetch admins to send quarantine card: %s", exc)
 
 
@@ -195,8 +196,8 @@ async def scan_visual(
     if source is None:
         raise SkipHandler
         
-    if source.file_size and source.file_size > 20_000_000:
-        log.info(f"Skipping large visual media: {source.file_size} bytes")
+    if source.file_size is None or source.file_size > 5_000_000:
+        log.info(f"Skipping large or unknown size visual media: {source.file_size} bytes")
         raise SkipHandler
 
     ai_cfg = get_config(settings)["ai"]
@@ -204,9 +205,9 @@ async def scan_visual(
         raise SkipHandler
 
     try:
-        buf = await bot.download(source)
+        buf = await asyncio.wait_for(bot.download(source), timeout=10.0)
         image = buf.read()
-    except Exception as exc:
+    except (TelegramAPIError, asyncio.TimeoutError) as exc:
         log.warning("visual download failed: %s", exc)
         raise SkipHandler from exc
 
@@ -243,11 +244,11 @@ async def scan_document(
     parts = [message.caption or "", doc.file_name or ""]
     # Read the body of small, text-like attachments; everything else is judged by its
     # caption + filename (which is where scam links/lures usually live anyway).
-    if doc.mime_type in _TEXT_MIMES and (doc.file_size or 0) <= _MAX_DOC_BYTES:
+    if doc.mime_type in _TEXT_MIMES and doc.file_size is not None and doc.file_size <= _MAX_DOC_BYTES:
         try:
-            buf = await bot.download(doc)
+            buf = await asyncio.wait_for(bot.download(doc), timeout=10.0)
             parts.append(buf.read().decode("utf-8", "ignore")[:4000])
-        except Exception as exc:  # noqa: BLE001
+        except (TelegramAPIError, asyncio.TimeoutError) as exc:  # noqa: BLE001
             log.debug("document download failed: %s", exc)
 
     combined = "\n".join(p for p in parts if p).strip()
@@ -285,18 +286,22 @@ async def scan_voice(
         raise SkipHandler
 
     media = message.voice or message.video_note
-    if media.file_size and media.file_size > 20_000_000:
-        log.info(f"Skipping large voice/video note: {media.file_size} bytes")
+    if media.file_size is None or media.file_size > 5_000_000:
+        log.info(f"Skipping large or unknown size voice/video note: {media.file_size} bytes")
         raise SkipHandler
 
     try:
-        buf = await bot.download(media)
+        buf = await asyncio.wait_for(bot.download(media), timeout=10.0)
         audio = buf.read()
-    except Exception as exc:
+    except (TelegramAPIError, asyncio.TimeoutError) as exc:
         log.warning("voice download failed: %s", exc)
         raise SkipHandler from exc
 
-    text = await transcriber.transcribe(audio)
+    try:
+        text = await asyncio.wait_for(transcriber.transcribe(audio), timeout=15.0)
+    except asyncio.TimeoutError:
+        log.warning("transcription timed out")
+        raise SkipHandler
     if not text:
         raise SkipHandler
     try:

@@ -62,7 +62,7 @@ class OpenAIProvider(CloudAIProvider):
             parts.append(f"Chat language: {lang}.")
         if context:
             parts.append(f"Context: \"{context[:500]}\"")
-        parts.append(f"Message: \"{text[:4000]}\"")
+        parts.append(f"\n---BEGIN USER MESSAGE---\n{text[:4000]}\n---END USER MESSAGE---\n")
         
         payload = {
             "model": self.model or "gpt-4o-mini",
@@ -99,7 +99,7 @@ class GeminiProvider(CloudAIProvider):
             parts.append(f"Chat language: {lang}.")
         if context:
             parts.append(f"Context: \"{context[:500]}\"")
-        parts.append(f"Message: \"{text[:4000]}\"")
+        parts.append(f"\n---BEGIN USER MESSAGE---\n{text[:4000]}\n---END USER MESSAGE---\n")
         
         model_name = self.model or "gemini-1.5-flash"
         payload = {
@@ -131,7 +131,7 @@ class ClaudeProvider(CloudAIProvider):
             parts.append(f"Chat language: {lang}.")
         if context:
             parts.append(f"Context: \"{context[:500]}\"")
-        parts.append(f"Message: \"{text[:4000]}\"")
+        parts.append(f"\n---BEGIN USER MESSAGE---\n{text[:4000]}\n---END USER MESSAGE---\n")
         
         payload = {
             "model": self.model or "claude-3-5-haiku-20241022",
