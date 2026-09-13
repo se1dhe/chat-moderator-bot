@@ -20,9 +20,9 @@ export function Landing() {
   useEffect(() => {
     api.get<any>('/stats/global')
       .then((res) => setStats({
-        total_actions: res.total_actions,
-        protected_chats: res.protected_chats,
-        ai_decisions: res.ai_decisions
+        total_actions: res.mod_actions || 0,
+        protected_chats: res.chats || 0,
+        ai_decisions: res.ai_verdicts || 0
       }))
       .catch(() => {});
   }, []);

@@ -85,8 +85,12 @@ function Nav({ cid }: { cid: string }) {
               ${isActive ? 'text-primary' : 'text-neutral-500 hover:text-neutral-900 dark:hover:text-neutral-300'}
             `}
           >
-            <it.icon size={22} className={({ isActive }: any) => isActive ? 'fill-primary/10' : ''} />
-            <span className="text-[10px] font-medium leading-none">{it.label}</span>
+            {({ isActive }) => (
+              <>
+                <it.icon size={22} className={isActive ? 'fill-primary/10' : ''} />
+                <span className="text-[10px] font-medium leading-none">{it.label}</span>
+              </>
+            )}
           </NavLink>
         ))}
       </div>
