@@ -21,6 +21,7 @@ function Header() {
   const { t, lang, setLang } = useLang()
   const navigate = useNavigate()
   const { section } = useParams()
+  const s = useChatSettings()
   const cycle = { en: 'ru', ru: 'uk', uk: 'en' }
   return (
     <header className="app-header">
@@ -35,7 +36,7 @@ function Header() {
       )}
       <div>
         <div className="title">{t('app.title')}</div>
-        <div className="subtitle">{t('app.subtitle')}</div>
+        <div className="subtitle">{s?.chat?.title || t('app.subtitle')}</div>
       </div>
       <div className="header-spacer" />
       {section ? <SaveHint /> : null}
