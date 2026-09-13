@@ -79,9 +79,7 @@ async def ban(
     )
 
     # Check if global ban is enabled
-    settings = await session.scalar(
-        sa.select(repo.ChatSettings).where(repo.ChatSettings.chat_telegram_id == chat_id)
-    )
+    settings = await repo.get_settings(session, chat_id)
     if settings and (settings.data or {}).get("modes", {}).get("use_global_bans", False):
         # Insert or update GlobalBan
         from redqueen.db.models import GlobalBan

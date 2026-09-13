@@ -27,7 +27,7 @@ export function Quarantine() {
       setItems((list) => list!.filter((v) => v.id !== vid));
     } catch (e: any) {
       haptic('error');
-      window.Telegram?.WebApp?.showAlert?.(e.message || 'Error processing decision');
+      window.Telegram?.WebApp?.showAlert?.(t('quar.error') + (e.message ? `: ${e.message}` : ''));
     } finally {
       setBusy(null);
     }
