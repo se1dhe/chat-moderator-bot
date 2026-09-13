@@ -37,7 +37,7 @@ export default function AutoComment({ s, t }) {
       {c.enabled && (
         <>
           <div className="text-sm font-semibold text-neutral-500 uppercase tracking-wider ml-1 mt-4 mb-2">{t('sec.autocomment.text')}</div>
-          <div className="card p-4">
+          <div className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-2xl p-4 mb-4 shadow-sm w-full">
             <textarea 
               className="w-full bg-transparent border-none outline-none text-[var(--tg-theme-text-color)] resize-none"
               rows={4}
@@ -47,11 +47,11 @@ export default function AutoComment({ s, t }) {
             />
           </div>
           <div className="text-sm font-semibold text-neutral-500 uppercase tracking-wider ml-1 mt-4 mb-2">{t('sec.autocomment.media')}</div>
-          <div className="card p-4 flex items-center justify-between">
+          <div className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-2xl p-4 mb-4 shadow-sm w-full flex items-center justify-between">
             <div className="text-[13px] text-[var(--tg-theme-hint-color)] truncate mr-3">
               {c.media_url ? t('common.mediaAttached') : t('common.noMedia')}
             </div>
-            <label className={`btn btn-secondary px-3 py-1 text-[13px] whitespace-nowrap cursor-pointer ${uploading ? 'opacity-50' : ''}`}>
+            <label className={`px-4 py-2 bg-neutral-200 dark:bg-neutral-800 hover:bg-neutral-300 dark:hover:bg-neutral-700 text-neutral-900 dark:text-neutral-50 rounded-xl font-medium transition-colors px-3 py-1 text-[13px] whitespace-nowrap cursor-pointer ${uploading ? 'opacity-50' : ''}`}>
               {uploading ? t('common.uploading') : t('common.upload')}
               <input type="file" className="hidden" accept="image/*,video/mp4,image/gif" disabled={uploading} onChange={handleUpload} />
             </label>

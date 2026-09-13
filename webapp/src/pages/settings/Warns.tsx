@@ -30,7 +30,7 @@ export default function Warns({ s, t }) {
         ]} />
 
       {core.warn_action === 'mute' && (
-        <div className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-2xl p-2 mb-4 shadow-sm w-full" style={{ marginTop: '0.75rem' }}>
+        <div className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-2xl p-2 mb-4 shadow-sm w-full mt-3">
           <Row title={t('warns.muteDuration')} value={muteMin <= 0 ? t('dur.perm') : `${muteMin} ${t('common.minutes')}`}>
             <Stepper value={muteMin} min={0} max={7 * DAY_MIN} step={30}
               onChange={(v) => s.updateSection('warns', { mute_seconds: v * 60 })} />
@@ -38,7 +38,7 @@ export default function Warns({ s, t }) {
         </div>
       )}
       {core.warn_action === 'ban' && (
-        <div className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-2xl p-2 mb-4 shadow-sm w-full" style={{ marginTop: '0.75rem' }}>
+        <div className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-2xl p-2 mb-4 shadow-sm w-full mt-3">
           <Row title={t('warns.banDuration')} value={banMin <= 0 ? t('dur.perm') : `${banMin} ${t('common.minutes')}`}>
             <Stepper value={banMin} min={0} max={7 * DAY_MIN} step={60}
               onChange={(v) => s.updateSection('warns', { ban_seconds: v * 60 })} />

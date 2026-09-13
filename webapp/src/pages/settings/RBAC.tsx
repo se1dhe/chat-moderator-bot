@@ -67,10 +67,10 @@ export default function RBAC({ chatId }) {
 
   return (
     <div className="space-y-6">
-      <div className="card p-4 space-y-4">
+      <div className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-2xl p-4 mb-4 shadow-sm w-full space-y-4">
         <div className="flex gap-2">
           <input 
-            className="input flex-1"
+            className="w-full px-4 py-3 bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-neutral-800 rounded-xl focus:outline-none focus:border-primary/50 transition-colors font-medium text-[15px] flex-1"
             placeholder={t('rbac_username_placeholder') || '@username'}
             value={usernameInput}
             onChange={(e) => setUsernameInput(e.target.value)}

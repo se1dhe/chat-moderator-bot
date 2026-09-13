@@ -15,12 +15,12 @@ export default function Raid({ s, t }) {
         <button className="pro-note" onClick={() => s.openUpgrade()}>
           <Lock size={14} />
           <span>{t('pro.raidNote')}</span>
-          <span className="badge badge-gold">PRO</span>
+          <span className="px-2 py-0.5 bg-amber-100 text-amber-700 dark:bg-amber-500/20 dark:text-amber-400 rounded-md text-[11px] font-bold uppercase tracking-wider">PRO</span>
         </button>
       )}
       {r.locked && (
-        <div className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-2xl p-4 mb-4 shadow-sm w-full" style={{ display: 'flex', alignItems: 'center', gap: '0.7rem' }}>
-          <span className="badge badge-danger"><Lock size={12} /> {t('raid.locked')}</span>
+        <div className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-2xl p-4 mb-4 shadow-sm w-full flex items-center gap-3">
+          <span className="px-2 py-0.5 bg-red-100 text-red-700 dark:bg-red-500/20 dark:text-red-400 rounded-md text-[11px] font-bold uppercase tracking-wider inline-flex items-center gap-1"><Lock size={12} /> {t('raid.locked')}</span>
           <div className="header-spacer" />
           <button className="w-full flex items-center justify-center gap-2 py-3 bg-red-500 hover:bg-red-600 text-white rounded-xl font-bold transition-all active:scale-95 shadow-md shadow-red-500/20 text-[15px]" onClick={() => { haptic('warning'); s.updateSection('raid', { locked: false }) }}>
             {t('raid.unlock')}

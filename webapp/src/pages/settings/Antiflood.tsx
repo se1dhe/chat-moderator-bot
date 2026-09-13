@@ -33,7 +33,7 @@ export default function Antiflood({ s, t }) {
           { value: 'ban', label: t('action.ban') },
         ]} />
       {a.action === 'ban' && (
-        <div className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-2xl p-2 mb-4 shadow-sm w-full" style={{ marginTop: '0.75rem' }}>
+        <div className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-2xl p-2 mb-4 shadow-sm w-full mt-3">
           <Row title={t('antiflood.banSeconds')}
             value={mins(a.ban_seconds) <= 0 ? t('dur.perm') : `${mins(a.ban_seconds)} ${t('common.minutes')}`}>
             <Stepper value={mins(a.ban_seconds)} min={0} max={7 * 1440} step={60}

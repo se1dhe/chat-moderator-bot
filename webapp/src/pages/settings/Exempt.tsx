@@ -19,7 +19,7 @@ export default function Exempt({ s, t }) {
         {ids.length ? (
           <Chips items={ids.map(String)} onRemove={(x) => s.setSection('exempt_user_ids', ids.filter((i) => String(i) !== x))} />
         ) : (
-          <div className="row-desc">{t('exempt.empty')}</div>
+          <div className="text-[13px] text-neutral-500 leading-snug">{t('exempt.empty')}</div>
         )}
         <div className="chip-input">
           <input className="w-full px-4 py-3 bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-neutral-800 rounded-xl focus:outline-none focus:border-primary/50 transition-colors font-medium text-[15px]" inputMode="numeric" value={val} placeholder={t('exempt.add')}
