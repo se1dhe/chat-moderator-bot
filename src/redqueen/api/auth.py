@@ -19,7 +19,10 @@ def _extract_init_data(request: web.Request) -> str:
     auth = request.headers.get("Authorization", "")
     if auth.startswith("tma "):
         return auth[4:]
-    return request.headers.get("X-Init-Data", "")
+    res = request.headers.get("X-Init-Data", "")
+    if not res:
+        res = request.query.get("initData", "")
+    return res
 
 
 async def get_user(request: web.Request) -> WebAppUser:

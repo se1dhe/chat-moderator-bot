@@ -223,7 +223,7 @@ async def scan_visual(
 
 
 _TEXT_MIMES = {
-    "text/plain", "text/markdown", "text/csv", "application/csv", "application/json",
+    "text/plain", "text/markdown", "text/csv", "application/json",
 }
 _MAX_DOC_BYTES = 100_000
 

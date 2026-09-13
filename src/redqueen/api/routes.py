@@ -446,19 +446,34 @@ async def error_handling_middleware(request: web.Request, handler):
         logging.getLogger(__name__).exception("Unhandled API Error")
         raise web.HTTPInternalServerError(reason="Internal Server Error")
 
+upload_semaphore = asyncio.Semaphore(3)
+
 async def upload_media(request: web.Request) -> web.Response:
     """Accept multipart upload, send to admin's PM to get a permanent file_id."""
     cid = _chat_id(request)
     user = await require_chat_admin(request, cid)
     uid = user.id
 
-    reader = await request.multipart()
-    field = await reader.next()
-    if not field:
-        raise web.HTTPBadRequest(reason="No file provided")
-    
-    filename = field.filename or "file"
-    content = await field.read()
+    async with upload_semaphore:
+        reader = await request.multipart()
+        field = await reader.next()
+        if not field:
+            raise web.HTTPBadRequest(reason="No file provided")
+        
+        filename = field.filename or "file"
+        
+        MAX_UPLOAD_SIZE = 10 * 1024 * 1024  # 10MB
+        chunks = []
+        total = 0
+        while True:
+            chunk = await field.read_chunk(8192)
+            if not chunk:
+                break
+            total += len(chunk)
+            if total > MAX_UPLOAD_SIZE:
+                raise web.HTTPRequestEntityTooLarge(max_size=MAX_UPLOAD_SIZE, actual_size=total)
+            chunks.append(chunk)
+        content = b''.join(chunks)
     
     bot = request_bot(request)
     
@@ -547,6 +562,13 @@ async def create_trigger(request: web.Request) -> web.Response:
         raise web.HTTPBadRequest(reason="trigger_word and reply_text are required")
         
     async with _session(request) as session:
+        from sqlalchemy import func
+        count = await session.scalar(
+            select(func.count(ChatTrigger.id)).where(ChatTrigger.chat_telegram_id == cid)
+        )
+        if count >= 100:
+            raise web.HTTPBadRequest(reason="Maximum 100 triggers per chat")
+        
         trigger = ChatTrigger(
             chat_telegram_id=cid,
             trigger_word=word[:255],

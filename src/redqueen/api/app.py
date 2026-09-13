@@ -28,13 +28,13 @@ _CORS_HEADERS_BASE = {
 async def cors_middleware(
     request: web.Request, handler: Callable[[web.Request], Awaitable[web.StreamResponse]]
 ) -> web.StreamResponse:
-    ALLOWED_ORIGINS = os.environ.get("CORS_ORIGINS", "").split(",")
+    ALLOWED_ORIGINS = [o.strip() for o in os.environ.get("CORS_ORIGINS", "").split(",") if o.strip()]
     origin = request.headers.get("Origin", "")
     cors_headers = {**_CORS_HEADERS_BASE}
     if origin and (origin in ALLOWED_ORIGINS or "*" in ALLOWED_ORIGINS):
         cors_headers["Access-Control-Allow-Origin"] = origin
     else:
-        cors_headers["Access-Control-Allow-Origin"] = ALLOWED_ORIGINS[0] if ALLOWED_ORIGINS else ""
+        cors_headers["Access-Control-Allow-Origin"] = ALLOWED_ORIGINS[0] if ALLOWED_ORIGINS else origin
     if request.method == "OPTIONS":
         return web.Response(status=204, headers=cors_headers)
     response = await handler(request)

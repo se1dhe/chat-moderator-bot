@@ -7,6 +7,7 @@ from __future__ import annotations
 
 import logging
 
+import aiogram
 from aiogram import Bot
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -53,6 +54,6 @@ async def decide(
     if verdict.message_id:
         try:
             await bot.delete_message(verdict.chat_telegram_id, verdict.message_id)
-        except Exception as exc:  # noqa: BLE001
+        except aiogram.exceptions.TelegramAPIError as exc:
             log.debug("could not delete flagged message: %s", exc)
     return action
