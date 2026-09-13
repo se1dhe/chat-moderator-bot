@@ -26,7 +26,7 @@ export function SettingsSection() {
     warns: <Warns s={s} t={t} />,
     exempt: <Exempt s={s} t={t} />,
     autocomment: <AutoComment s={s} t={t} />,
-    triggers: <Triggers chatId={s.cid} t={t} />,
+    triggers: <Triggers chatId={s.chatId} t={t} />,
   }
   return <div className="content fade-in">{map[section] ?? null}</div>
 }

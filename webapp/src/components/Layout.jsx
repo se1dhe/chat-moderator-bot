@@ -36,7 +36,7 @@ function Header() {
       )}
       <div>
         <div className="title">{t('app.title')}</div>
-        <div className="subtitle">{s?.chat?.title || t('app.subtitle')}</div>
+        {!section && <div className="subtitle">{t('app.subtitle')}</div>}
       </div>
       <div className="header-spacer" />
       {section ? <SaveHint /> : null}
