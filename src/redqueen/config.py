@@ -37,7 +37,7 @@ class Settings(BaseSettings):
     # Vision model for multimodal anti-scam (e.g. "qwen2.5vl:7b", "llava:7b"). Empty
     # disables image analysis (captions still checked by the text path).
     ollama_vision_model: str = Field(default="", alias="OLLAMA_VISION_MODEL")
-    ai_enabled: bool = Field(default=False, alias="AI_ENABLED")
+    ai_enabled: bool = Field(default=True, alias="AI_ENABLED")
     ai_max_concurrency: int = Field(default=2, alias="AI_MAX_CONCURRENCY")
     # Voice anti-scam via faster-whisper. Empty disables it. Needs the `voice` extra
     # (`uv sync --extra voice`); the model auto-downloads on first use.
