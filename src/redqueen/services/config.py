@@ -33,12 +33,12 @@ DEFAULT_DATA: dict[str, Any] = {
     # `thresholds`: optional per-category overrides (0..100), e.g. {"scam": 60}.
     # Empty → the chat's global `ai_threshold` column applies to every category.
     "ai": {"max_per_minute": 20, "thresholds": {}},
-    "raid": {
+    "defcon": {
         "enabled": False,
-        "join_threshold": 5,
-        "window_seconds": 30,
-        "lock_seconds": 600,
-        "locked_until": None,  # epoch seconds, or None when not locked
+        "threshold": 10,
+        "action": "read_only",  # read_only, strict, captcha
+        "lock_seconds": 900,
+        "active_until": None,
     },
     "auto_comment": {
         "enabled": False,
@@ -143,8 +143,8 @@ def full_view(settings: ChatSettings) -> dict[str, Any]:
         "filters": cfg["filters"],
         "modes": cfg["modes"],
         "ai": cfg["ai"],
-        "raid": {k: v for k, v in cfg["raid"].items() if k != "locked_until"}
-        | {"locked": bool(cfg["raid"].get("locked_until"))},
+        "defcon": {k: v for k, v in cfg["defcon"].items() if k != "active_until"}
+        | {"active": bool(cfg["defcon"].get("active_until"))},
         "auto_comment": cfg["auto_comment"],
         "onboarding": cfg["onboarding"],
         "exempt_user_ids": cfg["exempt_user_ids"],
@@ -247,18 +247,17 @@ def apply_patch(settings: ChatSettings, patch: dict[str, Any]) -> dict[str, Any]
             "thresholds": thresholds,
         }
 
-    if "raid" in patch:
-        r, cur = patch["raid"], cfg["raid"]
-        cfg["raid"] = {
+    if "defcon" in patch:
+        r, cur = patch["defcon"], cfg["defcon"]
+        cfg["defcon"] = {
             **cur,
             "enabled": _as_bool(r.get("enabled"), cur["enabled"]),
-            "join_threshold": _clamp(r.get("join_threshold"), 2, 100, cur["join_threshold"]),
-            "window_seconds": _clamp(r.get("window_seconds"), 5, 600, cur["window_seconds"]),
+            "threshold": _clamp(r.get("threshold"), 2, 100, cur["threshold"]),
+            "action": str(r.get("action", cur["action"])),
             "lock_seconds": _clamp(r.get("lock_seconds"), 60, 86400, cur["lock_seconds"]),
         }
-        # The Mini App may only *clear* an active lock, never set one.
-        if r.get("locked") is False:
-            cfg["raid"]["locked_until"] = None
+        if r.get("active") is False:
+            cfg["defcon"]["active_until"] = None
 
     if "auto_comment" in patch:
         ac, cur = patch["auto_comment"], cfg["auto_comment"]

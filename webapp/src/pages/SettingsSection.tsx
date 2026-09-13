@@ -9,7 +9,7 @@ import Antiflood from './settings/Antiflood';
 import Filters from './settings/Filters';
 import Modes from './settings/Modes';
 import AI from './settings/AI';
-import Raid from './settings/Raid';
+import Defcon from './settings/Defcon';
 import Warns from './settings/Warns';
 import Exempt from './settings/Exempt';
 import AutoComment from './settings/AutoComment';

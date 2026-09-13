@@ -50,8 +50,8 @@ export function Dashboard() {
     {
       label: t('dash.protection'),
       items: [
-        { key: 'rbac', icon: Shield, title: t('sec.rbac'), desc: t('sec.rbac.desc'), on: true },
-        { key: 'captcha', icon: ShieldCheck, title: t('sec.captcha'), desc: t('sec.captcha.desc'), on: draft.captcha.enabled },
+        { key: 'rbac', icon: ShieldAlert, title: t('sec.rbac'), desc: t('sec.rbac.desc'), on: true },
+        { key: 'captcha', icon: ShieldAlertCheck, title: t('sec.captcha'), desc: t('sec.captcha.desc'), on: draft.captcha.enabled },
         { key: 'raid', icon: Siren, title: t('sec.raid'), desc: t('sec.raid.desc'), on: draft.raid.enabled, pro: true },
         { key: 'warns', icon: AlertTriangle, title: t('sec.warns'), desc: t('sec.warns.desc'), on: true, state: `${draft.core.warn_limit} → ${t(`action.${draft.core.warn_action}`)}` },
       ],
@@ -60,7 +60,7 @@ export function Dashboard() {
       label: t('dash.content'),
       items: [
         { key: 'welcome', icon: UserCheck, title: t('sec.welcome'), desc: t('sec.welcome.desc'), on: !!draft.onboarding?.welcome_message },
-        { key: "triggers", icon: ShieldCheck, title: t('sec.triggers'), desc: t('sec.triggers.desc'), on: true },
+        { key: "triggers", icon: ShieldAlertCheck, title: t('sec.triggers'), desc: t('sec.triggers.desc'), on: true },
         { key: "autocomment", icon: Filter, title: t('sec.autocomment'), desc: t('sec.autocomment.desc'), on: draft.auto_comment?.enabled, pro: true },
         { key: 'antiflood', icon: Gauge, title: t('sec.antiflood'), desc: t('sec.antiflood.desc'), on: draft.antiflood.enabled },
         { key: 'filters', icon: Filter, title: t('sec.filters'), desc: t('sec.filters.desc'), on: filtersOn },

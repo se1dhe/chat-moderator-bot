@@ -96,7 +96,10 @@ async def on_join_request(
         return
     settings = await repo.get_settings(session, event.chat.id)
     cfg = get_config(settings)["captcha"]
-    if not cfg["enabled"]:
+    from redqueen.handlers.defcon import is_active
+    full_cfg = get_config(settings)
+    is_defcon_captcha = is_active(full_cfg) and full_cfg["defcon"]["action"] == "captcha"
+    if not cfg["enabled"] and not is_defcon_captcha:
         await bot.approve_chat_join_request(event.chat.id, event.from_user.id)
         return
 
