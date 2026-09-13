@@ -1,6 +1,18 @@
 {
   "version": 1,
   "skills": {
+    "aiogram-bot-auditor": {
+      "source": "goldenprofile/llm-skills",
+      "sourceType": "github",
+      "skillPath": "skills/aiogram-bot-auditor/SKILL.md",
+      "computedHash": "5df6e71fc7b0d04560462563b5a1fab0e1e5f93a5efca296caa111bbdb3c9b79"
+    },
+    "aiogram-framework": {
+      "source": "narumiruna/telegram-bot",
+      "sourceType": "github",
+      "skillPath": ".codex/skills/aiogram-framework/SKILL.md",
+      "computedHash": "496006ca2bfd4eb8e4ff481a5a4aa0ea40deff8b4b8fb3d54ece0e4b55bcdfd8"
+    },
     "ui-ux-pro-max": {
       "source": "nextlevelbuilder/ui-ux-pro-max-skill",
       "sourceType": "github",
