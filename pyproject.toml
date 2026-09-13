@@ -14,6 +14,7 @@ dependencies = [
     "aiohttp>=3.10",
     "cryptography>=50.0.1",
     "aiocryptopay>=0.3.0",
+    "prometheus-client>=0.20",
 ]
 
 [project.optional-dependencies]

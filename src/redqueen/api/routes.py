@@ -357,9 +357,9 @@ async def error_handling_middleware(request: web.Request, handler):
 
 async def metrics(request: web.Request) -> web.Response:
     """Prometheus metrics endpoint."""
-    from redqueen.services.metrics import collect_metrics
+    from redqueen.services.metrics import collect_metrics, CONTENT_TYPE_LATEST
     output = await collect_metrics(request.app)
-    return web.Response(text=output, content_type="text/plain")
+    return web.Response(body=output, content_type=CONTENT_TYPE_LATEST)
 
 def setup_routes(app: web.Application) -> None:
     app.middlewares.append(error_handling_middleware)
@@ -373,6 +373,8 @@ def setup_routes(app: web.Application) -> None:
     app.router.add_get("/api/chats/{cid}/settings", get_settings)
     app.router.add_put("/api/chats/{cid}/settings", put_settings)
     app.router.add_get("/api/chats/{cid}/audit", audit)
+    from .routes_audit import audit_export
+    app.router.add_get("/api/chats/{cid}/audit/export", audit_export)
     app.router.add_get("/api/chats/{cid}/quarantine", quarantine_list)
     
     from .live import live_feed, global_stats

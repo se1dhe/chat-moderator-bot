@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
-import { ScrollText } from 'lucide-react'
+import { ScrollText, Download } from 'lucide-react'
 import { useLang } from '../context/LangContext'
 import { api } from '../lib/api'
+import { initData } from '../lib/telegram'
 import { Spinner } from '../components/ui'
 
 const fmt = (iso) => {
@@ -57,7 +58,16 @@ export function Audit() {
 
   return (
     <div className="content fade-in">
-      <div className="section-label">{t('audit.title')}</div>
+      <div className="section-label" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        {t('audit.title')}
+        <a 
+          href={`/api/chats/${cid}/audit/export?initData=${encodeURIComponent(initData)}`} 
+          className="btn" 
+          style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '4px 12px', fontSize: '14px' }}
+        >
+          <Download size={16} /> {t('audit.export')}
+        </a>
+      </div>
       <div className="card">
         {rows.map((r) => (
           <div key={r.id} className="audit-item">
