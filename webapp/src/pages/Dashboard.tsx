@@ -10,6 +10,7 @@ import { Spinner, Segmented, Row, Toggle } from '../components/ui';
 import { ProBanner } from '../components/ProBanner';
 import { Tips } from '../components/Tips';
 import { AISummary } from '../components/AISummary';
+import { PresetsGallery } from '../components/PresetsGallery';
 import { OnboardingWizard } from '../components/OnboardingWizard';
 import { haptic } from '../lib/telegram';
 
@@ -92,6 +93,8 @@ export function Dashboard() {
   return (
     <motion.div variants={container} initial="hidden" animate="show" className="w-full flex flex-col gap-4">
       <motion.div variants={item}><ProBanner /></motion.div>
+
+      <motion.div variants={item}><PresetsGallery /></motion.div>
 
       <motion.div variants={item}><Tips chatId={cid} /></motion.div>
 

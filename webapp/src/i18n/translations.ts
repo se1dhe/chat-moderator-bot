@@ -32,6 +32,17 @@ export const LOCALES: Record<Locales, LocaleDict> = {
     'tips.defcon': 'Auto-DEFCON is off, your group is vulnerable to spam spikes.',
     'tips.filters': 'Set up filters to block unwanted content.',
     'tips.quarantine': 'You have pending messages in Quarantine.',
+    'presets.title': 'Smart Presets',
+    'presets.apply': 'Apply',
+    'presets.basic': 'Safe & Simple',
+    'presets.basic.desc': 'Standard protection. Basic filters, anti-flood.',
+    'presets.crypto': 'Crypto & Web3',
+    'presets.crypto.desc': 'Max security. Auto-ban bots, Strict DEFCON, Captcha.',
+    'presets.corp': 'Corporate',
+    'presets.corp.desc': 'Zero tolerance for toxicity. Quarantine mode.',
+    'presets.chill': 'Chill Chat',
+    'presets.chill.desc': 'Relaxed rules. Minimal interruptions.',
+
 
     'act.warn': 'Warn',
     'act.ban': 'Ban',

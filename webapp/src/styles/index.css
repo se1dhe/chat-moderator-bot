@@ -20,3 +20,11 @@
 }
 
 /* KEEPING LEGACY STYLES FOR NOW UNTIL COMPONENTS ARE MIGRATED */
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
