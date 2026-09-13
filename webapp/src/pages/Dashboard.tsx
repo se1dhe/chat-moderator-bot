@@ -9,6 +9,7 @@ import { useChatSettings } from '../context/ChatSettingsContext';
 import { Spinner, Segmented, Row, Toggle } from '../components/ui';
 import { ProBanner } from '../components/ProBanner';
 import { Tips } from '../components/Tips';
+import { AISummary } from '../components/AISummary';
 import { OnboardingWizard } from '../components/OnboardingWizard';
 import { haptic } from '../lib/telegram';
 

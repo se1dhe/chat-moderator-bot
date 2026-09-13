@@ -141,6 +141,20 @@ class OllamaProvider(AIProvider):
                         "until the model is available", exc)
             return False
 
+
+    async def generate_text(self, prompt: str, chat_settings=None) -> str:
+        payload = {
+            "model": self.model or "llama3",
+            "prompt": prompt,
+            "stream": False,
+        }
+        try:
+            async with self._client().post(f"{self.base_url}/api/generate", json=payload, timeout=60) as resp:
+                data = await resp.json()
+                return data.get("response", "")
+        except Exception as exc:
+            return f"Ollama Error: {exc}"
+
     async def classify_text(
         self, text: str, *, context: str | None = None, lang: str | None = None, chat_settings = None
     ) -> Verdict:

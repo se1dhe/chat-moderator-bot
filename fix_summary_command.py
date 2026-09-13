@@ -1,4 +1,9 @@
-"""AI Summarizer: Keeps a rolling buffer of chat history in Redis and generates summaries."""
+with open('src/redqueen/handlers/summary.py', 'r') as f:
+    text = f.read()
+
+# I will just remove the cmd_summary function entirely.
+# The store_history function will remain.
+new_text = """\"\"\"AI Summarizer: Keeps a rolling buffer of chat history in Redis and generates summaries.\"\"\"
 from __future__ import annotations
 
 import json
@@ -30,3 +35,7 @@ async def store_history(
     
     # 2. Always let the pipeline continue!
     raise SkipHandler
+"""
+with open('src/redqueen/handlers/summary.py', 'w') as f:
+    f.write(new_text)
+
