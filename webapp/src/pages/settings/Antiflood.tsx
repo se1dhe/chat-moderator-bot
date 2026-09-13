@@ -4,9 +4,9 @@ import { Toggle, Row, Segmented, Stepper, Slider, Chips, Spinner } from '../../c
 import { haptic, showAlert } from '../../lib/telegram'
 import { api } from '../../lib/api'
 
-const mins = (sec) => Math.round(sec / 60)
+const mins = (sec: number | null | undefined) => Math.round((sec || 0) / 60)
 
-export default function Antiflood({ s, t }) {
+export default function Antiflood({ s, t }: { s: any, t: any }) {
   const a = s.draft.antiflood
   return (
     <>

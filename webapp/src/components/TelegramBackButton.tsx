@@ -19,8 +19,10 @@ export function TelegramBackButton() {
     const handleBack = () => {
       haptic('light');
       const parts = location.pathname.split('/').filter(Boolean);
-      if (parts.length === 2 || (parts.length === 3 && ['members', 'quarantine', 'audit', 'stats'].includes(parts[2]))) {
+      if (parts.length === 2) {
         navigate('/');
+      } else if (parts.length === 3 && ['members', 'quarantine', 'audit', 'stats'].includes(parts[2])) {
+        navigate(`/c/${parts[1]}`);
       } else {
         navigate(-1);
       }

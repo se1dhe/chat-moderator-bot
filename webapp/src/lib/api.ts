@@ -20,12 +20,14 @@ async function request<T>(method: string, path: string, body?: any, opts: Reques
   
   if (!resp.ok) {
     let detail = resp.statusText;
+    let responseData = null;
     try { 
-      const data = await resp.json();
-      detail = data.error || detail;
+      responseData = await resp.json();
+      detail = responseData.error || responseData.reason || detail;
     } catch { /* empty */ }
     const err = new Error(detail) as any;
     err.status = resp.status;
+    err.response = { data: responseData };
     throw err;
   }
   

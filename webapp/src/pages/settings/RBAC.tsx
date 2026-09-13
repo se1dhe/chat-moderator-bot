@@ -48,7 +48,8 @@ export default function RBAC({ chatId }) {
   };
 
   const handleRemove = async (uid) => {
-    if (!confirm(t('rbac_remove_confirm') || 'Are you sure?')) return;
+    const confirmed = await new Promise(resolve => showConfirm(t('rbac_remove_confirm') || 'Are you sure?', resolve));
+    if (!confirmed) return;
     try {
       await api.del(`/chats/${chatId}/moderators/${uid}`);
       fetchMods();

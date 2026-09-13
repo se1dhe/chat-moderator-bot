@@ -176,10 +176,10 @@ export function ChatSettingsProvider({ chatId, children }: { chatId: number; chi
   useEffect(() => () => { if (timerRef.current) clearTimeout(timerRef.current); }, []);
 
   const pro = !!billing?.pro;
-  const value: ChatSettingsContextType = {
+  const value: ChatSettingsContextType = useMemo(() => ({
     chatId, saved, draft, saving, error, updateSection, setSection, reload: load,
     billing, pro, loadBilling, openUpgrade,
-  };
+  }), [chatId, saved, draft, saving, error, updateSection, setSection, load, billing, pro, loadBilling, openUpgrade]);
 
   return (
     <Ctx.Provider value={value}>
