@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Card, Input, Button, Toggle } from '../components/ui';
-import api from '../lib/api';
+import { Toggle } from '../components/ui';
+import { api } from '../lib/api';
 
 export default function Triggers({ chatId, t }) {
   const [triggers, setTriggers] = useState([]);
@@ -60,48 +60,49 @@ export default function Triggers({ chatId, t }) {
     <div className="space-y-6">
       <div className="space-y-2">
         <h2 className="text-xl font-display font-bold">{t ? t("sec.triggers") : "Auto-Replies"}</h2>
-        <p className="text-sm text-text-muted">Configure the bot to reply automatically to specific phrases or commands.</p>
+        <p className="text-sm text-[var(--tg-theme-hint-color)]">Configure the bot to reply automatically to specific phrases or commands.</p>
       </div>
       
       {error && <div className="text-red-500 text-sm">{error}</div>}
 
-      <Card className="p-4 space-y-4">
+      <div className="card" style={{ padding: '16px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
         <h3 className="font-bold text-sm">Add New Trigger</h3>
-        <Input 
-          label="Phrase or Command" 
-          value={word} 
-          onChange={(e) => setWord(e.target.value)} 
-          placeholder="e.g. /rules or price"
-        />
-        <Input 
-          label="Reply Text" 
-          value={reply} 
-          onChange={(e) => setReply(e.target.value)} 
-          placeholder="The bot will send this..."
-          multiline
-        />
-        <div className="flex justify-between items-center">
+        
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+          <div className="text-sm font-medium">Phrase or Command</div>
+          <input className="input" style={{ width: '100%' }} value={word} onChange={(e) => setWord(e.target.value)} placeholder="e.g. /rules or price" />
+        </div>
+        
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+          <div className="text-sm font-medium">Reply Text</div>
+          <textarea className="input" style={{ width: '100%', minHeight: '80px', fontFamily: 'inherit' }} value={reply} onChange={(e) => setReply(e.target.value)} placeholder="The bot will send this..."></textarea>
+        </div>
+        
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <span className="text-sm">Use Regex</span>
           <Toggle checked={isRegex} onChange={setIsRegex} />
         </div>
-        <Button onClick={handleCreate} disabled={!word || !reply} className="w-full">
+        
+        <button className="btn btn-primary" style={{ width: '100%', padding: '12px' }} onClick={handleCreate} disabled={!word || !reply}>
           Add Trigger
-        </Button>
-      </Card>
+        </button>
+      </div>
 
-      <div className="space-y-3">
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
         <h3 className="font-bold text-sm">Active Triggers</h3>
         {triggers.length === 0 ? (
-          <div className="text-sm text-text-muted">No triggers found.</div>
+          <div className="text-sm text-[var(--tg-theme-hint-color)]">No triggers found.</div>
         ) : (
-          triggers.map(t => (
-            <Card key={t.id} className="p-3 flex justify-between items-start gap-4">
-              <div className="flex-1">
-                <div className="font-mono text-sm text-accent">{t.trigger_word} {t.is_regex && <span className="text-xs bg-bg-elevated px-1 rounded text-text-muted">REGEX</span>}</div>
-                <div className="text-sm text-text-secondary mt-1">{t.reply_text}</div>
+          triggers.map(trig => (
+            <div key={trig.id} className="card" style={{ padding: '12px', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '16px' }}>
+              <div style={{ flex: 1 }}>
+                <div style={{ fontSize: '14px', color: 'var(--tg-theme-accent-color)', fontFamily: 'monospace' }}>
+                  {trig.trigger_word} {trig.is_regex && <span style={{ fontSize: '10px', background: 'rgba(255,255,255,0.1)', padding: '2px 4px', borderRadius: '4px', marginLeft: '6px' }}>REGEX</span>}
+                </div>
+                <div style={{ fontSize: '14px', color: 'var(--tg-theme-text-color)', marginTop: '4px' }}>{trig.reply_text}</div>
               </div>
-              <Button variant="danger" size="sm" onClick={() => handleDelete(t.id)}>Delete</Button>
-            </Card>
+              <button className="btn btn-danger" style={{ fontSize: "12px", padding: "6px 12px", borderRadius: "8px" }} onClick={() => handleDelete(trig.id)}>Delete</button>
+            </div>
           ))
         )}
       </div>
