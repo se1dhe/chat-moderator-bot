@@ -75,20 +75,6 @@ export function Dashboard() {
     },
   ];
 
-  const container = {
-    hidden: { opacity: 0 },
-    show: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.05
-      }
-    }
-  };
-
-  const item = {
-    hidden: { opacity: 0, y: 15, scale: 0.95 },
-    show: { opacity: 1, y: 0, scale: 1, transition: { type: "spring", stiffness: 300, damping: 24 } }
-  };
 
   return (
     <div className="w-full flex flex-col gap-4 animate-in fade-in slide-in-from-bottom-2 duration-300">
@@ -114,14 +100,13 @@ export function Dashboard() {
       </div>
 
       {groups.map((g) => (
-        <motion.div key={g.label} variants={container} initial="hidden" animate="show" className="w-full flex flex-col gap-2">
+        <motion.div key={g.label}  className="w-full flex flex-col gap-2">
           <div className="text-sm font-semibold text-neutral-500 uppercase tracking-wider mt-2 ml-1">{g.label}</div>
           <div className="flex flex-col gap-2">
             {g.items.map((it) => {
               const locked = it.pro && !pro;
               return (
                 <motion.button
-                  variants={item}
                   whileTap={{ scale: 0.97 }}
                   key={it.key}
                   className="w-full flex items-center p-4 bg-white dark:bg-[#0a0a0a] border border-neutral-200 dark:border-neutral-800/60 rounded-2xl shadow-sm hover:border-primary/30 dark:hover:border-primary/30 active:bg-neutral-50 dark:active:bg-neutral-800 transition-all text-left group"
