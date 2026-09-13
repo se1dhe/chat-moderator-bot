@@ -19,22 +19,12 @@ from ..services import billing, moderation, quarantine, roles, warns
 from ..services.config import apply_patch, full_view
 from ..utils.duration import humanize, until_from_now
 from .auth import get_user, request_bot, require_chat_admin
+from .utils import _chat_id, _session
 
 
-def _chat_id(request: web.Request) -> int:
-    try:
-        return int(request.match_info["cid"])
-    except (KeyError, ValueError) as exc:
-        raise web.HTTPBadRequest(reason="bad chat id") from exc
 
 
-from contextlib import asynccontextmanager
 
-@asynccontextmanager
-async def _session(request: web.Request):
-    async with request.app["sessionmaker"]() as session:
-        session.info["redis"] = request.app["redis"]
-        yield session
 
 
 async def health(request: web.Request) -> web.Response:
@@ -79,10 +69,18 @@ async def me(request: web.Request) -> web.Response:
             await session.commit()
         db_user_lang = db_user.lang or "en"
             
+        from sqlalchemy import select
+        from ..db.models import ChatMember
+        member_chat_ids = set(await session.scalars(
+            select(ChatMember.chat_telegram_id)
+            .where(ChatMember.user_telegram_id == user.id)
+        ))
+        
         for chat in await repo.list_active_chats(session, bot_id=bot.id):
-            if owner or await roles.is_admin(bot, redis, chat_id=chat.telegram_id, user_id=user.id):
-                chats.append({"id": chat.telegram_id, "title": chat.title, "type": chat.type,
-                              "lang": chat.lang})
+            if owner or chat.telegram_id in member_chat_ids:
+                if owner or await roles.is_admin(bot, redis, chat_id=chat.telegram_id, user_id=user.id):
+                    chats.append({"id": chat.telegram_id, "title": chat.title, "type": chat.type,
+                                  "lang": chat.lang})
     bot_me = await bot.get_me()
     return web.json_response({
         "user": {"id": user.id, "username": user.username, "name": user.full_name, "lang": db_user_lang},
@@ -229,96 +227,6 @@ async def stats(request: web.Request) -> web.Response:
         })
 
 
-async def billing_status(request: web.Request) -> web.Response:
-    cid = _chat_id(request)
-    await require_chat_admin(request, cid)
-    async with _session(request) as session:
-        sub = await billing.get_subscription(session, cid)
-        return web.json_response({
-            "pro": await billing.is_pro(session, cid),
-            "active_until": sub.active_until.isoformat() if sub and sub.active_until else None,
-            "price_stars": billing.PRO_PRICE_STARS,
-            "period_days": billing.PRO_PERIOD_DAYS,
-            "features": sorted(billing.PRO_FEATURES),
-        })
-
-
-async def billing_invoice(request: web.Request) -> web.Response:
-    """Create a Telegram Stars invoice link the Mini App opens via openInvoice()."""
-    cid = _chat_id(request)
-    await require_chat_admin(request, cid)
-    
-    try:
-        body = await request.json()
-    except ValueError:
-        body = {}
-    method = body.get("method", "stars")
-    
-    days = billing.PRO_PERIOD_DAYS
-    
-    if method == "crypto":
-        cryptopay_token = request.app["settings"].cryptopay_token
-        if not cryptopay_token:
-            raise web.HTTPBadRequest(reason="CryptoPay is not configured")
-        
-        from aiocryptopay import AioCryptoPay, Networks
-        crypto = AioCryptoPay(token=cryptopay_token, network=Networks.MAIN_NET)
-        try:
-            # We use USDT 5.0 as an equivalent to 500 Stars? Let's say 5 USDT for Pro
-            invoice = await crypto.create_invoice(
-                asset="USDT",
-                amount=5.0,
-                description=f"RedQueen Pro ({days} days) for chat {cid}",
-                payload=f"pro:{cid}:{days}"
-            )
-            return web.json_response({"url": invoice.bot_invoice_url, "method": "crypto"})
-        finally:
-            await crypto.close()
-    
-    # Default: Telegram Stars
-    url = await request_bot(request).create_invoice_link(
-        title="RedQueen Pro",
-        description=f"AI auto-ban, raid shield and advanced analytics for {days} days.",
-        payload=f"pro:{cid}:{days}",
-        provider_token="",
-        currency="XTR",
-        prices=[LabeledPrice(label=f"RedQueen Pro · {days} days", amount=billing.PRO_PRICE_STARS)],
-    )
-    return web.json_response({"url": url, "method": "stars"})
-
-
-async def cryptopay_webhook(request: web.Request) -> web.Response:
-    cryptopay_token = request.app["settings"].cryptopay_token
-    if not cryptopay_token:
-        return web.Response(status=400)
-    
-    body = await request.text()
-    signature = request.headers.get("crypto-pay-api-signature", "")
-    
-    import hmac
-    import hashlib
-    secret = hashlib.sha256(cryptopay_token.encode()).digest()
-    expected_sig = hmac.new(secret, body.encode(), hashlib.sha256).hexdigest()
-    
-    if not hmac.compare_digest(signature, expected_sig):
-        return web.Response(status=401)
-        
-    data = await request.json()
-    if data.get("update_type") == "invoice_paid":
-        payload = data.get("payload", {}).get("payload", "")
-        if payload.startswith("pro:"):
-            parts = payload.split(":")
-            if len(parts) == 3:
-                _, cid, days = parts
-                async with request.app["sessionmaker"]() as session:
-                    await billing.activate_pro(session, int(cid), days=int(days))
-                    await repo.log_action(
-                        session, chat_telegram_id=int(cid), user_telegram_id=0,
-                        actor_id=None, action="pro_grant", reason=f"cryptopay {days}d"
-                    )
-    return web.Response(status=200)
-
-
 async def members_search(request: web.Request) -> web.Response:
     cid = _chat_id(request)
     await require_chat_admin(request, cid)
@@ -446,51 +354,6 @@ async def error_handling_middleware(request: web.Request, handler):
         logging.getLogger(__name__).exception("Unhandled API Error")
         raise web.HTTPInternalServerError(reason="Internal Server Error")
 
-upload_semaphore = asyncio.Semaphore(3)
-
-async def upload_media(request: web.Request) -> web.Response:
-    """Accept multipart upload, send to admin's PM to get a permanent file_id."""
-    cid = _chat_id(request)
-    user = await require_chat_admin(request, cid)
-    uid = user.id
-
-    async with upload_semaphore:
-        reader = await request.multipart()
-        field = await reader.next()
-        if not field:
-            raise web.HTTPBadRequest(reason="No file provided")
-        
-        filename = field.filename or "file"
-        
-        MAX_UPLOAD_SIZE = 10 * 1024 * 1024  # 10MB
-        chunks = []
-        total = 0
-        while True:
-            chunk = await field.read_chunk(8192)
-            if not chunk:
-                break
-            total += len(chunk)
-            if total > MAX_UPLOAD_SIZE:
-                raise web.HTTPRequestEntityTooLarge(max_size=MAX_UPLOAD_SIZE, actual_size=total)
-            chunks.append(chunk)
-        content = b''.join(chunks)
-    
-    bot = request_bot(request)
-    
-    from aiogram.types import BufferedInputFile
-    file = BufferedInputFile(content, filename=filename)
-    
-    try:
-        if filename.lower().endswith((".mp4", ".gif")):
-            msg = await bot.send_animation(uid, animation=file)
-            file_id = f"animation:{msg.animation.file_id}"
-        else:
-            msg = await bot.send_photo(uid, photo=file)
-            file_id = f"photo:{msg.photo[-1].file_id}"
-    except aiogram.exceptions.TelegramAPIError as e:
-        raise web.HTTPBadRequest(reason=f"Failed to process media (bot might need PM access): {e}")
-        
-    return web.json_response({"file_id": file_id})
 
 async def metrics(request: web.Request) -> web.Response:
     """Prometheus metrics endpoint."""
@@ -517,80 +380,18 @@ def setup_routes(app: web.Application) -> None:
     app.router.add_get("/api/stats/global", global_stats)
     app.router.add_post("/api/chats/{cid}/quarantine/{vid}", quarantine_decide)
     app.router.add_get("/api/chats/{cid}/stats", stats)
-    app.router.add_get("/api/chats/{cid}/billing", billing_status)
-    app.router.add_post("/api/chats/{cid}/billing/invoice", billing_invoice)
     app.router.add_get("/api/chats/{cid}/members", members_search)
     app.router.add_post("/api/chats/{cid}/members/{uid}/action", member_action)
-    app.router.add_post("/api/chats/{cid}/upload", upload_media)
+    
+    from .routes_billing import billing_status, billing_invoice, cryptopay_webhook
+    app.router.add_get("/api/chats/{cid}/billing", billing_status)
+    app.router.add_post("/api/chats/{cid}/billing/invoice", billing_invoice)
     app.router.add_post("/webhook/cryptopay", cryptopay_webhook)
+    
+    from .routes_media import upload_media
+    app.router.add_post("/api/chats/{cid}/upload", upload_media)
+    
+    from .routes_triggers import get_triggers, create_trigger, delete_trigger
     app.router.add_get("/api/chats/{cid}/triggers", get_triggers)
     app.router.add_post("/api/chats/{cid}/triggers", create_trigger)
     app.router.add_delete("/api/chats/{cid}/triggers/{tid}", delete_trigger)
-
-
-
-async def get_triggers(request: web.Request) -> web.Response:
-    cid = _chat_id(request)
-    await require_chat_admin(request, cid)
-    async with _session(request) as session:
-        triggers = await session.scalars(
-            select(ChatTrigger).where(ChatTrigger.chat_telegram_id == cid).order_by(ChatTrigger.created_at.desc())
-        )
-        return web.json_response([
-            {
-                "id": t.id,
-                "trigger_word": t.trigger_word,
-                "reply_text": t.reply_text,
-                "is_regex": t.is_regex,
-                "created_at": t.created_at.isoformat()
-            } for t in triggers
-        ])
-
-async def create_trigger(request: web.Request) -> web.Response:
-    cid = _chat_id(request)
-    await require_chat_admin(request, cid)
-    try:
-        body = await request.json()
-    except ValueError as exc:
-        raise web.HTTPBadRequest(reason="invalid JSON body") from exc
-        
-    word = body.get("trigger_word", "").strip()
-    reply = body.get("reply_text", "").strip()
-    is_regex = bool(body.get("is_regex", False))
-    
-    if not word or not reply:
-        raise web.HTTPBadRequest(reason="trigger_word and reply_text are required")
-        
-    async with _session(request) as session:
-        from sqlalchemy import func
-        count = await session.scalar(
-            select(func.count(ChatTrigger.id)).where(ChatTrigger.chat_telegram_id == cid)
-        )
-        if count >= 100:
-            raise web.HTTPBadRequest(reason="Maximum 100 triggers per chat")
-        
-        trigger = ChatTrigger(
-            chat_telegram_id=cid,
-            trigger_word=word[:255],
-            reply_text=reply[:4000],
-            is_regex=is_regex
-        )
-        session.add(trigger)
-        await session.commit()
-        return web.json_response({"id": trigger.id, "status": "created"})
-
-async def delete_trigger(request: web.Request) -> web.Response:
-    cid = _chat_id(request)
-    await require_chat_admin(request, cid)
-    try:
-        tid = int(request.match_info["tid"])
-    except (KeyError, ValueError) as exc:
-        raise web.HTTPBadRequest(reason="bad trigger id") from exc
-        
-    async with _session(request) as session:
-        trigger = await session.get(ChatTrigger, tid)
-        if not trigger or trigger.chat_telegram_id != cid:
-            raise web.HTTPNotFound(reason="trigger not found")
-        await session.delete(trigger)
-        await session.commit()
-        return web.json_response({"status": "deleted"})
