@@ -7,6 +7,8 @@ import { ChatSettingsData } from '../lib/types';
 
 interface BillingData {
   pro: boolean;
+  badges: { quarantine: number; audit: number };
+  clearAuditBadge: () => void;
   active_until?: string;
   price_stars?: number;
   period_days?: number;
@@ -24,6 +26,8 @@ interface ChatSettingsContextType {
   reload: () => Promise<void>;
   billing: BillingData | null;
   pro: boolean;
+  badges: { quarantine: number; audit: number };
+  clearAuditBadge: () => void;
   loadBilling: () => void;
   openUpgrade: () => Promise<string | null>;
 }
@@ -40,6 +44,35 @@ export function ChatSettingsProvider({ chatId, children }: { chatId: number; chi
   const [saving, setSaving] = useState(false);
   const [billing, setBilling] = useState<BillingData | null>(null);
   const [paymentResolver, setPaymentResolver] = useState<((val: string | null) => void) | null>(null);
+
+  const [badges, setBadges] = useState({ quarantine: 0, audit: 0 });
+  const [totalActions, setTotalActions] = useState(0);
+
+  useEffect(() => {
+    let alive = true;
+    const poll = async () => {
+      try {
+        const stats = await api.stats(chatId);
+        if (alive && stats) {
+          const qCount = stats.pending_quarantine || 0;
+          const tActions = Object.values(stats.actions || {}).reduce((a: any, b: any) => a + b, 0) as number;
+          setTotalActions(tActions);
+          const lastSeen = parseInt(localStorage.getItem(`lastSeenActions_${chatId}`) || '0', 10);
+          const aCount = Math.max(0, tActions - lastSeen);
+          setBadges({ quarantine: qCount, audit: aCount });
+        }
+      } catch(e) {}
+    };
+    poll();
+    const interval = setInterval(poll, 10000);
+    return () => { alive = false; clearInterval(interval); };
+  }, [chatId]);
+
+  const clearAuditBadge = useCallback(() => {
+    localStorage.setItem(`lastSeenActions_${chatId}`, totalActions.toString());
+    setBadges(b => ({ ...b, audit: 0 }));
+  }, [chatId, totalActions]);
+
 
   const draftRef = useRef<ChatSettingsData | null>(null);
   const savedRef = useRef<ChatSettingsData | null>(null);

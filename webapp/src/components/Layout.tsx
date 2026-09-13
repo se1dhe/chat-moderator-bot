@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { NavLink, useNavigate, useParams, useLocation, useOutlet } from 'react-router-dom';
 import { LayoutGrid, Users, ShieldAlert, ScrollText, BarChart3, ChevronLeft, Check, Loader2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -62,13 +63,22 @@ function Header() {
 
 function Nav({ cid }: { cid: string }) {
   const { t } = useLang();
+  const location = useLocation();
+  const { badges, clearAuditBadge } = useChatSettings();
   const base = `/c/${cid}`;
+  
+  useEffect(() => {
+    if (location.pathname.endsWith('/audit')) {
+      clearAuditBadge();
+    }
+  }, [location.pathname, clearAuditBadge]);
+
   const items = [
-    { to: base, icon: LayoutGrid, label: t('nav.dashboard'), end: true },
-    { to: `${base}/members`, icon: Users, label: t('nav.members') },
-    { to: `${base}/quarantine`, icon: ShieldAlert, label: t('nav.quarantine') },
-    { to: `${base}/audit`, icon: ScrollText, label: t('nav.audit') },
-    { to: `${base}/stats`, icon: BarChart3, label: t('nav.stats') },
+    { to: base, icon: LayoutGrid, label: t('nav.dashboard'), end: true, badge: 0 },
+    { to: `${base}/members`, icon: Users, label: t('nav.members'), badge: 0 },
+    { to: `${base}/quarantine`, icon: ShieldAlert, label: t('nav.quarantine'), badge: badges?.quarantine || 0 },
+    { to: `${base}/audit`, icon: ScrollText, label: t('nav.audit'), badge: badges?.audit || 0 },
+    { to: `${base}/stats`, icon: BarChart3, label: t('nav.stats'), badge: 0 },
   ];
 
   return (
@@ -81,13 +91,20 @@ function Nav({ cid }: { cid: string }) {
             end={it.end} 
             onClick={() => haptic('light')}
             className={({ isActive }) => `
-              flex flex-col items-center justify-center w-full h-full gap-1 transition-colors
+              flex flex-col items-center justify-center w-full h-full gap-1 transition-colors relative
               ${isActive ? 'text-primary' : 'text-neutral-500 hover:text-neutral-900 dark:hover:text-neutral-300'}
             `}
           >
             {({ isActive }) => (
               <>
-                <it.icon size={22} className={isActive ? 'fill-primary/10' : ''} />
+                <div className="relative">
+                  <it.icon size={22} className={isActive ? 'fill-primary/10' : ''} />
+                  {it.badge > 0 && (
+                    <div className="absolute -top-1.5 -right-2 bg-red-500 text-white text-[9px] font-bold px-1.5 py-0.5 rounded-full border-2 border-white dark:border-black min-w-[18px] text-center shadow-sm">
+                      {it.badge > 99 ? '99+' : it.badge}
+                    </div>
+                  )}
+                </div>
                 <span className="text-[10px] font-medium leading-none">{it.label}</span>
               </>
             )}
