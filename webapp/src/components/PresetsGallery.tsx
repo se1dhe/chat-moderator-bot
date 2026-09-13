@@ -5,7 +5,7 @@ import { haptic } from '../lib/telegram';
 
 export function PresetsGallery() {
   const { t } = useLang();
-  const { draft, setSection, pro, openUpgrade } = useChatSettings();
+  const { draft, setSection, billing, openPresetPayment } = useChatSettings();
 
   if (!draft) return null;
 
@@ -79,7 +79,7 @@ export function PresetsGallery() {
       <div className="text-sm font-semibold text-neutral-500 uppercase tracking-wider ml-1 mb-2">{t('presets.title')}</div>
       <div className="flex gap-3 overflow-x-auto snap-x snap-mandatory pb-4 pt-1 -mx-4 px-4 no-scrollbar">
         {presets.map((p) => {
-          const locked = p.pro && !pro;
+          const locked = p.pro && !(billing?.purchased_presets || []).includes(p.id);
           return (
             <div 
               key={p.id} 
@@ -102,7 +102,7 @@ export function PresetsGallery() {
                 onClick={() => {
                   if (locked) {
                     haptic('warning');
-                    openUpgrade();
+                    openPresetPayment(p.id);
                   } else {
                     haptic('success');
                     p.apply();
@@ -110,7 +110,7 @@ export function PresetsGallery() {
                   }
                 }}
               >
-                {locked ? <><Lock size={14} /> PRO</> : <><Check size={14} /> {t('presets.apply')}</>}
+                {locked ? <><Lock size={14} /> 150 ⭐️</> : <><Check size={14} /> {t('presets.apply')}</>}
               </button>
             </div>
           );

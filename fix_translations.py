@@ -1,40 +1,34 @@
 with open('webapp/src/i18n/translations.ts', 'r') as f:
     text = f.read()
 
-# Add defcon translations
-ru = """      'sec.defcon': 'Auto-DEFCON',
-      'defcon.enabled': 'Включить защиту',
-      'defcon.enabled_desc': 'Активируется при атаке спамеров',
-      'defcon.threshold': 'Порог активации',
-      'defcon.lockSeconds': 'Длительность тревоги',
-      'defcon.action': 'Действие при тревоге',
-      'action.read_only': 'Read-Only (новым)',
-      'action.strict': 'Strict (удалять медиа)',
-      'action.captcha': 'Капча',"""
+ru_keys = """
+    'presets.title': 'Умные Пресеты',
+    'presets.apply': 'Применить',
+    'presets.basic': 'Базовый',
+    'presets.basic.desc': 'Стандартная защита от спама и флуда.',
+    'presets.crypto': 'Крипто и Web3',
+    'presets.crypto.desc': 'Максимальная защита. Автобан, Captcha, DEFCON.',
+    'presets.corp': 'Строгий (Корпорат)',
+    'presets.corp.desc': 'Никакой токсичности и мата. Карантин включен.',
+    'presets.chill': 'Свободное Общение',
+    'presets.chill.desc': 'Расслабленные правила. Минимум вмешательств.',
+"""
 
-en = """      'sec.defcon': 'Auto-DEFCON',
-      'defcon.enabled': 'Enable Shield',
-      'defcon.enabled_desc': 'Activates during a spam attack',
-      'defcon.threshold': 'Activation threshold',
-      'defcon.lockSeconds': 'Alert duration',
-      'defcon.action': 'Action on alert',
-      'action.read_only': 'Read-Only (new)',
-      'action.strict': 'Strict (block media)',
-      'action.captcha': 'Captcha',"""
+uk_keys = """
+    'presets.title': 'Розумні Пресети',
+    'presets.apply': 'Застосувати',
+    'presets.basic': 'Базовий',
+    'presets.basic.desc': 'Стандартний захист від спаму та флуду.',
+    'presets.crypto': 'Крипто та Web3',
+    'presets.crypto.desc': 'Максимальний захист. Автобан, Captcha, DEFCON.',
+    'presets.corp': 'Суворий (Корпорат)',
+    'presets.corp.desc': 'Жодної токсичності та лайки. Карантин увімкнено.',
+    'presets.chill': 'Вільне Спілкування',
+    'presets.chill.desc': 'Розслаблені правила. Мінімум втручань.',
+"""
 
-uk = """      'sec.defcon': 'Auto-DEFCON',
-      'defcon.enabled': 'Увімкнути захист',
-      'defcon.enabled_desc': 'Активується при спам-атаці',
-      'defcon.threshold': 'Поріг активації',
-      'defcon.lockSeconds': 'Тривалість тривоги',
-      'defcon.action': 'Дія під час тривоги',
-      'action.read_only': 'Read-Only (новим)',
-      'action.strict': 'Strict (видаляти медіа)',
-      'action.captcha': 'Капча',"""
-
-text = text.replace("'sec.raid': 'Рейд-защита',", ru)
-text = text.replace("'sec.raid': 'Raid Shield',", en)
-text = text.replace("'sec.raid': 'Рейд-захист',", uk)
+text = text.replace("'tips.quarantine': 'У вас есть новые сообщения в Карантине.',", "'tips.quarantine': 'У вас есть новые сообщения в Карантине.'," + ru_keys)
+text = text.replace("'tips.quarantine': 'У вас є нові повідомлення в Карантині.',", "'tips.quarantine': 'У вас є нові повідомлення в Карантині.'," + uk_keys)
 
 with open('webapp/src/i18n/translations.ts', 'w') as f:
     f.write(text)

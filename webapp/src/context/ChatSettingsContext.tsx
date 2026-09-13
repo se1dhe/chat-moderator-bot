@@ -30,6 +30,7 @@ interface ChatSettingsContextType {
   clearAuditBadge: () => void;
   loadBilling: () => void;
   openUpgrade: () => Promise<string | null>;
+  openPresetPayment: (presetId: string) => Promise<string | null>;
 }
 
 const Ctx = createContext<ChatSettingsContextType | null>(null);
@@ -44,6 +45,7 @@ export function ChatSettingsProvider({ chatId, children }: { chatId: number; chi
   const [saving, setSaving] = useState(false);
   const [billing, setBilling] = useState<BillingData | null>(null);
   const [paymentResolver, setPaymentResolver] = useState<((val: string | null) => void) | null>(null);
+  const [paymentPresetId, setPaymentPresetId] = useState<string | null>(null);
 
   const [badges, setBadges] = useState({ quarantine: 0, audit: 0 });
   const [totalActions, setTotalActions] = useState(0);
@@ -104,13 +106,25 @@ export function ChatSettingsProvider({ chatId, children }: { chatId: number; chi
   const openUpgrade = useCallback(() => {
     return new Promise<string | null>((resolve) => {
       haptic('light');
+      setPaymentPresetId(null);
+      setPaymentResolver(() => resolve);
+    });
+  }, []);
+
+  const openPresetPayment = useCallback((presetId: string) => {
+    return new Promise<string | null>((resolve) => {
+      haptic('light');
+      setPaymentPresetId(presetId);
       setPaymentResolver(() => resolve);
     });
   }, []);
 
   const handlePaymentSelect = useCallback(async (method: string | null) => {
     const resolve = paymentResolver;
+    const presetId = paymentPresetId;
     setPaymentResolver(null);
+    setPaymentPresetId(null);
+    
     if (!method) {
       resolve?.(null);
       return;
@@ -118,13 +132,13 @@ export function ChatSettingsProvider({ chatId, children }: { chatId: number; chi
 
     try {
       if (method === 'crypto') {
-        const data = await api.invoice(chatId, 'crypto');
+        const data = await api.invoice(chatId, 'crypto', presetId || undefined);
         if (data.url) {
           window.Telegram?.WebApp?.openLink(data.url);
           resolve?.('crypto');
         }
       } else if (method === 'stars') {
-        const data = await api.invoice(chatId, 'stars');
+        const data = await api.invoice(chatId, 'stars', presetId || undefined);
         if (data.url) {
           window.Telegram?.WebApp?.openInvoice(data.url, (status: string) => {
             if (status === 'paid') {
@@ -140,7 +154,7 @@ export function ChatSettingsProvider({ chatId, children }: { chatId: number; chi
       haptic('error');
       resolve?.(null);
     }
-  }, [chatId, loadBilling, paymentResolver]);
+  }, [chatId, loadBilling, paymentResolver, paymentPresetId]);
 
   const flush = useCallback(async () => {
     const payload = patchRef.current;

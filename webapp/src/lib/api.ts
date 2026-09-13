@@ -50,7 +50,7 @@ export const api = {
   decide: (cid: number | string, vid: number | string, action: string) => request<any>('POST', `/chats/${cid}/quarantine/${vid}`, { action }),
   stats: (cid: number | string) => request<any>('GET', `/chats/${cid}/stats`),
   billing: (cid: number | string) => request<any>('GET', `/chats/${cid}/billing`),
-  invoice: (cid: number | string, method = 'stars') => request<any>('POST', `/chats/${cid}/billing/invoice`, { method }),
+  invoice: (cid: number | string, method = 'stars', preset_id?: string) => request<any>('POST', `/chats/${cid}/billing/invoice`, { method, preset_id }),
   
   members: (cid: number | string, q = '', opts?: RequestOpts) => request<any[]>('GET', `/chats/${cid}/members?q=${encodeURIComponent(q)}`, undefined, opts),
   memberAction: (cid: number | string, uid: number | string, action: string, extra = {}) =>

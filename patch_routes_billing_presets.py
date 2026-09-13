@@ -1,22 +1,18 @@
-from __future__ import annotations
+import re
 
-import hmac
-import hashlib
+with open('src/redqueen/api/routes_billing.py', 'r') as f:
+    text = f.read()
 
-from aiohttp import web
-from aiogram.types import LabeledPrice
+# Modify billing_status to return purchased_presets
+old_status = """        return web.json_response({
+            "pro": await billing.is_pro(session, cid),
+            "active_until": sub.active_until.isoformat() if sub and sub.active_until else None,
+            "price_stars": billing.PRO_PRICE_STARS,
+            "period_days": billing.PRO_PERIOD_DAYS,
+            "features": sorted(billing.PRO_FEATURES),
+        })"""
 
-from .utils import _chat_id, _session
-from .auth import require_chat_admin, request_bot
-from ..services import billing
-from ..db import repo
-
-async def billing_status(request: web.Request) -> web.Response:
-    cid = _chat_id(request)
-    await require_chat_admin(request, cid)
-    async with _session(request) as session:
-        sub = await billing.get_subscription(session, cid)
-        
+new_status = """        
         from ..db.models import ChatSettings
         from sqlalchemy import select
         settings_obj = await session.scalar(select(ChatSettings).where(ChatSettings.chat_id == cid))
@@ -31,15 +27,21 @@ async def billing_status(request: web.Request) -> web.Response:
             "period_days": billing.PRO_PERIOD_DAYS,
             "features": sorted(billing.PRO_FEATURES),
             "purchased_presets": purchased_presets,
-        })
+        })"""
+text = text.replace(old_status, new_status)
 
-
-async def billing_invoice(request: web.Request) -> web.Response:
-    """Create a Telegram Stars invoice link the Mini App opens via openInvoice()."""
-    cid = _chat_id(request)
-    await require_chat_admin(request, cid)
+# Modify billing_invoice to accept preset_id
+old_invoice = """    try:
+        body = await request.json()
+    except ValueError:
+        body = {}
+    method = body.get("method", "stars")
     
-    try:
+    days = billing.PRO_PERIOD_DAYS
+    
+    if method == "crypto":"""
+
+new_invoice = """    try:
         body = await request.json()
     except ValueError:
         body = {}
@@ -48,16 +50,16 @@ async def billing_invoice(request: web.Request) -> web.Response:
     
     days = billing.PRO_PERIOD_DAYS
     
-    if method == "crypto":
-        cryptopay_token = request.app["settings"].cryptopay_token
-        if not cryptopay_token:
-            raise web.HTTPBadRequest(reason="CryptoPay is not configured")
-        
-        from aiocryptopay import AioCryptoPay, Networks
-        crypto = AioCryptoPay(token=cryptopay_token, network=Networks.MAIN_NET)
-        try:
-            # We use USDT 5.0 as an equivalent to 500 Stars? Let's say 5 USDT for Pro
-            payload_str = f"preset:{cid}:{preset_id}" if preset_id else f"pro:{cid}:{days}"
+    if method == "crypto":"""
+text = text.replace(old_invoice, new_invoice)
+
+old_crypto = """            invoice = await crypto.create_invoice(
+                asset="USDT",
+                amount=5.0,
+                description=f"RedQueen Pro ({days} days) for chat {cid}",
+                payload=f"pro:{cid}:{days}"
+            )"""
+new_crypto = """            payload_str = f"preset:{cid}:{preset_id}" if preset_id else f"pro:{cid}:{days}"
             desc_str = f"Template: {preset_id}" if preset_id else f"RedQueen Pro ({days} days)"
             amt = 2.0 if preset_id else 5.0  # Presets are cheaper
             invoice = await crypto.create_invoice(
@@ -65,13 +67,18 @@ async def billing_invoice(request: web.Request) -> web.Response:
                 amount=amt,
                 description=desc_str + f" for chat {cid}",
                 payload=payload_str
-            )
-            return web.json_response({"url": invoice.bot_invoice_url, "method": "crypto"})
-        finally:
-            await crypto.close()
-    
-    # Default: Telegram Stars
-    
+            )"""
+text = text.replace(old_crypto, new_crypto)
+
+old_stars = """    url = await request_bot(request).create_invoice_link(
+        title="RedQueen Pro",
+        description=f"AI auto-ban, raid shield and advanced analytics for {days} days.",
+        payload=f"pro:{cid}:{days}",
+        provider_token="",
+        currency="XTR",
+        prices=[LabeledPrice(label=f"RedQueen Pro · {days} days", amount=billing.PRO_PRICE_STARS)],
+    )"""
+new_stars = """    
     if preset_id:
         url = await request_bot(request).create_invoice_link(
             title=f"Smart Preset: {preset_id.title()}",
@@ -89,26 +96,25 @@ async def billing_invoice(request: web.Request) -> web.Response:
             provider_token="",
             currency="XTR",
             prices=[LabeledPrice(label=f"RedQueen Pro · {days} days", amount=billing.PRO_PRICE_STARS)],
-        )
-    return web.json_response({"url": url, "method": "stars"})
+        )"""
+text = text.replace(old_stars, new_stars)
 
+# Cryptopay webhook handler update
+old_webhook = """    if data.get("update_type") == "invoice_paid":
+        payload = data.get("payload", {}).get("payload", "")
+        if payload.startswith("pro:"):
+            parts = payload.split(":")
+            if len(parts) == 3:
+                _, cid, days = parts
+                async with request.app["sessionmaker"]() as session:
+                    await billing.activate_pro(session, int(cid), days=int(days))
+                    await repo.log_action(
+                        session, chat_telegram_id=int(cid), user_telegram_id=0,
+                        actor_id=None, action="pro_grant", reason=f"cryptopay {days}d"
+                    )
+    return web.Response(status=200)"""
 
-async def cryptopay_webhook(request: web.Request) -> web.Response:
-    cryptopay_token = request.app["settings"].cryptopay_token
-    if not cryptopay_token:
-        return web.Response(status=400)
-    
-    body = await request.text()
-    signature = request.headers.get("crypto-pay-api-signature", "")
-    
-    secret = hashlib.sha256(cryptopay_token.encode()).digest()
-    expected_sig = hmac.new(secret, body.encode(), hashlib.sha256).hexdigest()
-    
-    if not hmac.compare_digest(signature, expected_sig):
-        return web.Response(status=401)
-        
-    data = await request.json()
-    if data.get("update_type") == "invoice_paid":
+new_webhook = """    if data.get("update_type") == "invoice_paid":
         payload = data.get("payload", {}).get("payload", "")
         
         async with request.app["sessionmaker"]() as session:
@@ -145,4 +151,8 @@ async def cryptopay_webhook(request: web.Request) -> web.Response:
                         session, chat_telegram_id=int(cid), user_telegram_id=0,
                         actor_id=None, action="preset_payment", reason=f"cryptopay preset {preset_id}"
                     )
-    return web.Response(status=200)
+    return web.Response(status=200)"""
+text = text.replace(old_webhook, new_webhook)
+
+with open('src/redqueen/api/routes_billing.py', 'w') as f:
+    f.write(text)
