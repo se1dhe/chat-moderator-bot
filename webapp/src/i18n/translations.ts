@@ -267,6 +267,15 @@ export const LOCALES: Record<Locales, LocaleDict> = {
     'defcon.info.action': 'What to do with new users during an attack:\n• Read-Only: Cannot send messages.\n• Strict: Cannot send media/links.\n• Captcha: Must solve captcha.',
     'ai.info.mode': 'How AI handles violations:\n• Quarantine: Sends message to moderators for review.\n• Auto-ban: Instantly bans the user.',
     'ai.info.log': 'ID of a private channel/group where the bot will send Quarantine cards. Moderators can vote inline. If empty, bot PMs moderators.',
+    'captcha.info.timeout': 'How much time (in seconds) the user has to pass the verification. If they fail, they will be kicked.',
+    'antiflood.info.messages': 'How many consecutive messages a user can send within the time window.',
+    'antiflood.info.window': 'The time window (in seconds) for the message limit.',
+    'filters.info.links': 'Automatically delete any links sent by regular users.',
+    'filters.info.forwards': 'Prevent users from forwarding messages from other chats/channels.',
+    'filters.info.badwords': 'Delete messages containing profanity or insults.',
+    'modes.info.readonly': 'Nobody except admins will be able to write in the chat.',
+    'modes.info.slowmode': 'Restricts how often a single user can send messages.',
+
 
 
     'sec.warns': 'Warns',
@@ -645,6 +654,15 @@ export const LOCALES: Record<Locales, LocaleDict> = {
     'defcon.info.action': 'Что делать с новичками во время атаки:\n• Read-Only: Запрет писать.\n• Strict: Запрет медиа/ссылок.\n• Капча: Проверка капчей.',
     'ai.info.mode': 'Реакция ИИ на спам:\n• Карантин: Отправляет сообщение модераторам на проверку.\n• Авто-бан: Сразу блокирует нарушителя.',
     'ai.info.log': 'ID приватного канала или группы, куда бот будет присылать сообщения из Карантина. Модераторы смогут голосовать прямо там. Если пусто — бот пишет модераторам в личку.',
+    'captcha.info.timeout': 'Сколько времени (в секундах) есть у пользователя, чтобы пройти проверку. Если не успеет — будет исключен.',
+    'antiflood.info.messages': 'Сколько сообщений подряд можно написать за отведенное время.',
+    'antiflood.info.window': 'Окно времени (в секундах), за которое считается лимит сообщений.',
+    'filters.info.links': 'Автоматически удалять любые ссылки, кроме тех, что скинули администраторы.',
+    'filters.info.forwards': 'Запретить пересылку сообщений из других каналов и чатов.',
+    'filters.info.badwords': 'Удалять сообщения, содержащие нецензурную лексику или оскорбления.',
+    'modes.info.readonly': 'Никто кроме админов не сможет писать в чат. Режим "Только чтение".',
+    'modes.info.slowmode': 'Задержка между отправкой сообщений (ограничивает флуд).',
+
 
 
     'sec.warns': 'Варны',
@@ -1014,6 +1032,15 @@ export const LOCALES: Record<Locales, LocaleDict> = {
     'defcon.info.action': 'Що робити з новачками під час атаки:\n• Read-Only: Заборона писати.\n• Strict: Заборона медіа/посилань.\n• Капча: Перевірка капчею.',
     'ai.info.mode': 'Реакція ШІ на спам:\n• Карантин: Відправляє повідомлення модераторам на перевірку.\n• Авто-бан: Одразу блокує порушника.',
     'ai.info.log': 'ID приватного каналу або групи, куди бот буде надсилати повідомлення з Карантину. Модератори зможуть голосувати прямо там. Якщо порожньо — бот пише модераторам в особисті.',
+    'captcha.info.timeout': 'Скільки часу (у секундах) є у користувача, щоб пройти перевірку. Якщо не встигне — буде виключений.',
+    'antiflood.info.messages': 'Скільки повідомлень поспіль можна написати за відведений час.',
+    'antiflood.info.window': 'Вікно часу (в секундах), за яке рахується ліміт повідомлень.',
+    'filters.info.links': 'Автоматично видаляти будь-які посилання, крім тих, що надіслали адміністратори.',
+    'filters.info.forwards': 'Заборонити пересилання повідомлень з інших каналів і чатів.',
+    'filters.info.badwords': 'Видаляти повідомлення, що містять нецензурну лексику або образи.',
+    'modes.info.readonly': 'Ніхто крім адмінів не зможе писати в чат. Режим "Тільки читання".',
+    'modes.info.slowmode': 'Затримка між відправкою повідомлень (обмежує флуд).',
+
 
 
     'sec.warns': 'Варни',

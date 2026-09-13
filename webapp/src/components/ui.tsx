@@ -1,4 +1,4 @@
-import { X, Lock } from 'lucide-react';
+import { X, Lock, Info } from 'lucide-react';
 import { haptic } from '../lib/telegram';
 import { ReactNode } from 'react';
 

@@ -15,7 +15,7 @@ export default function Captcha({ s, t }) {
         <Row title={t('captcha.enabled')}>
           <Toggle checked={c.enabled} onChange={(v) => s.updateSection('captcha', { enabled: v })} />
         </Row>
-        <Row title={t('captcha.timeout')} value={`${mins(c.timeout_seconds)} ${t('common.minutes')}`}>
+        <Row title={t('captcha.timeout')} onInfo={() => showAlert(t('captcha.info.timeout'))} value={`${mins(c.timeout_seconds)} ${t('common.minutes')}`}>
           <Stepper value={mins(c.timeout_seconds)} min={1} max={30}
             onChange={(v) => s.updateSection('captcha', { timeout_seconds: v * 60 })} />
         </Row>

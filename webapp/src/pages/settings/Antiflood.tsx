@@ -18,7 +18,7 @@ export default function Antiflood({ s, t }: { s: any, t: any }) {
         <Row title={t('antiflood.limit')} value={a.limit}>
           <Stepper value={a.limit} min={2} max={50} onChange={(v) => s.updateSection('antiflood', { limit: v })} />
         </Row>
-        <Row title={t('antiflood.window')} value={`${a.window} ${t('common.seconds')}`}>
+        <Row title={t('antiflood.window')} onInfo={() => showAlert(t('antiflood.info.window'))} value={`${a.window} ${t('common.seconds')}`}>
           <Stepper value={a.window} min={2} max={300} step={1} onChange={(v) => s.updateSection('antiflood', { window: v })} />
         </Row>
         <Row title={t('antiflood.muteSeconds')} value={`${mins(a.mute_seconds)} ${t('common.minutes')}`}>

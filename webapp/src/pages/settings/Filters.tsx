@@ -21,8 +21,8 @@ export default function Filters({ s, t }) {
     <>
       <div className="text-sm font-semibold text-neutral-500 uppercase tracking-wider ml-1 mt-4 mb-2">{t('sec.filters')}</div>
       <div className="bg-white dark:bg-[#0a0a0a] border border-neutral-200 dark:border-neutral-800/60 rounded-2xl p-2 mb-4 shadow-sm w-full">
-        <Row title={t('filters.links')}><Toggle checked={f.block_links} onChange={(v) => s.updateSection('filters', { block_links: v })} /></Row>
-        <Row title={t('filters.forwards')}><Toggle checked={f.block_forwards} onChange={(v) => s.updateSection('filters', { block_forwards: v })} /></Row>
+        <Row title={t('filters.links')} onInfo={() => showAlert(t('filters.info.links'))}><Toggle checked={f.block_links} onChange={(v) => s.updateSection('filters', { block_links: v })} /></Row>
+        <Row title={t('filters.forwards')} onInfo={() => showAlert(t('filters.info.forwards'))}><Toggle checked={f.block_forwards} onChange={(v) => s.updateSection('filters', { block_forwards: v })} /></Row>
         <Row title={t('filters.mentions')}><Toggle checked={f.block_mentions} onChange={(v) => s.updateSection('filters', { block_mentions: v })} /></Row>
       </div>
 
