@@ -317,7 +317,7 @@ export const LOCALES: Record<Locales, LocaleDict> = {
     'landing.nav.pricing': 'Pricing',
     'landing.nav.login': 'Add to Telegram',
     
-    'landing.hero.badge': 'Next-Gen Autonomous AI Moderation',
+    'landing.hero.badge': 'The Future of Autonomous AI Moderation',
     'landing.hero.title1': 'Keep your communities ',
     'landing.hero.title_safe': 'safe',
     'landing.hero.title2': ' and ',
@@ -349,9 +349,9 @@ export const LOCALES: Record<Locales, LocaleDict> = {
     'landing.pricing.title': 'Transparent Pricing',
     'landing.pricing.desc': 'Pay only for the AI power you need. Basic protection is always free.',
     'landing.price.free': 'Free',
-    'landing.price.free.desc': 'Essential tools for any group',
+    'landing.price.free.desc': 'The perfect starting point with essential tools for any growing community.',
     'landing.price.pro': 'Pro',
-    'landing.price.pro.desc': 'Full AI autonomy for serious communities',
+    'landing.price.pro.desc': 'Unleash the full power of autonomous AI moderation. Built for massive, high-stakes communities.',
     'landing.price.month': '/month',
     
     'landing.plan.feat.basic': 'Basic Captcha & Anti-flood',
@@ -717,12 +717,12 @@ export const LOCALES: Record<Locales, LocaleDict> = {
     'landing.nav.pricing': 'Тарифы',
     'landing.nav.login': 'Добавить в Telegram',
     
-    'landing.hero.badge': 'Автономная ИИ-Модерация Нового Поколения',
+    'landing.hero.badge': 'Будущее автономной ИИ-модерации уже здесь',
     'landing.hero.title1': 'Сделай свои сообщества ',
     'landing.hero.title_safe': 'безопасными',
     'landing.hero.title2': ' и ',
     'landing.hero.title_clean': 'чистыми',
-    'landing.hero.desc': 'RedQueen — это продвинутый ИИ-модератор, который понимает контекст, выявляет токсичность, банит скамеров и защищает твои группы 24/7 без сложной настройки.',
+    'landing.hero.desc': 'RedQueen — это ИИ-модератор энтерпрайз-класса, который по-настоящему понимает контекст. Нейросети выявляют токсичность, моментально банят скамеров и берут на себя 100% рутины. Твое сообщество под надежной защитой 24/7 без скучной настройки.',
     'landing.hero.cta': 'Защитить группу',
     'landing.hero.demo': 'Смотреть в действии',
     
@@ -732,7 +732,7 @@ export const LOCALES: Record<Locales, LocaleDict> = {
     'landing.stats.ai': 'Вердиктов ИИ',
     
     'landing.features.title': 'Почему именно RedQueen?',
-    'landing.features.desc': 'Защита военного уровня в сочетании с элегантным интерфейсом.',
+    'landing.features.desc': 'Безопасность военного уровня в безупречно элегантном интерфейсе. Создано для тех, кто ценит качество.',
     
     'landing.feat1.title': 'ИИ понимает контекст',
     'landing.feat1.desc': 'Наши нейросети понимают сарказм, контекст и намерения. Больше никаких ложных банов за обычные слова.',
@@ -749,9 +749,9 @@ export const LOCALES: Record<Locales, LocaleDict> = {
     'landing.pricing.title': 'Прозрачные тарифы',
     'landing.pricing.desc': 'Плати только за мощь ИИ, которая тебе нужна. Базовая защита всегда бесплатна.',
     'landing.price.free': 'Базовый',
-    'landing.price.free.desc': 'Необходимые инструменты для любой группы',
+    'landing.price.free.desc': 'Идеальный старт с базовым набором инструментов для развивающихся чатов.',
     'landing.price.pro': 'Pro',
-    'landing.price.pro.desc': 'Полная автономия ИИ для серьезных комьюнити',
+    'landing.price.pro.desc': 'Безграничная мощь нейросетей и полная автономия. Выбор крупнейших комьюнити в Telegram.',
     'landing.price.month': '/мес',
     
     'landing.plan.feat.basic': 'Капча и базовый антифлуд',
@@ -1108,12 +1108,12 @@ export const LOCALES: Record<Locales, LocaleDict> = {
     'landing.nav.pricing': 'Тарифи',
     'landing.nav.login': 'Додати в Telegram',
     
-    'landing.hero.badge': 'Автономна ШІ-Модерація Нового Покоління',
+    'landing.hero.badge': 'Майбутнє автономної ШІ-модерації вже тут',
     'landing.hero.title1': 'Зроби свої спільноти ',
     'landing.hero.title_safe': 'безпечними',
     'landing.hero.title2': ' та ',
     'landing.hero.title_clean': 'чистими',
-    'landing.hero.desc': 'RedQueen — це просунутий ШІ-модератор, який розуміє контекст, виявляє токсичність, банить скамерів і захищає твої групи 24/7 без складного налаштування.',
+    'landing.hero.desc': 'RedQueen — це ШІ-модератор ентерпрайз-класу, який по-справжньому розуміє контекст. Нейромережі виявляють токсичність, миттєво банять скамерів та беруть на себе 100% рутини. Твоя спільнота під надійним захистом 24/7 без складних налаштувань.',
     'landing.hero.cta': 'Захистити групу',
     'landing.hero.demo': 'Дивитись у дії',
     
@@ -1123,7 +1123,7 @@ export const LOCALES: Record<Locales, LocaleDict> = {
     'landing.stats.ai': 'Вердиктів ШІ',
     
     'landing.features.title': 'Чому саме RedQueen?',
-    'landing.features.desc': 'Захист військового рівня у поєднанні з елегантним інтерфейсом.',
+    'landing.features.desc': 'Безпека військового рівня у бездоганно елегантному інтерфейсі. Створено для тих, хто цінує якість.',
     
     'landing.feat1.title': 'ШІ розуміє контекст',
     'landing.feat1.desc': 'Наші нейромережі розуміють сарказм, контекст та наміри. Більше жодних хибних банів за звичайні слова.',
@@ -1140,9 +1140,9 @@ export const LOCALES: Record<Locales, LocaleDict> = {
     'landing.pricing.title': 'Прозорі тарифи',
     'landing.pricing.desc': 'Плати тільки за потужність ШІ, яка тобі потрібна. Базова захист завжди безкоштовна.',
     'landing.price.free': 'Базовий',
-    'landing.price.free.desc': 'Необхідні інструменти для будь-якої групи',
+    'landing.price.free.desc': 'Ідеальний старт з базовим набором інструментів для спільнот, що розвиваються.',
     'landing.price.pro': 'Pro',
-    'landing.price.pro.desc': 'Повна автономія ШІ для серйозних ком\'юніті',
+    'landing.price.pro.desc': 'Безмежна міць нейромереж та повна автономія. Вибір найбільших спільнот у Telegram.',
     'landing.price.month': '/міс',
     
     'landing.plan.feat.basic': 'Капча та базовий антифлуд',
