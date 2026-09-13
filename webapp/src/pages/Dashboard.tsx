@@ -21,7 +21,8 @@ export function Dashboard() {
   const { draft, error, reload, setSection, pro, openUpgrade } = useChatSettings();
 
   if (error) {
-    return (
+  
+              return (
       <div className="flex-1 flex flex-col items-center justify-center text-center gap-4 py-12 text-neutral-500">
         <ServerCrash size={48} className="text-primary" />
         <h3 className="font-semibold text-neutral-800 dark:text-neutral-200">{t('common.error')}</h3>
@@ -76,18 +77,29 @@ export function Dashboard() {
   ];
 
 
+
+            
+  const container = {
+    hidden: { opacity: 0 },
+    show: { opacity: 1, transition: { staggerChildren: 0.03 } }
+  };
+  const item = {
+    hidden: { opacity: 0, y: 8, scale: 0.97 },
+    show: { opacity: 1, y: 0, scale: 1, transition: { type: "spring", stiffness: 500, damping: 30, mass: 0.5 } }
+  };
+
   return (
-    <div className="w-full flex flex-col gap-4 animate-in fade-in slide-in-from-bottom-2 duration-300">
-      <ProBanner />
+    <motion.div variants={container} initial="hidden" animate="show" className="w-full flex flex-col gap-4">
+      <motion.div variants={item}><ProBanner /></motion.div>
 
-      <Tips chatId={cid} />
+      <motion.div variants={item}><Tips chatId={cid} /></motion.div>
 
-      <div>
+      <motion.div variants={item}>
         <div className="text-sm font-semibold text-neutral-500 uppercase tracking-wider mb-2 ml-1">{t('dash.chatLang')}</div>
         <Segmented value={draft.lang} onChange={(v: string) => setSection('lang', v)} options={LANGS} />
-      </div>
+      </motion.div>
 
-      <div>
+      <motion.div variants={item}>
         <div className="text-sm font-semibold text-neutral-500 uppercase tracking-wider mb-2 ml-1">{t('dash.privacy')}</div>
         <div className="bg-white dark:bg-[#0a0a0a] border border-neutral-200 dark:border-neutral-800/60 rounded-2xl p-4 shadow-sm">
           <Row title={t('dash.privacy')} desc={t('dash.privacy.desc')}>
@@ -97,16 +109,18 @@ export function Dashboard() {
             />
           </Row>
         </div>
-      </div>
+      </motion.div>
 
       {groups.map((g) => (
-        <motion.div key={g.label}  className="w-full flex flex-col gap-2">
-          <div className="text-sm font-semibold text-neutral-500 uppercase tracking-wider mt-2 ml-1">{g.label}</div>
+        <div key={g.label} className="w-full flex flex-col gap-2">
+          <motion.div variants={item} className="text-sm font-semibold text-neutral-500 uppercase tracking-wider mt-2 ml-1">{g.label}</motion.div>
           <div className="flex flex-col gap-2">
             {g.items.map((it) => {
               const locked = it.pro && !pro;
+            
               return (
                 <motion.button
+                  variants={item}
                   whileTap={{ scale: 0.97 }}
                   key={it.key}
                   className="w-full flex items-center p-4 bg-white dark:bg-[#0a0a0a] border border-neutral-200 dark:border-neutral-800/60 rounded-2xl shadow-sm hover:border-primary/30 dark:hover:border-primary/30 active:bg-neutral-50 dark:active:bg-neutral-800 transition-all text-left group"
@@ -146,8 +160,8 @@ export function Dashboard() {
               );
             })}
           </div>
-        </motion.div>
+        </div>
       ))}
-    </div>
+    </motion.div>
   );
 }
