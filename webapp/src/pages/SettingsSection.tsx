@@ -30,7 +30,7 @@ export function SettingsSection() {
     filters: <Filters s={s} t={t} />,
     modes: <Modes s={s} t={t} />,
     ai: <AI s={s} t={t} />,
-    raid: <Raid s={s} t={t} />,
+    defcon: <Defcon s={s} t={t} />,
     warns: <Warns s={s} t={t} />,
     exempt: <Exempt s={s} t={t} />,
     autocomment: <AutoComment s={s} t={t} />,
