@@ -26,11 +26,14 @@ export function Toggle({ checked, onChange, disabled, onDisabledClick }: { check
   );
 }
 
-export function Row({ title, desc, value, children }: { title: string, desc?: string, value?: any, children?: ReactNode }) {
+export function Row({ title, desc, value, children, onInfo }: { title: string, desc?: string, value?: any, children?: ReactNode, onInfo?: () => void }) {
   return (
     <div className="flex items-center justify-between w-full p-2 gap-3 min-h-[44px]">
       <div className="flex flex-col flex-1 min-w-0 justify-center">
-        <div className="text-sm font-semibold text-neutral-900 dark:text-neutral-50 truncate leading-tight">{title}</div>
+        <div className="text-sm font-semibold text-neutral-900 dark:text-neutral-50 truncate leading-tight flex items-center gap-1.5">
+          {title}
+          {onInfo && <button onClick={onInfo} className="text-neutral-400 hover:text-blue-500 active:scale-95 transition-all"><Info size={15} /></button>}
+        </div>
         {desc && <div className="text-[13px] text-neutral-500 leading-snug mt-0.5 pr-2">{desc}</div>}
       </div>
       {value !== undefined && <div className="text-sm font-medium text-neutral-400 shrink-0">{value}</div>}

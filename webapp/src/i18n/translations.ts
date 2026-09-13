@@ -263,6 +263,11 @@ export const LOCALES: Record<Locales, LocaleDict> = {
     
     'ai.log_channel': 'AI Tribunal (Log Channel)',
     'ai.log_channel.desc': 'Channel/Group ID for Quarantine cards to vote on',
+    'defcon.info.threshold': 'How many users must join within 1 minute to trigger the shield.',
+    'defcon.info.action': 'What to do with new users during an attack:\n• Read-Only: Cannot send messages.\n• Strict: Cannot send media/links.\n• Captcha: Must solve captcha.',
+    'ai.info.mode': 'How AI handles violations:\n• Quarantine: Sends message to moderators for review.\n• Auto-ban: Instantly bans the user.',
+    'ai.info.log': 'ID of a private channel/group where the bot will send Quarantine cards. Moderators can vote inline. If empty, bot PMs moderators.',
+
 
     'sec.warns': 'Warns',
     'sec.warns.desc': 'Strike system for violations',
@@ -624,7 +629,7 @@ export const LOCALES: Record<Locales, LocaleDict> = {
     'dashboard.ai_summary.loading': 'Анализирую историю чата...',
     'sec.overview': 'Обзор',
     
-    'sec.defcon': 'Auto-DEFCON',
+    'sec.defcon': 'Авто-Защита',
     'defcon.enabled': 'Включить защиту',
     'defcon.enabled_desc': 'Активируется при атаке спамеров',
     'defcon.threshold': 'Порог активации',
@@ -636,6 +641,11 @@ export const LOCALES: Record<Locales, LocaleDict> = {
     
     'ai.log_channel': 'AI Tribunal (Лог-канал)',
     'ai.log_channel.desc': 'ID канала/группы для отправки карточек Quarantine на голосование',
+    'defcon.info.threshold': 'Сколько новых участников должно зайти за 1 минуту, чтобы активировалась защита.',
+    'defcon.info.action': 'Что делать с новичками во время атаки:\n• Read-Only: Запрет писать.\n• Strict: Запрет медиа/ссылок.\n• Капча: Проверка капчей.',
+    'ai.info.mode': 'Реакция ИИ на спам:\n• Карантин: Отправляет сообщение модераторам на проверку.\n• Авто-бан: Сразу блокирует нарушителя.',
+    'ai.info.log': 'ID приватного канала или группы, куда бот будет присылать сообщения из Карантина. Модераторы смогут голосовать прямо там. Если пусто — бот пишет модераторам в личку.',
+
 
     'sec.warns': 'Варны',
     'sec.warns.desc': 'Система страйков за нарушения',
@@ -988,7 +998,7 @@ export const LOCALES: Record<Locales, LocaleDict> = {
     'dashboard.ai_summary.loading': 'Аналізую історію чату...',
     'sec.overview': 'Огляд',
     
-    'sec.defcon': 'Auto-DEFCON',
+    'sec.defcon': 'Авто-Захист',
     'defcon.enabled': 'Увімкнути захист',
     'defcon.enabled_desc': 'Активується при спам-атаці',
     'defcon.threshold': 'Поріг активації',
@@ -1000,6 +1010,11 @@ export const LOCALES: Record<Locales, LocaleDict> = {
     
     'ai.log_channel': 'AI Tribunal (Лог-канал)',
     'ai.log_channel.desc': 'ID каналу/групи для відправки карток Quarantine на голосування',
+    'defcon.info.threshold': 'Скільки нових учасників має зайти за 1 хвилину, щоб активувався захист.',
+    'defcon.info.action': 'Що робити з новачками під час атаки:\n• Read-Only: Заборона писати.\n• Strict: Заборона медіа/посилань.\n• Капча: Перевірка капчею.',
+    'ai.info.mode': 'Реакція ШІ на спам:\n• Карантин: Відправляє повідомлення модераторам на перевірку.\n• Авто-бан: Одразу блокує порушника.',
+    'ai.info.log': 'ID приватного каналу або групи, куди бот буде надсилати повідомлення з Карантину. Модератори зможуть голосувати прямо там. Якщо порожньо — бот пише модераторам в особисті.',
+
 
     'sec.warns': 'Варни',
     'sec.warns.desc': 'Система страйков за порушення',
