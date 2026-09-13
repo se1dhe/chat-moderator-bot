@@ -78,19 +78,19 @@ export default function Triggers({ chatId, t }) {
         </button>
       </div>
 
-      <div className="text-sm font-semibold text-neutral-500 uppercase tracking-wider ml-1 mt-4 mb-2 mt-6">{t("triggers.active")}</div>
+      <div className="text-sm font-semibold text-neutral-500 uppercase tracking-wider ml-1 mt-6 mb-2">{t("triggers.active")}</div>
       <div className="bg-white dark:bg-[#0a0a0a] border border-neutral-200 dark:border-neutral-800/60 rounded-2xl p-2 mb-4 shadow-sm w-full">
         {triggers.length === 0 ? (
           <div className="p-4 text-[13px] text-neutral-500 leading-snug">{t("triggers.empty")}</div>
         ) : (
           triggers.map(trig => (
-            <div key={trig.id} className="p-4 flex flex-col gap-2 border-b border-neutral-200 dark:border-neutral-800/60/50 last:border-0">
+            <div key={trig.id} className="p-4 flex flex-col gap-2 border-b border-neutral-200 dark:border-neutral-800/60 last:border-0">
               <div className="flex justify-between items-center">
                 <div className="font-mono text-primary font-semibold">
                   {trig.trigger_word}
                   {trig.is_regex && <span className="px-2 py-0.5 bg-amber-100 text-amber-700 dark:bg-amber-500/20 dark:text-amber-400 rounded-md text-[11px] font-bold uppercase tracking-wider ml-1.5">{t("triggers.regexBadge")}</span>}
                 </div>
-                <button className="w-full flex items-center justify-center gap-2 py-3 bg-red-500 hover:bg-red-600 text-white rounded-xl font-bold transition-all active:scale-95 shadow-md shadow-red-500/20 text-[15px] px-3 py-1 text-[13px]" onClick={() => handleDelete(trig.id)}>
+                <button className="shrink-0 flex items-center justify-center gap-1.5 px-3 py-1.5 bg-red-500/10 hover:bg-red-500/20 text-red-500 rounded-lg font-bold transition-all active:scale-95 text-[13px]" onClick={() => handleDelete(trig.id)}>
                   {t("triggers.btn.delete")}
                 </button>
               </div>

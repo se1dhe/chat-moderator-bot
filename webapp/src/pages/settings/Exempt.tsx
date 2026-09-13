@@ -21,7 +21,7 @@ export default function Exempt({ s, t }) {
         ) : (
           <div className="text-[13px] text-neutral-500 leading-snug">{t('exempt.empty')}</div>
         )}
-        <div className="chip-input">
+        <div className="flex flex-col gap-3 mt-3">
           <input className="w-full px-4 py-3 bg-neutral-50 dark:bg-black border border-neutral-200 dark:border-neutral-800/60 rounded-xl focus:outline-none focus:border-primary/50 transition-colors font-medium text-[15px]" inputMode="numeric" value={val} placeholder={t('exempt.add')}
             onChange={(e) => setVal(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && add()} />
           <button className="w-full flex items-center justify-center gap-2 py-3 bg-gradient-to-r from-red-600 to-red-500 hover:from-red-500 hover:to-red-400 text-white shadow-[0_4px_20px_-4px_rgba(220,38,38,0.5)] rounded-xl font-bold transition-all active:scale-95  text-[15px]" onClick={add}><Plus size={16} /></button>

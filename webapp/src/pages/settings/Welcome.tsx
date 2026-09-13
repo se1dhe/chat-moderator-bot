@@ -44,7 +44,7 @@ export default function Welcome({ s, t }) {
         {fileId && (
           <div className="flex items-center gap-2">
             <div className="text-[13px] text-neutral-500 leading-snug text-emerald-500">{t('welcome.media.uploaded')}</div>
-            <button className="w-full flex items-center justify-center gap-2 py-3 bg-neutral-200 dark:bg-neutral-800 text-neutral-900 dark:text-neutral-100 rounded-xl font-bold transition-all active:scale-95 text-[15px] px-2.5 py-1 text-xs" onClick={() => s.setSection('welcome_file_id', null)}>{t('common.delete') || 'Delete'}</button>
+            <button className="shrink-0 flex items-center justify-center gap-1.5 px-3 py-1.5 bg-neutral-200 dark:bg-neutral-800 text-neutral-900 dark:text-neutral-100 rounded-lg font-bold transition-all active:scale-95 text-[12px]" onClick={() => s.setSection('welcome_file_id', null)}>{t('common.delete') || 'Delete'}</button>
           </div>
         )}
         <input 
