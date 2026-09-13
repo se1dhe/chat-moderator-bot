@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { ShieldCheck, Check, Ban, Ruler, ShieldAlert } from 'lucide-react';
 import { useLang } from '../context/LangContext';
+import { useChatSettings } from '../context/ChatSettingsContext';
 import { api } from '../lib/api';
 import { Spinner } from '../components/ui';
 import { haptic } from '../lib/telegram';
@@ -12,12 +13,20 @@ export function Quarantine() {
   const [items, setItems] = useState<any[] | null>(null);
   const [busy, setBusy] = useState<number | null>(null);
 
+  const { badges, clearQuarantineBadge } = useChatSettings();
+
   useEffect(() => {
     let alive = true;
     if (!cid) return;
-    api.quarantine(cid).then((d) => alive && setItems(d)).catch(() => alive && setItems([]));
+    
+    // Auto-reload items when live SSE increments the badge
+    api.quarantine(cid).then((d) => {
+      if (alive) setItems(d);
+      if (badges.quarantine > 0) clearQuarantineBadge();
+    }).catch(() => alive && setItems([]));
+    
     return () => { alive = false; };
-  }, [cid]);
+  }, [cid, badges.quarantine, clearQuarantineBadge]);
 
   const decide = async (vid: number, action: string) => {
     setBusy(vid);

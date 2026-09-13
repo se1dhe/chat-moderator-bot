@@ -28,6 +28,7 @@ interface ChatSettingsContextType {
   pro: boolean;
   badges: { quarantine: number; audit: number };
   clearAuditBadge: () => void;
+  clearQuarantineBadge: () => void;
   loadBilling: () => void;
   openUpgrade: () => Promise<string | null>;
   openPresetPayment: (presetId: string) => Promise<string | null>;
@@ -74,6 +75,10 @@ export function ChatSettingsProvider({ chatId, children }: { chatId: number; chi
     localStorage.setItem(`lastSeenActions_${chatId}`, totalActions.toString());
     setBadges(b => ({ ...b, audit: 0 }));
   }, [chatId, totalActions]);
+
+  const clearQuarantineBadge = useCallback(() => {
+    setBadges(b => ({ ...b, quarantine: 0 }));
+  }, []);
 
 
   const draftRef = useRef<ChatSettingsData | null>(null);
@@ -225,8 +230,8 @@ export function ChatSettingsProvider({ chatId, children }: { chatId: number; chi
   const pro = !!billing?.pro;
   const value: ChatSettingsContextType = useMemo(() => ({
     chatId, saved, draft, saving, error, updateSection, setSection, reload: load,
-    billing, pro, badges, clearAuditBadge, loadBilling, openUpgrade, openPresetPayment,
-  }), [chatId, saved, draft, saving, error, updateSection, setSection, load, billing, pro, badges, clearAuditBadge, loadBilling, openUpgrade, openPresetPayment]);
+    billing, pro, badges, clearAuditBadge, clearQuarantineBadge, loadBilling, openUpgrade, openPresetPayment,
+  }), [chatId, saved, draft, saving, error, updateSection, setSection, load, billing, pro, badges, clearAuditBadge, clearQuarantineBadge, loadBilling, openUpgrade, openPresetPayment]);
 
   return (
     <Ctx.Provider value={value}>
