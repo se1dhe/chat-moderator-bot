@@ -29,7 +29,7 @@ export const LOCALES: Record<Locales, LocaleDict> = {
     'tips.captcha': 'Enable Captcha to block bots.',
     'tips.antiflood': 'Enable Anti-Flood to reduce spam.',
     'tips.ai': 'Enable AI moderation for smart filtering.',
-    'tips.raid': 'Anti-Raid is off, your group is vulnerable.',
+    'tips.defcon': 'Auto-DEFCON is off, your group is vulnerable to spam spikes.',
     'tips.filters': 'Set up filters to block unwanted content.',
     'tips.quarantine': 'You have pending messages in Quarantine.',
 
@@ -243,7 +243,7 @@ export const LOCALES: Record<Locales, LocaleDict> = {
     'triggers.btn.delete': 'Delete',
 
     'sec.raid': 'Anti-Raid',
-    'sec.raid.desc': 'Lockdown on massive join spikes',
+    'sec.defcon.desc': 'Lockdown on massive join spikes',
     'sec.warns': 'Warns',
     'sec.warns.desc': 'Strike system for violations',
     'sec.ai': 'AI Core',
@@ -382,7 +382,7 @@ export const LOCALES: Record<Locales, LocaleDict> = {
     'tips.captcha': 'Включите Капчу для защиты от ботов.',
     'tips.antiflood': 'Включите Антифлуд, чтобы уменьшить спам.',
     'tips.ai': 'Включите модерацию ИИ для умной фильтрации.',
-    'tips.raid': 'Анти-Рейд выключен, ваша группа уязвима.',
+    'tips.defcon': 'Auto-DEFCON выключен, ваша группа уязвима для атак.',
     'tips.filters': 'Настройте фильтры для блокировки контента.',
     'tips.quarantine': 'У вас есть новые сообщения в Карантине.',
 
@@ -596,7 +596,7 @@ export const LOCALES: Record<Locales, LocaleDict> = {
     'triggers.btn.delete': 'Удалить',
 
     'sec.raid': 'Анти-Рейд',
-    'sec.raid.desc': 'Блокировка при массовых вступлениях',
+    'sec.defcon.desc': 'Блокировка при спам-атаках',
     'sec.warns': 'Варны',
     'sec.warns.desc': 'Система страйков за нарушения',
     'sec.ai': 'ИИ Ядро',
@@ -726,7 +726,7 @@ export const LOCALES: Record<Locales, LocaleDict> = {
     'tips.captcha': 'Увімкніть Капчу для захисту від ботів.',
     'tips.antiflood': 'Увімкніть Антифлуд, щоб зменшити спам.',
     'tips.ai': 'Увімкніть модерацію ШІ для розумної фільтрації.',
-    'tips.raid': 'Анти-Рейд вимкнений, ваша група вразлива.',
+    'tips.defcon': 'Auto-DEFCON вимкнено, ваша група вразлива для атак.',
     'tips.filters': 'Налаштуйте фільтри для блокування контенту.',
     'tips.quarantine': 'У вас є нові повідомлення в Карантині.',
 
@@ -940,7 +940,7 @@ export const LOCALES: Record<Locales, LocaleDict> = {
     'triggers.btn.delete': 'Видалити',
 
     'sec.raid': 'Анти-Рейд',
-    'sec.raid.desc': 'Блокування при масових вступах',
+    'sec.defcon.desc': 'Блокування при спам-атаках',
     'sec.warns': 'Варни',
     'sec.warns.desc': 'Система страйков за порушення',
     'sec.ai': 'ШІ Ядро',

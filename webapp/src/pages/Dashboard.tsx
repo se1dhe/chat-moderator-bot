@@ -53,7 +53,7 @@ export function Dashboard() {
       items: [
         { key: 'rbac', icon: ShieldAlert, title: t('sec.rbac'), desc: t('sec.rbac.desc'), on: true },
         { key: 'captcha', icon: ShieldCheck, title: t('sec.captcha'), desc: t('sec.captcha.desc'), on: draft.captcha.enabled },
-        { key: 'raid', icon: Siren, title: t('sec.raid'), desc: t('sec.raid.desc'), on: draft.raid.enabled, pro: true },
+        { key: 'defcon', icon: Siren, title: t('sec.defcon'), desc: t('sec.defcon.desc'), on: draft.defcon?.enabled, pro: true },
         { key: 'warns', icon: AlertTriangle, title: t('sec.warns'), desc: t('sec.warns.desc'), on: true, state: `${draft.core.warn_limit} → ${t(`action.${draft.core.warn_action}`)}` },
       ],
     },

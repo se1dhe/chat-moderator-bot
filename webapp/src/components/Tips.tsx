@@ -11,7 +11,7 @@ function buildTips(d: any, stats: any) {
   if (!d.antiflood.enabled) tips.push('tips.antiflood');
   if (d.core.ai_mode === 'off') tips.push('tips.ai');
   else tips.push(null);
-  if (!d.raid.enabled) tips.push('tips.raid');
+  if (!d.defcon?.enabled) tips.push('tips.defcon');
   if (!f.block_links && f.banned_words.length === 0 && f.blocked_media.length === 0) tips.push('tips.filters');
   if (stats && stats.pending_quarantine > 0) tips.push('tips.quarantine');
   return tips.filter(Boolean);
