@@ -23,7 +23,7 @@ async def _send_webhook(url: str, payload: dict) -> None:
         pass
 
 async def _fire_webhook(session: AsyncSession, chat_id: int, action: str, user_id: int, actor_id: int, reason: str | None = None) -> None:
-    settings = await session.scalar(sa.select(repo.ChatSettings).where(repo.ChatSettings.chat_telegram_id == chat_id))
+    settings = await repo.get_settings(session, chat_id)
     if not settings or not settings.data:
         return
     url = settings.data.get("webhook_url")
