@@ -44,6 +44,8 @@ async def run() -> None:
         raise SystemExit("BOT_TOKEN is not set. Copy .env.example to .env and fill it in.")
 
     init_engine(settings.sqlalchemy_dsn)
+    from .db.base import create_all
+    await create_all()
     redis = create_redis(settings)
 
     # AI deps are shared across every brand bot in this process.

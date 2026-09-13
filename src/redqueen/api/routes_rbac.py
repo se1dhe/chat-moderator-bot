@@ -11,7 +11,7 @@ async def get_moderators(request: web.Request) -> web.Response:
     cid = int(request.match_info["cid"])
     await require_chat_admin(request, cid)
     
-    session_maker = request.app["db_session_maker"]
+    session_maker = request.app["sessionmaker"]
     async with session_maker() as session:
         mods_data = await repo.get_chat_moderators(session, cid)
         
@@ -34,7 +34,7 @@ async def add_moderator(request: web.Request) -> web.Response:
     
     data = await request.json()
     
-    session_maker = request.app["db_session_maker"]
+    session_maker = request.app["sessionmaker"]
     async with session_maker() as session:
         user_id = data.get("user_id")
         
@@ -68,7 +68,7 @@ async def remove_moderator(request: web.Request) -> web.Response:
     uid = int(request.match_info["uid"])
     await require_chat_admin(request, cid)
     
-    session_maker = request.app["db_session_maker"]
+    session_maker = request.app["sessionmaker"]
     async with session_maker() as session:
         await repo.remove_chat_moderator(session, cid, uid)
         await session.commit()

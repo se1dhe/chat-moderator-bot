@@ -37,7 +37,6 @@ function Header() {
       )}
       <div>
         <div className="title" style={{ whiteSpace: 'nowrap' }}>{t('app.title')}</div>
-        {!section && <div className="subtitle">{t('app.subtitle')}</div>}
       </div>
       <div className="header-spacer" />
       {section ? <SaveHint /> : null}
