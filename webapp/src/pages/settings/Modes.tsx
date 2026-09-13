@@ -13,12 +13,17 @@ export default function Modes({ s, t }) {
         <Row title={t('modes.night')}>
           <Toggle checked={m.night.enabled} onChange={(v) => s.updateSection('modes', { night: { ...m.night, enabled: v } })} />
         </Row>
-        <Row title={t('modes.nightRange')} value={`${m.night.start}:00 – ${m.night.end}:00`}>
-          <div className="flex gap-2">
-            <Stepper value={m.night.start} min={0} max={23} onChange={(v) => s.updateSection('modes', { night: { ...m.night, start: v } })} />
-            <Stepper value={m.night.end} min={0} max={23} onChange={(v) => s.updateSection('modes', { night: { ...m.night, end: v } })} />
+        <div className="flex flex-col gap-3 px-2 py-3 border-t border-neutral-100 dark:border-neutral-800/50 mt-1">
+          <div className="flex justify-between items-center w-full">
+            <span className="text-sm font-semibold text-neutral-900 dark:text-neutral-50 leading-tight">{t('modes.nightRange')}</span>
+            <span className="text-sm font-medium text-neutral-400 shrink-0">{m.night.start}:00 – {m.night.end}:00</span>
           </div>
-        </Row>
+          <div className="flex gap-2 w-full items-center justify-between">
+            <div className="flex-1 flex justify-center"><Stepper value={m.night.start} min={0} max={23} onChange={(v) => s.updateSection('modes', { night: { ...m.night, start: v } })} /></div>
+            <span className="text-neutral-400 font-bold">—</span>
+            <div className="flex-1 flex justify-center"><Stepper value={m.night.end} min={0} max={23} onChange={(v) => s.updateSection('modes', { night: { ...m.night, end: v } })} /></div>
+          </div>
+        </div>
       </div>
       <div className="bg-white dark:bg-[#0a0a0a] border border-neutral-200 dark:border-neutral-800/60 rounded-2xl p-2 mb-4 shadow-sm w-full">
         <Row title={t('settings.crossChatTitle')} desc={t('settings.crossChatDesc')}>
