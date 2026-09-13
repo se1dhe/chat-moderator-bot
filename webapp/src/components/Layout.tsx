@@ -41,7 +41,7 @@ function Header() {
       )}
       
       <div className="flex-1 min-w-0">
-        <h1 className="text-lg font-bold truncate text-neutral-900 dark:text-white tracking-tight dark:drop-shadow-[0_2px_10px_rgba(0,0,0,1)]">
+        <h1 className={`text-lg font-bold truncate text-neutral-900 dark:text-white tracking-tight dark:drop-shadow-[0_2px_10px_rgba(0,0,0,1)] ${isTelegram ? 'hidden sm:block' : ''}`}>
           {t('app.title')}
         </h1>
       </div>

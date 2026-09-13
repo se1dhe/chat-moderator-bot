@@ -87,11 +87,8 @@ export default function RBAC({ chatId }) {
         </div>
 
         <div className="flex gap-2 relative">
-          <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
-            <span className="text-neutral-400 font-medium">@</span>
-          </div>
           <input 
-            className="w-full pl-8 pr-4 py-3 bg-neutral-50 dark:bg-black border border-neutral-200 dark:border-neutral-800/60 rounded-xl focus:outline-none focus:border-primary/50 transition-colors font-medium text-[15px] shadow-inner"
+            className="w-full px-4 py-3 bg-neutral-50 dark:bg-black border border-neutral-200 dark:border-neutral-800/60 rounded-xl focus:outline-none focus:border-primary/50 transition-colors font-medium text-[15px] shadow-inner"
             placeholder={t('rbac_username_placeholder') || 'username'}
             value={usernameInput}
             onChange={(e) => setUsernameInput(e.target.value)}
