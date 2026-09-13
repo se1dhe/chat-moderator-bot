@@ -65,8 +65,8 @@ export function LiveFeed({ standalone = false }: { standalone?: boolean }) {
   }
 
   return (
-    <div className={`relative overflow-hidden w-full ${standalone ? 'h-[400px]' : 'h-[360px] bg-white dark:bg-neutral-900 rounded-2xl border border-neutral-200 dark:border-neutral-800'}`}>
-      <div className="absolute top-0 left-0 right-0 p-3 bg-white/90 dark:bg-neutral-900/90 backdrop-blur-md z-10 border-b border-neutral-200 dark:border-neutral-800 flex items-center gap-2 text-[13px] font-bold text-neutral-500 uppercase tracking-wider">
+    <div className={`relative overflow-hidden w-full ${standalone ? 'h-[400px]' : 'h-[360px] bg-white dark:bg-[#0a0a0a] rounded-2xl border border-neutral-200 dark:border-neutral-800/60/60/60/60'}`}>
+      <div className="absolute top-0 left-0 right-0 p-3 bg-white/90 dark:bg-neutral-900/90 backdrop-blur-md z-10 border-b border-neutral-200 dark:border-neutral-800/60/60/60/60 flex items-center gap-2 text-[13px] font-bold text-neutral-500 uppercase tracking-wider">
         <div className="w-2 h-2 rounded-full bg-red-500 shadow-[0_0_8px_#ef4444] animate-pulse" />
         {t('live.feedTitle')}
       </div>
@@ -80,9 +80,9 @@ export function LiveFeed({ standalone = false }: { standalone?: boolean }) {
               animate={{ opacity: 1, x: 0, scale: 1 }}
               exit={{ opacity: 0, scale: 0.9 }}
               transition={{ type: "spring", stiffness: 400, damping: 25 }}
-              className="flex items-start gap-3 p-3 bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-neutral-800 rounded-xl"
+              className="flex items-start gap-3 p-3 bg-neutral-50 dark:bg-black border border-neutral-200 dark:border-neutral-800/60/60/60/60 rounded-xl"
             >
-              <div className="mt-0.5 shrink-0 bg-white dark:bg-neutral-900 p-2 rounded-full border border-neutral-200 dark:border-neutral-800 shadow-sm">
+              <div className="mt-0.5 shrink-0 bg-white dark:bg-[#0a0a0a] p-2 rounded-full border border-neutral-200 dark:border-neutral-800/60/60/60/60 shadow-sm">
                 {getIcon(ev.action)}
               </div>
               <div className="flex-1 min-w-0 flex flex-col">

@@ -6,7 +6,7 @@ export function Preloader() {
 
   return (
     <motion.div 
-      className="fixed inset-0 z-[999] bg-neutral-50 dark:bg-neutral-950 flex flex-col items-center justify-center"
+      className="fixed inset-0 z-[999] bg-neutral-50 dark:bg-black flex flex-col items-center justify-center"
       initial={{ opacity: 1 }}
       exit={{ opacity: 0, scale: 1.1, filter: 'blur(10px)' }}
       transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}

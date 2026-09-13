@@ -32,13 +32,13 @@ export function OnboardingWizard() {
         {t('ob.desc.1')}
       </p>
       
-      <div className="w-full bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-2xl p-2 mb-8 shadow-sm text-left">
+      <div className="w-full bg-white dark:bg-[#0a0a0a] border border-neutral-200 dark:border-neutral-800/60/60/60/60 rounded-2xl p-2 mb-8 shadow-sm text-left">
         <Row title={t('ob.card.1')} desc={t('ob.card.1.sub')}>
           <Toggle checked={draft.antiflood.enabled} onChange={v => updateSection('antiflood', { enabled: v })} />
         </Row>
       </div>
 
-      <button className="w-full py-3.5 bg-primary hover:bg-primary-dark text-white rounded-xl font-bold transition-all active:scale-95 text-base" onClick={next}>{t('ob.btn.continue')}</button>
+      <button className="w-full py-3.5 bg-gradient-to-r from-red-600 to-red-500 hover:from-red-500 hover:to-red-400 text-white shadow-[0_4px_20px_-4px_rgba(220,38,38,0.5)] rounded-xl font-bold transition-all active:scale-95 text-base" onClick={next}>{t('ob.btn.continue')}</button>
     </div>
   );
 
@@ -52,7 +52,7 @@ export function OnboardingWizard() {
         {t('ob.desc.2')}
       </p>
       
-      <div className="w-full bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-2xl p-2 mb-8 shadow-sm text-left flex flex-col gap-1">
+      <div className="w-full bg-white dark:bg-[#0a0a0a] border border-neutral-200 dark:border-neutral-800/60/60/60/60 rounded-2xl p-2 mb-8 shadow-sm text-left flex flex-col gap-1">
         <Row title={t('ob.card.2')} desc={t('ob.card.2.sub')}>
           <Toggle checked={draft.core.ai_mode !== 'off'} onChange={v => updateSection('core', { ai_mode: v ? 'quarantine' : 'off' })} />
         </Row>
@@ -61,7 +61,7 @@ export function OnboardingWizard() {
         </Row>
       </div>
 
-      <button className="w-full py-3.5 bg-primary hover:bg-primary-dark text-white rounded-xl font-bold transition-all active:scale-95 text-base" onClick={next}>{t('ob.btn.continue')}</button>
+      <button className="w-full py-3.5 bg-gradient-to-r from-red-600 to-red-500 hover:from-red-500 hover:to-red-400 text-white shadow-[0_4px_20px_-4px_rgba(220,38,38,0.5)] rounded-xl font-bold transition-all active:scale-95 text-base" onClick={next}>{t('ob.btn.continue')}</button>
     </div>
   );
 
@@ -95,7 +95,7 @@ export function OnboardingWizard() {
           <div className="text-emerald-500 font-bold mb-8 flex items-center gap-2 text-lg">
             <Check size={24} /> {t('ob.pro.unlocked')}
           </div>
-          <button className="w-full py-3.5 bg-primary hover:bg-primary-dark text-white rounded-xl font-bold transition-all active:scale-95 text-base" onClick={finish}>{t('ob.btn.finish')}</button>
+          <button className="w-full py-3.5 bg-gradient-to-r from-red-600 to-red-500 hover:from-red-500 hover:to-red-400 text-white shadow-[0_4px_20px_-4px_rgba(220,38,38,0.5)] rounded-xl font-bold transition-all active:scale-95 text-base" onClick={finish}>{t('ob.btn.finish')}</button>
         </div>
       )}
     </div>

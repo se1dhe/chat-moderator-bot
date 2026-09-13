@@ -1,5 +1,6 @@
 import { useEffect, useState, useCallback, useRef } from 'react';
 import { useParams } from 'react-router-dom';
+import { motion, AnimatePresence } from 'framer-motion';
 import { Users, Search, TriangleAlert, VolumeX, Volume2, UserMinus, Ban, RotateCcw } from 'lucide-react';
 import { useLang } from '../context/LangContext';
 import { api } from '../lib/api';
@@ -91,7 +92,7 @@ export function Members() {
             <Search size={18} className="text-neutral-400" />
           </div>
           <input 
-            className="w-full pl-10 pr-4 py-3 bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all font-medium text-[15px]" 
+            className="w-full pl-10 pr-4 py-3 bg-white dark:bg-[#0a0a0a] border border-neutral-200 dark:border-neutral-800/60 rounded-xl focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all font-medium text-[15px]" 
             value={q} 
             placeholder={t('members.search')}
             onChange={(e) => setQ(e.target.value)} 
@@ -108,12 +109,13 @@ export function Members() {
             <p className="text-sm font-medium">{t('members.empty')}</p>
           </div>
         ) : (
-          rows.map((m) => {
+          <AnimatePresence>
+          {rows.map((m) => {
             const acts = actionsFor(m.state);
             const showDuration = acts.some((k) => META[k].duration);
             const sel = durs[m.user_id] ?? 60;
             return (
-              <div key={m.user_id} className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-2xl shadow-sm p-4 w-full flex flex-col gap-3">
+              <motion.div layout initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.9, height: 0 }} key={m.user_id} className="bg-white dark:bg-[#0a0a0a] border border-neutral-200 dark:border-neutral-800/60 rounded-2xl shadow-sm p-4 w-full flex flex-col gap-3">
                 <div className="flex items-start justify-between min-w-0">
                   <div className="flex flex-col min-w-0 pr-2">
                     <div className="flex items-center gap-2 mb-0.5 flex-wrap">
@@ -134,7 +136,7 @@ export function Members() {
                 </div>
 
                 <input
-                  className="w-full px-3 py-2 bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-neutral-800 rounded-lg text-[13px] focus:outline-none focus:border-primary/50 transition-colors"
+                  className="w-full px-3 py-2 bg-neutral-50 dark:bg-black border border-neutral-200 dark:border-neutral-800/60 rounded-lg text-[13px] focus:outline-none focus:border-primary/50 transition-colors"
                   value={reasons[m.user_id] || ''}
                   placeholder={t('members.reason')}
                   onChange={(e) => setReasons((r) => ({ ...r, [m.user_id]: e.target.value }))}
@@ -170,9 +172,10 @@ export function Members() {
                     );
                   })}
                 </div>
-              </div>
+              </motion.div>
             );
-          })
+          })}
+          </AnimatePresence>
         )}
       </div>
     </div>

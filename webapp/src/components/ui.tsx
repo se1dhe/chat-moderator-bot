@@ -59,7 +59,7 @@ export function Segmented({ options, value, onChange, onLocked }: { options: any
             onClick={() => { haptic('light'); if (o.locked) { onLocked?.(o); return; } onChange(o.value); }}
           >
             {active && (
-              <div className="absolute inset-0 bg-white dark:bg-neutral-900 rounded-lg shadow-sm -z-10" />
+              <div className="absolute inset-0 bg-white dark:bg-[#0a0a0a] rounded-lg shadow-sm -z-10" />
             )}
             {o.locked && <Lock size={12} className="mr-1 opacity-70" />}
             {o.label}

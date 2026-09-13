@@ -9,7 +9,7 @@ export default function Modes({ s, t }) {
   return (
     <>
       <div className="text-sm font-semibold text-neutral-500 uppercase tracking-wider ml-1 mt-4 mb-2">{t('modes.night')}</div>
-      <div className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-2xl p-2 mb-4 shadow-sm w-full">
+      <div className="bg-white dark:bg-[#0a0a0a] border border-neutral-200 dark:border-neutral-800/60/60/60/60 rounded-2xl p-2 mb-4 shadow-sm w-full">
         <Row title={t('modes.night')}>
           <Toggle checked={m.night.enabled} onChange={(v) => s.updateSection('modes', { night: { ...m.night, enabled: v } })} />
         </Row>
@@ -20,7 +20,7 @@ export default function Modes({ s, t }) {
           </div>
         </Row>
       </div>
-      <div className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-2xl p-2 mb-4 shadow-sm w-full">
+      <div className="bg-white dark:bg-[#0a0a0a] border border-neutral-200 dark:border-neutral-800/60/60/60/60 rounded-2xl p-2 mb-4 shadow-sm w-full">
         <Row title={t('settings.crossChatTitle')} desc={t('settings.crossChatDesc')}>
           <Toggle checked={m.use_global_bans || false} onChange={(v) => s.updateSection('modes', { use_global_bans: v })} />
         </Row>

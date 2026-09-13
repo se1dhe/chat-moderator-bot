@@ -36,7 +36,7 @@ export function ProBanner() {
       onClick={upgrade} 
       disabled={busy}
     >
-      <Sparkles size={24} className="text-primary shrink-0" />
+      <Sparkles size={24} className="text-primary shrink-0 drop-shadow-[0_0_8px_rgba(220,38,38,0.5)] drop-shadow-[0_0_8px_rgba(220,38,38,0.5)] drop-shadow-[0_0_8px_rgba(220,38,38,0.5)] drop-shadow-[0_0_8px_rgba(220,38,38,0.5)]" />
       <div className="flex-1 min-w-0">
         <div className="font-bold text-neutral-900 dark:text-neutral-50 text-sm">{busy ? t('pro.opening') : t('pro.upgrade')}</div>
         <div className="text-[11px] text-neutral-500 mt-0.5 leading-tight">{t('pro.pitch')}</div>

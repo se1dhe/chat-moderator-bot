@@ -39,7 +39,7 @@ export class ErrorBoundary extends React.Component<Props, State> {
       const t = (k: string) => LOCALES[lang][k] || k;
 
       return (
-        <div className="min-h-screen w-full flex flex-col items-center justify-center p-6 bg-neutral-50 dark:bg-neutral-950 text-neutral-900 dark:text-neutral-50 text-center">
+        <div className="min-h-screen w-full flex flex-col items-center justify-center p-6 bg-neutral-50 dark:bg-black text-neutral-900 dark:text-neutral-50 text-center">
           <div className="w-20 h-20 bg-red-500/10 rounded-full flex items-center justify-center mb-6">
             <AlertTriangle size={40} className="text-red-500" />
           </div>
@@ -51,7 +51,7 @@ export class ErrorBoundary extends React.Component<Props, State> {
             {this.state.error?.toString()}
           </div>
           <button 
-            className="flex items-center gap-2 px-6 py-3.5 bg-primary hover:bg-primary-dark text-white rounded-xl font-bold transition-all active:scale-95 shadow-lg shadow-primary/20" 
+            className="flex items-center gap-2 px-6 py-3.5 bg-gradient-to-r from-red-600 to-red-500 hover:from-red-500 hover:to-red-400 text-white shadow-[0_4px_20px_-4px_rgba(220,38,38,0.5)] rounded-xl font-bold transition-all active:scale-95 shadow-lg shadow-primary/20" 
             onClick={this.handleReload}
           >
             <RefreshCcw size={18} /> {t('error.reload')}

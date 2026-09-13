@@ -19,7 +19,7 @@ export default function Raid({ s, t }) {
         </button>
       )}
       {r.locked && (
-        <div className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-2xl p-4 mb-4 shadow-sm w-full flex items-center gap-3">
+        <div className="bg-white dark:bg-[#0a0a0a] border border-neutral-200 dark:border-neutral-800/60/60/60/60 rounded-2xl p-4 mb-4 shadow-sm w-full flex items-center gap-3">
           <span className="px-2 py-0.5 bg-red-100 text-red-700 dark:bg-red-500/20 dark:text-red-400 rounded-md text-[11px] font-bold uppercase tracking-wider inline-flex items-center gap-1"><Lock size={12} /> {t('raid.locked')}</span>
           <div className="header-spacer" />
           <button className="w-full flex items-center justify-center gap-2 py-3 bg-red-500 hover:bg-red-600 text-white rounded-xl font-bold transition-all active:scale-95 shadow-md shadow-red-500/20 text-[15px]" onClick={() => { haptic('warning'); s.updateSection('raid', { locked: false }) }}>
@@ -28,7 +28,7 @@ export default function Raid({ s, t }) {
         </div>
       )}
       <div className="text-sm font-semibold text-neutral-500 uppercase tracking-wider ml-1 mt-4 mb-2">{t('sec.raid')}</div>
-      <div className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-2xl p-2 mb-4 shadow-sm w-full">
+      <div className="bg-white dark:bg-[#0a0a0a] border border-neutral-200 dark:border-neutral-800/60/60/60/60 rounded-2xl p-2 mb-4 shadow-sm w-full">
         <Row title={t('raid.enabled')}>
           <Toggle checked={r.enabled && !locked} disabled={locked} onDisabledClick={() => s.openUpgrade()}
             onChange={(v) => s.updateSection('raid', { enabled: v })} />

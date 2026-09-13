@@ -31,11 +31,11 @@ export default function AI({ s, t }) {
         ]} />
         
       {(core.ai_provider && core.ai_provider !== 'ollama') && (
-        <div className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-2xl p-2 mb-4 shadow-sm w-full mt-3 flex flex-col gap-2">
+        <div className="bg-white dark:bg-[#0a0a0a] border border-neutral-200 dark:border-neutral-800/60/60/60/60 rounded-2xl p-2 mb-4 shadow-sm w-full mt-3 flex flex-col gap-2">
           <div className="px-4 py-3">
             <div className="text-[13px] font-semibold mb-1">{t('settings.apiKey')} {core.ai_has_key && t('settings.apiKeySaved')}</div>
             <input 
-              className="w-full px-4 py-3 bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-neutral-800 rounded-xl focus:outline-none focus:border-primary/50 transition-colors font-medium text-[15px]" 
+              className="w-full px-4 py-3 bg-neutral-50 dark:bg-black border border-neutral-200 dark:border-neutral-800/60/60/60/60 rounded-xl focus:outline-none focus:border-primary/50 transition-colors font-medium text-[15px]" 
               type="password"
               placeholder={core.ai_has_key ? "••••••••••••••••" : t('settings.enterApiKey')}
               onChange={(e) => s.updateSection('core', { ai_api_key: e.target.value })}
@@ -45,7 +45,7 @@ export default function AI({ s, t }) {
           <div className="px-4 pb-3">
             <div className="text-[13px] font-semibold mb-1">{t('settings.model')}</div>
             <input 
-              className="w-full px-4 py-3 bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-neutral-800 rounded-xl focus:outline-none focus:border-primary/50 transition-colors font-medium text-[15px]" 
+              className="w-full px-4 py-3 bg-neutral-50 dark:bg-black border border-neutral-200 dark:border-neutral-800/60/60/60/60 rounded-xl focus:outline-none focus:border-primary/50 transition-colors font-medium text-[15px]" 
               type="text"
               placeholder={t('settings.modelPlaceholder')}
               value={core.ai_model || ''}
@@ -57,12 +57,12 @@ export default function AI({ s, t }) {
       )}
 
       <div className="text-sm font-semibold text-neutral-500 uppercase tracking-wider ml-1 mt-4 mb-2">{t('ai.threshold')} · {core.ai_threshold}%</div>
-      <div className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-2xl p-4 mb-4 shadow-sm w-full">
+      <div className="bg-white dark:bg-[#0a0a0a] border border-neutral-200 dark:border-neutral-800/60/60/60/60 rounded-2xl p-4 mb-4 shadow-sm w-full">
         <Slider value={core.ai_threshold} min={0} max={100} step={5} onChange={(v) => s.updateSection('core', { ai_threshold: v })} />
       </div>
 
       <div className="text-sm font-semibold text-neutral-500 uppercase tracking-wider ml-1 mt-4 mb-2">{t('ai.perCategory')}</div>
-      <div className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-2xl p-4 mb-4 shadow-sm w-full flex flex-col gap-3">
+      <div className="bg-white dark:bg-[#0a0a0a] border border-neutral-200 dark:border-neutral-800/60/60/60/60 rounded-2xl p-4 mb-4 shadow-sm w-full flex flex-col gap-3">
         {CATEGORIES.map((cat) => {
           const val = ai.thresholds[cat] ?? core.ai_threshold
           const overridden = cat in ai.thresholds
@@ -82,7 +82,7 @@ export default function AI({ s, t }) {
       </div>
 
       <div className="text-sm font-semibold text-neutral-500 uppercase tracking-wider ml-1 mt-4 mb-2">{t('ai.maxPerMinute')}</div>
-      <div className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-2xl p-2 mb-4 shadow-sm w-full">
+      <div className="bg-white dark:bg-[#0a0a0a] border border-neutral-200 dark:border-neutral-800/60/60/60/60 rounded-2xl p-2 mb-4 shadow-sm w-full">
         <Row title={t('ai.maxPerMinute')} value={ai.max_per_minute}>
           <Stepper value={ai.max_per_minute} min={1} max={600} step={1} onChange={(v) => s.updateSection('ai', { max_per_minute: v })} />
         </Row>

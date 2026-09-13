@@ -60,7 +60,7 @@ export function WhatsNewModal() {
   const current = slides[slide];
 
   return (
-    <div className="fixed inset-0 z-[100] bg-neutral-50 dark:bg-neutral-950 flex flex-col animate-in fade-in duration-300">
+    <div className="fixed inset-0 z-[100] bg-neutral-50 dark:bg-black flex flex-col animate-in fade-in duration-300">
       <div className="flex-1 flex flex-col items-center justify-center p-6 text-center relative overflow-hidden">
         
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-primary/5 rounded-full blur-3xl pointer-events-none"></div>
@@ -100,7 +100,7 @@ export function WhatsNewModal() {
         </div>
       </div>
 
-      <div className="p-4 bg-white/80 dark:bg-neutral-900/80 backdrop-blur-md pb-safe border-t border-neutral-200 dark:border-neutral-800">
+      <div className="p-4 bg-white/80 dark:bg-black/70 backdrop-blur-xl pb-safe border-t border-neutral-200 dark:border-neutral-800/60/60/60/60">
         <div className="flex gap-3 max-w-md mx-auto">
           {slide > 0 && (
             <button 

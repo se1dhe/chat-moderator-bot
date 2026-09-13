@@ -26,7 +26,7 @@ function Header() {
   const cycle: Record<string, string> = { en: 'ru', ru: 'uk', uk: 'en' };
 
   return (
-    <header className="sticky top-0 z-40 w-full flex items-center h-14 px-4 bg-white/80 dark:bg-neutral-900/80 backdrop-blur-md border-b border-neutral-200 dark:border-neutral-800">
+    <header className="sticky top-0 z-40 w-full flex items-center h-14 px-4 bg-white/80 dark:bg-black/70 backdrop-blur-xl border-b border-neutral-200 dark:border-neutral-800/60/60/60/60">
       {section && !isTelegram ? (
         <button 
           className="p-2 -ml-2 text-neutral-900 dark:text-neutral-50 hover:bg-neutral-100 dark:hover:bg-neutral-800 rounded-full transition-colors"
@@ -35,13 +35,13 @@ function Header() {
           <ChevronLeft size={24} />
         </button>
       ) : (
-        <div className="w-8 h-8 rounded-full overflow-hidden shrink-0 border border-neutral-200 dark:border-neutral-800 mr-3">
+        <div className="w-8 h-8 rounded-full overflow-hidden shrink-0 border border-neutral-200 dark:border-neutral-800/60/60/60/60 mr-3">
           <img src="/app/logo.jpg" alt="Logo" className="w-full h-full object-cover" />
         </div>
       )}
       
       <div className="flex-1 min-w-0">
-        <h1 className="text-lg font-bold truncate text-neutral-900 dark:text-neutral-50 tracking-tight">
+        <h1 className="text-lg font-bold truncate text-neutral-900 dark:text-white tracking-tight dark:drop-shadow-[0_2px_10px_rgba(0,0,0,1)]">
           {t('app.title')}
         </h1>
       </div>
@@ -72,7 +72,7 @@ function Nav({ cid }: { cid: string }) {
   ];
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-40 bg-white/90 dark:bg-neutral-900/90 backdrop-blur-lg border-t border-neutral-200 dark:border-neutral-800 pb-safe">
+    <nav className="fixed bottom-0 left-0 right-0 z-40 bg-white/90 dark:bg-black/80 backdrop-blur-2xl border-t border-neutral-200 dark:border-neutral-800/60/60/60/60 pb-safe">
       <div className="max-w-md mx-auto w-full flex items-center justify-between px-2 h-16">
         {items.map((it) => (
           <NavLink 
@@ -107,7 +107,7 @@ export function Layout() {
 
   return (
     <ChatSettingsProvider chatId={Number(cid)}>
-      <div className="w-full max-w-md mx-auto min-h-screen flex flex-col bg-neutral-50 dark:bg-neutral-950 text-neutral-900 dark:text-neutral-50 overflow-x-hidden relative">
+      <div className="w-full max-w-md mx-auto min-h-screen flex flex-col bg-neutral-50 dark:bg-black text-neutral-900 dark:text-neutral-50 overflow-x-hidden relative">
         <Header />
         
         <main className="flex-1 w-full overflow-y-auto pb-24 pt-4 px-4 flex flex-col relative">

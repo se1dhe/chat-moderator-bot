@@ -28,7 +28,7 @@ export default function AutoComment({ s, t }) {
   return (
     <>
       <div className="text-sm font-semibold text-neutral-500 uppercase tracking-wider ml-1 mt-4 mb-2">{t('sec.autocomment')}</div>
-      <div className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-2xl p-2 mb-4 shadow-sm w-full">
+      <div className="bg-white dark:bg-[#0a0a0a] border border-neutral-200 dark:border-neutral-800/60/60/60/60 rounded-2xl p-2 mb-4 shadow-sm w-full">
         <Row title={t('sec.autocomment.enable')} subtitle={t('sec.autocomment.enable.desc')}>
           <Toggle checked={c.enabled} onChange={(v) => s.updateSection('auto_comment', { enabled: v })} />
         </Row>
@@ -37,7 +37,7 @@ export default function AutoComment({ s, t }) {
       {c.enabled && (
         <>
           <div className="text-sm font-semibold text-neutral-500 uppercase tracking-wider ml-1 mt-4 mb-2">{t('sec.autocomment.text')}</div>
-          <div className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-2xl p-4 mb-4 shadow-sm w-full">
+          <div className="bg-white dark:bg-[#0a0a0a] border border-neutral-200 dark:border-neutral-800/60/60/60/60 rounded-2xl p-4 mb-4 shadow-sm w-full">
             <textarea 
               className="w-full bg-transparent border-none outline-none text-[var(--tg-theme-text-color)] resize-none"
               rows={4}
@@ -47,7 +47,7 @@ export default function AutoComment({ s, t }) {
             />
           </div>
           <div className="text-sm font-semibold text-neutral-500 uppercase tracking-wider ml-1 mt-4 mb-2">{t('sec.autocomment.media')}</div>
-          <div className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-2xl p-4 mb-4 shadow-sm w-full flex items-center justify-between">
+          <div className="bg-white dark:bg-[#0a0a0a] border border-neutral-200 dark:border-neutral-800/60/60/60/60 rounded-2xl p-4 mb-4 shadow-sm w-full flex items-center justify-between">
             <div className="text-[13px] text-[var(--tg-theme-hint-color)] truncate mr-3">
               {c.media_url ? t('common.mediaAttached') : t('common.noMedia')}
             </div>

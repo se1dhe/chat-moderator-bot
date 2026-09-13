@@ -95,26 +95,26 @@ export function Stats() {
     <div className="w-full flex flex-col gap-5 animate-in fade-in slide-in-from-bottom-2 duration-300 mt-2">
       <div className="text-sm font-semibold text-neutral-500 uppercase tracking-wider ml-1">{t('stats.title')}</div>
       <div className="grid grid-cols-2 gap-3 w-full">
-        <div className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-2xl p-4 flex flex-col justify-center shadow-sm">
+        <div className="bg-white dark:bg-[#0a0a0a] border border-neutral-200 dark:border-neutral-800/60/60/60/60 rounded-2xl p-4 flex flex-col justify-center shadow-sm">
           <div className="text-2xl font-black text-neutral-900 dark:text-neutral-50">{total}</div>
           <div className="text-xs font-semibold text-neutral-500 uppercase tracking-wide mt-1">{t('stats.total')}</div>
         </div>
-        <div className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-2xl p-4 flex flex-col justify-center shadow-sm">
+        <div className="bg-white dark:bg-[#0a0a0a] border border-neutral-200 dark:border-neutral-800/60/60/60/60 rounded-2xl p-4 flex flex-col justify-center shadow-sm">
           <div className={`text-2xl font-black ${data.pending_quarantine ? 'text-amber-500' : 'text-neutral-900 dark:text-neutral-50'}`}>{data.pending_quarantine}</div>
           <div className="text-xs font-semibold text-neutral-500 uppercase tracking-wide mt-1">{t('stats.pending')}</div>
         </div>
-        <div className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-2xl p-4 flex flex-col justify-center shadow-sm">
+        <div className="bg-white dark:bg-[#0a0a0a] border border-neutral-200 dark:border-neutral-800/60/60/60/60 rounded-2xl p-4 flex flex-col justify-center shadow-sm">
           <div className="text-2xl font-black text-neutral-900 dark:text-neutral-50">{data.members || 0}</div>
           <div className="text-xs font-semibold text-neutral-500 uppercase tracking-wide mt-1">{t('stats.members')}</div>
         </div>
-        <div className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-2xl p-4 flex flex-col justify-center shadow-sm">
+        <div className="bg-white dark:bg-[#0a0a0a] border border-neutral-200 dark:border-neutral-800/60/60/60/60 rounded-2xl p-4 flex flex-col justify-center shadow-sm">
           <div className="text-2xl font-black text-neutral-900 dark:text-neutral-50">{cats.reduce((n, [, v]) => n + v, 0)}</div>
           <div className="text-xs font-semibold text-neutral-500 uppercase tracking-wide mt-1">{t('stats.categories')}</div>
         </div>
       </div>
 
       <div className="text-sm font-semibold text-neutral-500 uppercase tracking-wider ml-1 mt-2">{t('stats.last14')}</div>
-      <div className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-2xl p-4 shadow-sm w-full">
+      <div className="bg-white dark:bg-[#0a0a0a] border border-neutral-200 dark:border-neutral-800/60/60/60/60 rounded-2xl p-4 shadow-sm w-full">
         <div className="flex items-end gap-1 h-28">
           {days.map((d) => (
             <div className="flex-1 flex flex-col items-center gap-1 h-full justify-end group" key={d.key} title={`${d.key}: ${d.count}`}>
@@ -131,7 +131,7 @@ export function Stats() {
       {cats.length > 0 && (
         <>
           <div className="text-sm font-semibold text-neutral-500 uppercase tracking-wider ml-1 mt-2">{t('stats.categories')}</div>
-          <div className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-2xl p-4 shadow-sm w-full flex flex-col gap-3">
+          <div className="bg-white dark:bg-[#0a0a0a] border border-neutral-200 dark:border-neutral-800/60/60/60/60 rounded-2xl p-4 shadow-sm w-full flex flex-col gap-3">
             {cats.map(([cat, n]) => (
               <div key={cat} className="flex items-center gap-3 w-full">
                 <span className="w-20 text-xs font-medium text-neutral-600 dark:text-neutral-400 capitalize truncate">
@@ -150,7 +150,7 @@ export function Stats() {
       {actions.length > 0 ? (
         <>
           <div className="text-sm font-semibold text-neutral-500 uppercase tracking-wider ml-1 mt-2">{t('stats.actions')}</div>
-          <div className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-2xl p-4 shadow-sm w-full flex flex-col gap-3">
+          <div className="bg-white dark:bg-[#0a0a0a] border border-neutral-200 dark:border-neutral-800/60/60/60/60 rounded-2xl p-4 shadow-sm w-full flex flex-col gap-3">
             {actions.map(([action, n]) => (
               <div key={action} className="flex items-center gap-3 w-full">
                 <span className="w-20 text-xs font-medium text-neutral-600 dark:text-neutral-400 capitalize truncate">

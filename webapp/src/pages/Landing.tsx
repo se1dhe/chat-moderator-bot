@@ -34,13 +34,13 @@ export function Landing() {
   ];
 
   return (
-    <div className="min-h-screen bg-neutral-50 dark:bg-neutral-950 text-neutral-900 dark:text-neutral-50 font-sans selection:bg-primary/20">
+    <div className="min-h-screen bg-neutral-50 dark:bg-black text-neutral-900 dark:text-neutral-50 font-sans selection:bg-primary/20">
       
       {/* Header */}
-      <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${scrolled ? 'bg-white/80 dark:bg-neutral-900/80 backdrop-blur-md shadow-sm border-b border-neutral-200 dark:border-neutral-800 py-3' : 'bg-transparent py-5'}`}>
+      <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${scrolled ? 'bg-white/80 dark:bg-black/70 backdrop-blur-xl shadow-sm border-b border-neutral-200 dark:border-neutral-800/60/60/60/60 py-3' : 'bg-transparent py-5'}`}>
         <div className="max-w-7xl mx-auto px-6 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl overflow-hidden shadow-sm border border-neutral-200 dark:border-neutral-800">
+            <div className="w-10 h-10 rounded-xl overflow-hidden shadow-sm border border-neutral-200 dark:border-neutral-800/60/60/60/60">
               <img src="/app/logo.jpg" alt="Logo" className="w-full h-full object-cover" />
             </div>
             <span className="text-xl font-black tracking-tight">RedQueen</span>
@@ -109,7 +109,7 @@ export function Landing() {
           </p>
           
           <div className="flex flex-col sm:flex-row items-center gap-4 animate-in slide-in-from-bottom-7 w-full sm:w-auto">
-            <a href="https://t.me/se1dhe_bot" className="w-full sm:w-auto px-8 py-4 bg-primary hover:bg-primary-dark text-white rounded-2xl font-bold text-lg flex items-center justify-center gap-2 transition-all hover:scale-105 active:scale-95 shadow-xl shadow-primary/20">
+            <a href="https://t.me/se1dhe_bot" className="w-full sm:w-auto px-8 py-4 bg-gradient-to-r from-red-600 to-red-500 hover:from-red-500 hover:to-red-400 text-white shadow-[0_4px_20px_-4px_rgba(220,38,38,0.5)] rounded-2xl font-bold text-lg flex items-center justify-center gap-2 transition-all hover:scale-105 active:scale-95 shadow-xl shadow-primary/20">
               {t('landing.hero.cta')} <ArrowRight size={20} />
             </a>
             <a href="#live" className="w-full sm:w-auto px-8 py-4 bg-neutral-200 dark:bg-neutral-800 text-neutral-900 dark:text-white rounded-2xl font-bold text-lg hover:bg-neutral-300 dark:hover:bg-neutral-700 transition-colors text-center">
@@ -119,19 +119,19 @@ export function Landing() {
 
           {/* Stats */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-12 mt-24 w-full max-w-4xl animate-in slide-in-from-bottom-8">
-            <div className="flex flex-col items-center p-6 rounded-3xl bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 shadow-sm">
+            <div className="flex flex-col items-center p-6 rounded-3xl bg-white dark:bg-[#0a0a0a] border border-neutral-200 dark:border-neutral-800/60/60/60/60 shadow-sm">
               <div className="text-4xl md:text-5xl font-black text-neutral-900 dark:text-white mb-2 font-mono">
                 {stats.protected_chats.toLocaleString()}
               </div>
               <div className="text-sm font-bold text-neutral-500 uppercase tracking-wider">{t('landing.stats.chats')}</div>
             </div>
-            <div className="flex flex-col items-center p-6 rounded-3xl bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 shadow-sm">
+            <div className="flex flex-col items-center p-6 rounded-3xl bg-white dark:bg-[#0a0a0a] border border-neutral-200 dark:border-neutral-800/60/60/60/60 shadow-sm">
               <div className="text-4xl md:text-5xl font-black text-neutral-900 dark:text-white mb-2 font-mono">
                 {(stats.total_actions / 1000).toFixed(1)}K
               </div>
               <div className="text-sm font-bold text-neutral-500 uppercase tracking-wider">{t('landing.stats.actions')}</div>
             </div>
-            <div className="flex flex-col items-center p-6 rounded-3xl bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 shadow-sm">
+            <div className="flex flex-col items-center p-6 rounded-3xl bg-white dark:bg-[#0a0a0a] border border-neutral-200 dark:border-neutral-800/60/60/60/60 shadow-sm">
               <div className="text-4xl md:text-5xl font-black text-primary mb-2 font-mono">
                 {stats.ai_decisions.toLocaleString()}
               </div>
@@ -141,7 +141,7 @@ export function Landing() {
         </section>
 
         {/* Features */}
-        <section id="features" className="px-6 py-24 bg-white dark:bg-neutral-900 border-y border-neutral-200 dark:border-neutral-800">
+        <section id="features" className="px-6 py-24 bg-white dark:bg-[#0a0a0a] border-y border-neutral-200 dark:border-neutral-800/60/60/60/60">
           <div className="max-w-7xl mx-auto">
             <div className="text-center mb-16">
               <h3 className="text-4xl md:text-5xl font-black tracking-tight mb-4">{t('landing.features.title')}</h3>
@@ -155,7 +155,7 @@ export function Landing() {
                 { icon: Activity, title: t('landing.feat3.title'), desc: t('landing.feat3.desc') },
                 { icon: ShieldCheck, title: t('landing.feat4.title'), desc: t('landing.feat4.desc') }
               ].map((f, i) => (
-                <div key={i} className="bg-neutral-50 dark:bg-neutral-950 p-8 rounded-3xl border border-neutral-200 dark:border-neutral-800 hover:border-primary/30 transition-colors">
+                <div key={i} className="bg-neutral-50 dark:bg-black p-8 rounded-3xl border border-neutral-200 dark:border-neutral-800/60/60/60/60 hover:border-primary/30 transition-colors">
                   <div className="w-14 h-14 bg-primary/10 text-primary rounded-2xl flex items-center justify-center mb-6">
                     <f.icon size={28} />
                   </div>
@@ -178,7 +178,7 @@ export function Landing() {
               <p className="text-lg md:text-xl text-neutral-500 max-w-2xl mx-auto">{t('landing.live.desc')}</p>
             </div>
             
-            <div className="bg-white dark:bg-neutral-900 rounded-3xl overflow-hidden border border-neutral-200 dark:border-neutral-800 shadow-2xl shadow-primary/5">
+            <div className="bg-white dark:bg-[#0a0a0a] rounded-3xl overflow-hidden border border-neutral-200 dark:border-neutral-800/60/60/60/60 shadow-2xl shadow-primary/5">
               <LiveFeed standalone={true} />
             </div>
           </div>
@@ -194,7 +194,7 @@ export function Landing() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
             
             {/* Free */}
-            <div className="bg-white dark:bg-neutral-900 p-8 md:p-12 rounded-[2rem] border border-neutral-200 dark:border-neutral-800 shadow-sm flex flex-col">
+            <div className="bg-white dark:bg-[#0a0a0a] p-8 md:p-12 rounded-[2rem] border border-neutral-200 dark:border-neutral-800/60/60/60/60 shadow-sm flex flex-col">
               <h4 className="text-2xl font-bold mb-2 text-neutral-900 dark:text-white">{t('landing.price.free')}</h4>
               <p className="text-neutral-500 mb-8">{t('landing.price.free.desc')}</p>
               <div className="text-6xl font-black mb-10 text-neutral-900 dark:text-white font-mono">$0<span className="text-xl text-neutral-400 font-sans ml-2">{t('landing.price.month')}</span></div>
@@ -223,7 +223,7 @@ export function Landing() {
                 <li className="flex items-center gap-3 font-medium text-neutral-700 dark:text-neutral-300"><Check size={20} className="text-primary" /> {t('landing.plan.feat.priority')}</li>
               </ul>
               
-              <a href="https://t.me/se1dhe_bot" className="w-full py-4 text-center rounded-xl font-bold bg-primary hover:bg-primary-dark text-white shadow-lg shadow-primary/20 transition-transform active:scale-95">
+              <a href="https://t.me/se1dhe_bot" className="w-full py-4 text-center rounded-xl font-bold bg-gradient-to-r from-red-600 to-red-500 hover:from-red-500 hover:to-red-400 text-white shadow-[0_4px_20px_-4px_rgba(220,38,38,0.5)] shadow-lg shadow-primary/20 transition-transform active:scale-95">
                 {t('landing.plan.cta.pro')}
               </a>
             </div>
@@ -234,7 +234,7 @@ export function Landing() {
       </main>
 
       {/* Footer */}
-      <footer className="border-t border-neutral-200 dark:border-neutral-800 py-12 px-6 bg-white dark:bg-neutral-900">
+      <footer className="border-t border-neutral-200 dark:border-neutral-800/60/60/60/60 py-12 px-6 bg-white dark:bg-[#0a0a0a]">
         <div className="max-w-7xl mx-auto flex flex-col items-center gap-4">
           <div className="flex items-center gap-2">
             <img src="/app/logo.jpg" alt="Logo" className="w-6 h-6 rounded-md" />

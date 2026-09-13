@@ -57,18 +57,18 @@ export function ChatPicker() {
 
       {!state.loading && (
         <motion.div 
-          className="w-full max-w-md mx-auto min-h-screen flex flex-col bg-neutral-50 dark:bg-neutral-950 text-neutral-900 dark:text-neutral-50"
+          className="w-full max-w-md mx-auto min-h-screen flex flex-col bg-neutral-50 dark:bg-black text-neutral-900 dark:text-neutral-50"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4, ease: 'easeOut' }}
         >
-          <header className="sticky top-0 z-40 w-full flex items-center h-16 px-4 bg-white/80 dark:bg-neutral-900/80 backdrop-blur-md border-b border-neutral-200 dark:border-neutral-800">
-            <div className="w-10 h-10 rounded-full overflow-hidden shrink-0 border border-neutral-200 dark:border-neutral-800 mr-3">
+          <header className="sticky top-0 z-40 w-full flex items-center h-16 px-4 bg-white/80 dark:bg-black/70 backdrop-blur-xl border-b border-neutral-200 dark:border-neutral-800/60/60/60/60">
+            <div className="w-10 h-10 rounded-full overflow-hidden shrink-0 border border-neutral-200 dark:border-neutral-800/60/60/60/60 mr-3">
               <img src="/app/logo.jpg" alt="Logo" className="w-full h-full object-cover" />
             </div>
             
             <div className="flex-1 min-w-0">
-              <h1 className="text-lg font-bold truncate text-neutral-900 dark:text-neutral-50 tracking-tight leading-tight">
+              <h1 className="text-lg font-bold truncate text-neutral-900 dark:text-white tracking-tight leading-tight dark:drop-shadow-[0_2px_10px_rgba(0,0,0,1)]">
                 {t('app.title')}
               </h1>
               <p className="text-xs text-neutral-500 truncate">{t('app.subtitle')}</p>
@@ -108,7 +108,7 @@ export function ChatPicker() {
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: i * 0.05 }}
-                    className="w-full flex items-center p-4 bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-2xl shadow-sm hover:border-primary/30 dark:hover:border-primary/30 active:scale-[0.98] transition-all text-left" 
+                    className="w-full flex items-center p-4 bg-white dark:bg-[#0a0a0a] border border-neutral-200 dark:border-neutral-800/60/60/60/60 rounded-2xl shadow-sm hover:border-primary/30 dark:hover:border-primary/30 active:scale-[0.98] transition-all text-left" 
                     onClick={() => { haptic('light'); navigate(`/c/${c.id}`); }}
                   >
                     <div className="w-12 h-12 rounded-full overflow-hidden shrink-0 border border-neutral-100 dark:border-neutral-800 mr-4">
