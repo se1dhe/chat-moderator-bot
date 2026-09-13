@@ -10,6 +10,33 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from ..db import repo
 from . import trust
+import asyncio
+import aiohttp
+
+async def _send_webhook(url: str, payload: dict) -> None:
+    try:
+        async with aiohttp.ClientSession() as http_session:
+            await http_session.post(url, json=payload, timeout=5)
+    except Exception:
+        pass
+
+async def _fire_webhook(session: AsyncSession, chat_id: int, action: str, user_id: int, actor_id: int, reason: str | None = None) -> None:
+    settings = await session.scalar(sa.select(repo.ChatSettings).where(repo.ChatSettings.chat_telegram_id == chat_id))
+    if not settings or not settings.data:
+        return
+    url = settings.data.get("webhook_url")
+    if not url:
+        return
+    payload = {
+        "event": action,
+        "chat_id": chat_id,
+        "user_id": user_id,
+        "actor_id": actor_id,
+        "reason": reason,
+        "timestamp": datetime.utcnow().isoformat(),
+    }
+    asyncio.create_task(_send_webhook(url, payload))
+
 
 _MUTED_PERMISSIONS = ChatPermissions(
     can_send_messages=False,
@@ -69,6 +96,7 @@ async def ban(
         await session.execute(stmt)
     await repo.set_member_state(session, chat_id, user_id, state="banned")
     await trust.adjust(session, user_id, trust.BAN)
+    await _fire_webhook(session, chat_id, "ban", user_id, actor_id, reason)
 
 
 async def unban(
@@ -80,6 +108,7 @@ async def unban(
         action="unban",
     )
     await repo.set_member_state(session, chat_id, user_id, state="active")
+    await _fire_webhook(session, chat_id, "unban", user_id, actor_id)
 
 
 async def kick(
@@ -94,6 +123,7 @@ async def kick(
     )
     await repo.set_member_state(session, chat_id, user_id, state="active")
     await trust.adjust(session, user_id, trust.KICK)
+    await _fire_webhook(session, chat_id, "kick", user_id, actor_id, reason)
 
 
 async def mute(
@@ -111,6 +141,7 @@ async def mute(
     if reason != "captcha_pending":  # procedural quarantine, not a behavioral penalty
         await repo.set_member_state(session, chat_id, user_id, state="muted", muted_until=until)
         await trust.adjust(session, user_id, trust.MUTE)
+    await _fire_webhook(session, chat_id, "mute", user_id, actor_id, reason)
 
 
 async def unmute(
@@ -122,3 +153,5 @@ async def unmute(
         action="unmute",
     )
     await repo.set_member_state(session, chat_id, user_id, state="active", muted_until=None)
+    await _fire_webhook(session, chat_id, "unmute", user_id, actor_id)
+

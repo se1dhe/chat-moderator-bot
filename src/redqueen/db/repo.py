@@ -8,7 +8,7 @@ from sqlalchemy.dialects.postgresql import insert as pg_insert
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
-from .models import AIVerdict, BotInstance, Chat, ChatMember, ChatSettings, ModAction, User, Warn
+from .models import ChatModerator, AIVerdict, BotInstance, Chat, ChatMember, ChatSettings, ModAction, User, Warn
 
 
 async def get_or_create_chat(
@@ -412,3 +412,35 @@ async def verdict_category_counts(
         .group_by(AIVerdict.category)
     )
     return {cat: int(n) for cat, n in result.all()}
+
+async def get_chat_moderators(session: AsyncSession, chat_id: int):
+    result = await session.execute(
+        select(ChatModerator, ChatMember)
+        .join(ChatMember, (ChatModerator.chat_telegram_id == ChatMember.chat_telegram_id) & (ChatModerator.user_telegram_id == ChatMember.user_telegram_id))
+        .where(ChatModerator.chat_telegram_id == chat_id)
+    )
+    return result.all()
+
+async def add_chat_moderator(session: AsyncSession, chat_id: int, user_id: int, promoted_by: int):
+    stmt = pg_insert(ChatModerator).values(
+        chat_telegram_id=chat_id,
+        user_telegram_id=user_id,
+        promoted_by=promoted_by
+    ).on_conflict_do_nothing()
+    await session.execute(stmt)
+
+async def remove_chat_moderator(session: AsyncSession, chat_id: int, user_id: int):
+    from sqlalchemy import delete
+    await session.execute(
+        delete(ChatModerator)
+        .where(ChatModerator.chat_telegram_id == chat_id)
+        .where(ChatModerator.user_telegram_id == user_id)
+    )
+
+async def is_chat_moderator(session: AsyncSession, chat_id: int, user_id: int) -> bool:
+    result = await session.execute(
+        select(ChatModerator)
+        .where(ChatModerator.chat_telegram_id == chat_id)
+        .where(ChatModerator.user_telegram_id == user_id)
+    )
+    return result.scalar_one_or_none() is not None

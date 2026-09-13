@@ -51,14 +51,24 @@ def request_bot(request: web.Request) -> Bot:
 
 
 async def require_chat_admin(request: web.Request, chat_id: int) -> WebAppUser:
-    """Authenticated caller must be an administrator (or bot owner) of `chat_id`."""
+    """Authenticated caller must be an administrator (or bot owner) of `chat_id` or an explicitly granted ChatModerator."""
     user = await get_user(request)
     settings = request.app["settings"]
     if user.id in settings.owner_id_set:
         return user
+    
     is_admin = await roles.is_admin(
         request_bot(request), request.app["redis"], chat_id=chat_id, user_id=user.id
     )
-    if not is_admin:
-        raise web.HTTPForbidden(reason="not a chat administrator")
-    return user
+    if is_admin:
+        return user
+        
+    from sqlalchemy.ext.asyncio import AsyncSession
+    from ..db import repo
+    session_maker = request.app["db_session_maker"]
+    async with session_maker() as session:
+        is_mod = await repo.is_chat_moderator(session, chat_id, user.id)
+    if is_mod:
+        return user
+
+    raise web.HTTPForbidden(reason="not a chat administrator or moderator")

@@ -1,7 +1,7 @@
 import { useNavigate, useParams } from 'react-router-dom'
 import {
   ShieldCheck, Gauge, Filter, Moon, BrainCircuit, Siren, AlertTriangle, UserCheck,
-  ChevronRight, ServerCrash, Lock,
+  ChevronRight, ServerCrash, Lock, Shield,
 } from 'lucide-react'
 import { motion } from 'framer-motion'
 import { useLang } from '../context/LangContext'
@@ -46,6 +46,7 @@ export function Dashboard() {
     {
       label: t('dash.protection'),
       items: [
+        { key: 'rbac', icon: Shield, title: t('sec.rbac'), desc: t('sec.rbac.desc'), on: true },
         { key: 'captcha', icon: ShieldCheck, title: t('sec.captcha'), desc: t('sec.captcha.desc'), on: draft.captcha.enabled },
         { key: 'raid', icon: Siren, title: t('sec.raid'), desc: t('sec.raid.desc'), on: draft.raid.enabled, pro: true },
         { key: 'warns', icon: AlertTriangle, title: t('sec.warns'), desc: t('sec.warns.desc'), on: true, state: `${draft.core.warn_limit} → ${t(`action.${draft.core.warn_action}`)}` },

@@ -17,7 +17,8 @@ import Warns from './settings/Warns'
 import Exempt from './settings/Exempt'
 import AutoComment from './settings/AutoComment'
 import Welcome from './settings/Welcome'
-
+import Webhooks from './settings/Webhooks'
+import RBAC from './settings/RBAC'
 
 export function SettingsSection() {
   const { section } = useParams()
@@ -37,6 +38,8 @@ export function SettingsSection() {
     autocomment: <AutoComment s={s} t={t} />,
     triggers: <Triggers chatId={s.chatId} t={t} />,
     welcome: <Welcome s={s} t={t} />,
+    webhooks: <Webhooks s={s} t={t} />,
+    rbac: <RBAC chatId={s.chatId} />,
   }
   return <div className="content fade-in">{map[section] ?? null}</div>
 }

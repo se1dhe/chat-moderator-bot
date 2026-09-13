@@ -246,3 +246,16 @@ class GlobalBan(TimestampMixin, Base):
     admin_telegram_id: Mapped[int] = mapped_column(BigInteger)
     user_telegram_id: Mapped[int] = mapped_column(BigInteger)
     reason: Mapped[str | None] = mapped_column(String(255))
+class ChatModerator(TimestampMixin, Base):
+    """RBAC system: non-admin users explicitly granted TMA dashboard access by Chat Admins."""
+
+    __tablename__ = "chat_moderators"
+    __table_args__ = (
+        UniqueConstraint("chat_telegram_id", "user_telegram_id", name="uq_chat_moderator"),
+        Index("ix_chat_mods_chat", "chat_telegram_id"),
+    )
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    chat_telegram_id: Mapped[int] = mapped_column(BigInteger)
+    user_telegram_id: Mapped[int] = mapped_column(BigInteger)
+    promoted_by: Mapped[int] = mapped_column(BigInteger)

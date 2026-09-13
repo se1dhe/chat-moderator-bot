@@ -397,3 +397,6 @@ def setup_routes(app: web.Application) -> None:
     app.router.add_get("/api/chats/{cid}/triggers", get_triggers)
     app.router.add_post("/api/chats/{cid}/triggers", create_trigger)
     app.router.add_delete("/api/chats/{cid}/triggers/{tid}", delete_trigger)
+    
+    from .routes_rbac import routes as rbac_routes
+    app.router.add_routes(rbac_routes)

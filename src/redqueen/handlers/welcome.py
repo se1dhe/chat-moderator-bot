@@ -63,14 +63,32 @@ async def on_user_join(event: ChatMemberUpdated, session: AsyncSession) -> None:
         except Exception as e:
             log.error(f"Error checking global ban: {e}")
 
+    welcome_text = data.get("welcome_text", "")
+    welcome_file_id = data.get("welcome_file_id", "")
+
     # 2. Welcome Message
-    if welcome_message:
-        text = welcome_message.format(
-            name=user.full_name,
-            chat=event.chat.title
+    if welcome_text:
+        # Escape user name and chat title for MarkdownV2
+        import re
+        def esc(text: str) -> str:
+            return re.sub(r'([_*\[\]()~`>#\+\-=|{}.!])', r'\\\1', text)
+            
+        text = welcome_text.format(
+            name=esc(user.full_name),
+            chat=esc(event.chat.title)
         )
         try:
-            sent = await event.bot.send_message(event.chat.id, text, parse_mode="HTML")
+            if welcome_file_id:
+                try:
+                    sent = await event.bot.send_photo(event.chat.id, welcome_file_id, caption=text, parse_mode="MarkdownV2")
+                except Exception:
+                    try:
+                        sent = await event.bot.send_video(event.chat.id, welcome_file_id, caption=text, parse_mode="MarkdownV2")
+                    except Exception:
+                        sent = await event.bot.send_document(event.chat.id, welcome_file_id, caption=text, parse_mode="MarkdownV2")
+            else:
+                sent = await event.bot.send_message(event.chat.id, text, parse_mode="MarkdownV2")
+            
             # Auto delete after 5 minutes to keep chat clean
             asyncio.create_task(delete_later(sent, 300))
         except Exception as e:
