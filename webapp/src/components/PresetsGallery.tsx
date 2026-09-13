@@ -18,11 +18,11 @@ export function PresetsGallery() {
     
     switch (id) {
       case 'basic':
-        return a.enabled && a.messages === 5 && !c.enabled && !f.block_links && !d.enabled && core.ai_mode === 'off';
+        return a.enabled && a.limit === 5 && !c.enabled && !f.block_links && !d.enabled && core.ai_mode === 'off';
       case 'crypto':
-        return a.enabled && a.messages === 3 && c.enabled && f.block_links && d.enabled && d.action === 'strict' && core.ai_mode === 'autoban';
+        return a.enabled && a.limit === 3 && c.enabled && f.block_links && d.enabled && d.action === 'strict' && core.ai_mode === 'autoban';
       case 'corp':
-        return a.enabled && a.messages === 10 && !c.enabled && !f.block_links && d.enabled && d.action === 'read_only' && core.ai_mode === 'quarantine';
+        return a.enabled && a.limit === 10 && !c.enabled && !f.block_links && d.enabled && d.action === 'read_only' && core.ai_mode === 'quarantine';
       case 'chill':
         return !a.enabled && !c.enabled && !f.block_links && !d.enabled && core.ai_mode === 'off';
     }
@@ -38,7 +38,7 @@ export function PresetsGallery() {
       color: 'bg-emerald-500/10 text-emerald-600',
       pro: false,
       apply: () => {
-        setSection('antiflood', { enabled: true, messages: 5, window_seconds: 10 });
+        setSection('antiflood', { enabled: true, limit: 5, window: 10 });
         setSection('captcha', { enabled: false, mode: 'math', timeout_seconds: 60 });
         setSection('filters', { block_links: false, block_forwards: false, block_mentions: false, banned_words: [], blocked_media: [] });
         setSection('defcon', { enabled: false, threshold: 10, action: 'read_only', lock_seconds: 900 });
@@ -53,7 +53,7 @@ export function PresetsGallery() {
       color: 'bg-amber-500/10 text-amber-600',
       pro: true,
       apply: () => {
-        setSection('antiflood', { enabled: true, messages: 3, window_seconds: 15 });
+        setSection('antiflood', { enabled: true, limit: 3, window: 15 });
         setSection('captcha', { enabled: true, mode: 'math', timeout_seconds: 120 });
         setSection('filters', { block_links: true, block_forwards: true, block_mentions: true, banned_words: [], blocked_media: [] });
         setSection('defcon', { enabled: true, threshold: 5, action: 'strict', lock_seconds: 3600 });
@@ -69,7 +69,7 @@ export function PresetsGallery() {
       color: 'bg-blue-500/10 text-blue-600',
       pro: true,
       apply: () => {
-        setSection('antiflood', { enabled: true, messages: 10, window_seconds: 30 });
+        setSection('antiflood', { enabled: true, limit: 10, window: 30 });
         setSection('captcha', { enabled: false, mode: 'math', timeout_seconds: 60 });
         setSection('filters', { block_links: false, block_forwards: false, block_mentions: false, banned_words: [], blocked_media: [] });
         setSection('defcon', { enabled: true, threshold: 20, action: 'read_only', lock_seconds: 900 });
@@ -85,7 +85,7 @@ export function PresetsGallery() {
       color: 'bg-purple-500/10 text-purple-600',
       pro: false,
       apply: () => {
-        setSection('antiflood', { enabled: false, messages: 5, window_seconds: 10 });
+        setSection('antiflood', { enabled: false, limit: 5, window: 10 });
         setSection('captcha', { enabled: false, mode: 'math', timeout_seconds: 60 });
         setSection('filters', { block_links: false, block_forwards: false, block_mentions: false, banned_words: [], blocked_media: [] });
         setSection('defcon', { enabled: false, threshold: 10, action: 'read_only', lock_seconds: 900 });
