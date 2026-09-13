@@ -100,7 +100,7 @@ export function WhatsNewModal() {
         </div>
       </div>
 
-      <div className="p-4 bg-white/80 dark:bg-black/70 backdrop-blur-xl pb-safe border-t border-neutral-200 dark:border-neutral-800/60/60/60/60">
+      <div className="p-4 bg-white/80 dark:bg-black/70 backdrop-blur-xl pb-safe border-t border-neutral-200 dark:border-neutral-800/60">
         <div className="flex gap-3 max-w-md mx-auto">
           {slide > 0 && (
             <button 

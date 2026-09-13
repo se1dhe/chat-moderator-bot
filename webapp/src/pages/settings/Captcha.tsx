@@ -11,7 +11,7 @@ export default function Captcha({ s, t }) {
   return (
     <>
       <div className="text-sm font-semibold text-neutral-500 uppercase tracking-wider ml-1 mt-4 mb-2">{t('sec.captcha')}</div>
-      <div className="bg-white dark:bg-[#0a0a0a] border border-neutral-200 dark:border-neutral-800/60/60/60/60 rounded-2xl p-2 mb-4 shadow-sm w-full">
+      <div className="bg-white dark:bg-[#0a0a0a] border border-neutral-200 dark:border-neutral-800/60 rounded-2xl p-2 mb-4 shadow-sm w-full">
         <Row title={t('captcha.enabled')}>
           <Toggle checked={c.enabled} onChange={(v) => s.updateSection('captcha', { enabled: v })} />
         </Row>

@@ -26,7 +26,7 @@ function Header() {
   const cycle: Record<string, string> = { en: 'ru', ru: 'uk', uk: 'en' };
 
   return (
-    <header className="sticky top-0 z-40 w-full flex items-center h-14 px-4 bg-white/80 dark:bg-black/70 backdrop-blur-xl border-b border-neutral-200 dark:border-neutral-800/60/60/60/60">
+    <header className="sticky top-0 z-40 w-full flex items-center h-14 px-4 bg-white/80 dark:bg-black/70 backdrop-blur-xl border-b border-neutral-200 dark:border-neutral-800/60">
       {section && !isTelegram ? (
         <button 
           className="p-2 -ml-2 text-neutral-900 dark:text-neutral-50 hover:bg-neutral-100 dark:hover:bg-neutral-800 rounded-full transition-colors"
@@ -35,7 +35,7 @@ function Header() {
           <ChevronLeft size={24} />
         </button>
       ) : (
-        <div className="w-8 h-8 rounded-full overflow-hidden shrink-0 border border-neutral-200 dark:border-neutral-800/60/60/60/60 mr-3">
+        <div className="w-8 h-8 rounded-full overflow-hidden shrink-0 border border-neutral-200 dark:border-neutral-800/60 mr-3">
           <img src="/app/logo.jpg" alt="Logo" className="w-full h-full object-cover" />
         </div>
       )}
@@ -72,7 +72,7 @@ function Nav({ cid }: { cid: string }) {
   ];
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-40 bg-white/90 dark:bg-black/80 backdrop-blur-2xl border-t border-neutral-200 dark:border-neutral-800/60/60/60/60 pb-safe">
+    <nav className="fixed bottom-0 left-0 right-0 z-40 bg-white/90 dark:bg-black/80 backdrop-blur-2xl border-t border-neutral-200 dark:border-neutral-800/60 pb-safe">
       <div className="max-w-md mx-auto w-full flex items-center justify-between px-2 h-16">
         {items.map((it) => (
           <NavLink 
@@ -107,22 +107,11 @@ export function Layout() {
 
   return (
     <ChatSettingsProvider chatId={Number(cid)}>
-      <div className="w-full max-w-md mx-auto min-h-screen flex flex-col bg-neutral-50 dark:bg-black text-neutral-900 dark:text-neutral-50 overflow-x-hidden relative">
+      <div className="w-full max-w-md mx-auto min-h-screen flex flex-col bg-neutral-50 dark:bg-black text-neutral-900 dark:text-neutral-50 relative">
         <Header />
         
-        <main className="flex-1 w-full overflow-y-auto pb-24 pt-4 px-4 flex flex-col relative">
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={location.pathname}
-              initial={{ opacity: 0, scale: 0.98, y: 10 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.98, y: -10 }}
-              transition={{ duration: 0.25, ease: "easeOut" }}
-              className="flex-1 flex flex-col w-full min-h-0"
-            >
-              {outlet}
-            </motion.div>
-          </AnimatePresence>
+        <main className="flex-1 w-full  pb-24 pt-4 px-4 flex flex-col relative">
+          {outlet}
         </main>
 
         <Nav cid={cid} />

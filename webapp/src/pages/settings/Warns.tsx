@@ -16,7 +16,7 @@ export default function Warns({ s, t }) {
   return (
     <>
       <div className="text-sm font-semibold text-neutral-500 uppercase tracking-wider ml-1 mt-4 mb-2">{t('sec.warns')}</div>
-      <div className="bg-white dark:bg-[#0a0a0a] border border-neutral-200 dark:border-neutral-800/60/60/60/60 rounded-2xl p-2 mb-4 shadow-sm w-full">
+      <div className="bg-white dark:bg-[#0a0a0a] border border-neutral-200 dark:border-neutral-800/60 rounded-2xl p-2 mb-4 shadow-sm w-full">
         <Row title={t('warns.limit')} value={core.warn_limit}>
           <Stepper value={core.warn_limit} min={1} max={20} onChange={(v) => s.updateSection('core', { warn_limit: v })} />
         </Row>
@@ -30,7 +30,7 @@ export default function Warns({ s, t }) {
         ]} />
 
       {core.warn_action === 'mute' && (
-        <div className="bg-white dark:bg-[#0a0a0a] border border-neutral-200 dark:border-neutral-800/60/60/60/60 rounded-2xl p-2 mb-4 shadow-sm w-full mt-3">
+        <div className="bg-white dark:bg-[#0a0a0a] border border-neutral-200 dark:border-neutral-800/60 rounded-2xl p-2 mb-4 shadow-sm w-full mt-3">
           <Row title={t('warns.muteDuration')} value={muteMin <= 0 ? t('dur.perm') : `${muteMin} ${t('common.minutes')}`}>
             <Stepper value={muteMin} min={0} max={7 * DAY_MIN} step={30}
               onChange={(v) => s.updateSection('warns', { mute_seconds: v * 60 })} />
@@ -38,7 +38,7 @@ export default function Warns({ s, t }) {
         </div>
       )}
       {core.warn_action === 'ban' && (
-        <div className="bg-white dark:bg-[#0a0a0a] border border-neutral-200 dark:border-neutral-800/60/60/60/60 rounded-2xl p-2 mb-4 shadow-sm w-full mt-3">
+        <div className="bg-white dark:bg-[#0a0a0a] border border-neutral-200 dark:border-neutral-800/60 rounded-2xl p-2 mb-4 shadow-sm w-full mt-3">
           <Row title={t('warns.banDuration')} value={banMin <= 0 ? t('dur.perm') : `${banMin} ${t('common.minutes')}`}>
             <Stepper value={banMin} min={0} max={7 * DAY_MIN} step={60}
               onChange={(v) => s.updateSection('warns', { ban_seconds: v * 60 })} />

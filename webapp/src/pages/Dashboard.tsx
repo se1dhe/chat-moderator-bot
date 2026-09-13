@@ -103,7 +103,7 @@ export function Dashboard() {
 
       <div>
         <div className="text-sm font-semibold text-neutral-500 uppercase tracking-wider mb-2 ml-1">{t('dash.privacy')}</div>
-        <div className="bg-white dark:bg-[#0a0a0a] border border-neutral-200 dark:border-neutral-800/60/60/60/60 rounded-2xl p-4 shadow-sm">
+        <div className="bg-white dark:bg-[#0a0a0a] border border-neutral-200 dark:border-neutral-800/60 rounded-2xl p-4 shadow-sm">
           <Row title={t('dash.privacy')} desc={t('dash.privacy.desc')}>
             <Toggle 
               checked={draft.core.anonymize_events ?? false}
@@ -124,7 +124,7 @@ export function Dashboard() {
                   variants={item}
                   whileTap={{ scale: 0.97 }}
                   key={it.key}
-                  className="w-full flex items-center p-4 bg-white dark:bg-[#0a0a0a] border border-neutral-200 dark:border-neutral-800/60/60/60/60 rounded-2xl shadow-sm hover:border-primary/30 dark:hover:border-primary/30 active:bg-neutral-50 dark:active:bg-neutral-800 transition-all text-left group"
+                  className="w-full flex items-center p-4 bg-white dark:bg-[#0a0a0a] border border-neutral-200 dark:border-neutral-800/60 rounded-2xl shadow-sm hover:border-primary/30 dark:hover:border-primary/30 active:bg-neutral-50 dark:active:bg-neutral-800 transition-all text-left group"
                   onClick={() => {
                     haptic('light');
                     if (locked) openUpgrade();

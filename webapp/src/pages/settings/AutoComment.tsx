@@ -28,7 +28,7 @@ export default function AutoComment({ s, t }) {
   return (
     <>
       <div className="text-sm font-semibold text-neutral-500 uppercase tracking-wider ml-1 mt-4 mb-2">{t('sec.autocomment')}</div>
-      <div className="bg-white dark:bg-[#0a0a0a] border border-neutral-200 dark:border-neutral-800/60/60/60/60 rounded-2xl p-2 mb-4 shadow-sm w-full">
+      <div className="bg-white dark:bg-[#0a0a0a] border border-neutral-200 dark:border-neutral-800/60 rounded-2xl p-2 mb-4 shadow-sm w-full">
         <Row title={t('sec.autocomment.enable')} subtitle={t('sec.autocomment.enable.desc')}>
           <Toggle checked={c.enabled} onChange={(v) => s.updateSection('auto_comment', { enabled: v })} />
         </Row>
@@ -37,9 +37,9 @@ export default function AutoComment({ s, t }) {
       {c.enabled && (
         <>
           <div className="text-sm font-semibold text-neutral-500 uppercase tracking-wider ml-1 mt-4 mb-2">{t('sec.autocomment.text')}</div>
-          <div className="bg-white dark:bg-[#0a0a0a] border border-neutral-200 dark:border-neutral-800/60/60/60/60 rounded-2xl p-4 mb-4 shadow-sm w-full">
+          <div className="bg-white dark:bg-[#0a0a0a] border border-neutral-200 dark:border-neutral-800/60 rounded-2xl p-4 mb-4 shadow-sm w-full">
             <textarea 
-              className="w-full bg-transparent border-none outline-none text-[var(--tg-theme-text-color)] resize-none"
+              className="w-full bg-transparent border-none outline-none text-neutral-900 dark:text-neutral-50 resize-none"
               rows={4}
               placeholder={t('sec.autocomment.text.ph')}
               value={c.text}
@@ -47,11 +47,11 @@ export default function AutoComment({ s, t }) {
             />
           </div>
           <div className="text-sm font-semibold text-neutral-500 uppercase tracking-wider ml-1 mt-4 mb-2">{t('sec.autocomment.media')}</div>
-          <div className="bg-white dark:bg-[#0a0a0a] border border-neutral-200 dark:border-neutral-800/60/60/60/60 rounded-2xl p-4 mb-4 shadow-sm w-full flex items-center justify-between">
-            <div className="text-[13px] text-[var(--tg-theme-hint-color)] truncate mr-3">
+          <div className="bg-white dark:bg-[#0a0a0a] border border-neutral-200 dark:border-neutral-800/60 rounded-2xl p-4 mb-4 shadow-sm w-full flex items-center justify-between">
+            <div className="text-[13px] text-neutral-500 truncate mr-3">
               {c.media_url ? t('common.mediaAttached') : t('common.noMedia')}
             </div>
-            <label className={`px-4 py-2 bg-neutral-200 dark:bg-neutral-800 hover:bg-neutral-300 dark:hover:bg-neutral-700 text-neutral-900 dark:text-neutral-50 rounded-xl font-medium transition-colors px-3 py-1 text-[13px] whitespace-nowrap cursor-pointer ${uploading ? 'opacity-50' : ''}`}>
+            <label className={`px-4 py-2 bg-neutral-200 dark:bg-neutral-800 hover:bg-neutral-300 dark:hover:bg-neutral-700 text-neutral-900 dark:text-neutral-50 rounded-xl text-[13px] font-bold transition-colors whitespace-nowrap cursor-pointer ${uploading ? 'opacity-50' : ''}`}>
               {uploading ? t('common.uploading') : t('common.upload')}
               <input type="file" className="hidden" accept="image/*,video/mp4,image/gif" disabled={uploading} onChange={handleUpload} />
             </label>
@@ -63,7 +63,7 @@ export default function AutoComment({ s, t }) {
               </button>
             </div>
           )}
-          <p className="px-4 mt-2 text-[13px] text-[var(--tg-theme-hint-color)]">
+          <p className="px-4 mt-2 text-[13px] text-neutral-500">
             {t('sec.autocomment.media.desc')}
           </p>
         </>

@@ -55,7 +55,7 @@ export function Quarantine() {
 
       <div className="flex flex-col gap-3 w-full pb-4">
         {items.map((v) => (
-          <div key={v.id} className="p-4 bg-white dark:bg-[#0a0a0a] border border-neutral-200 dark:border-neutral-800/60/60 rounded-2xl shadow-sm flex flex-col gap-3 w-full relative overflow-hidden">
+          <div key={v.id} className="p-4 bg-white dark:bg-[#0a0a0a] border border-neutral-200 dark:border-neutral-800/60 rounded-2xl shadow-sm flex flex-col gap-3 w-full relative overflow-hidden">
             {v.score > 80 && (
               <div className="absolute top-0 right-0 w-16 h-16 bg-primary/5 rounded-bl-full pointer-events-none" />
             )}
@@ -75,7 +75,7 @@ export function Quarantine() {
             </div>
             
             {v.text && (
-              <div className="p-3 bg-neutral-50 dark:bg-black border border-neutral-200 dark:border-neutral-800/60/60 rounded-xl text-[13px] text-neutral-700 dark:text-neutral-300 break-words leading-relaxed">
+              <div className="p-3 bg-neutral-50 dark:bg-black border border-neutral-200 dark:border-neutral-800/60 rounded-xl text-[13px] text-neutral-700 dark:text-neutral-300 break-words leading-relaxed">
                 {v.text}
               </div>
             )}

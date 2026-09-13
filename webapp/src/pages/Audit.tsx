@@ -79,7 +79,7 @@ export function Audit() {
 
       <div className="flex flex-col gap-3 w-full pb-4">
         {logs!.map((log) => (
-          <div key={log.id} className="p-4 bg-white dark:bg-[#0a0a0a] border border-neutral-200 dark:border-neutral-800/60/60/60/60 rounded-2xl shadow-sm flex items-start gap-3 w-full">
+          <div key={log.id} className="p-4 bg-white dark:bg-[#0a0a0a] border border-neutral-200 dark:border-neutral-800/60 rounded-2xl shadow-sm flex items-start gap-3 w-full">
             <div className="mt-0.5 shrink-0">
               {log.action.includes('un') ? (
                 <CheckCircle2 size={20} className="text-emerald-500" />

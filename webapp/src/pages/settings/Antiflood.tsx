@@ -11,7 +11,7 @@ export default function Antiflood({ s, t }) {
   return (
     <>
       <div className="text-sm font-semibold text-neutral-500 uppercase tracking-wider ml-1 mt-4 mb-2">{t('sec.antiflood')}</div>
-      <div className="bg-white dark:bg-[#0a0a0a] border border-neutral-200 dark:border-neutral-800/60/60/60/60 rounded-2xl p-2 mb-4 shadow-sm w-full">
+      <div className="bg-white dark:bg-[#0a0a0a] border border-neutral-200 dark:border-neutral-800/60 rounded-2xl p-2 mb-4 shadow-sm w-full">
         <Row title={t('antiflood.enabled')}>
           <Toggle checked={a.enabled} onChange={(v) => s.updateSection('antiflood', { enabled: v })} />
         </Row>
@@ -33,7 +33,7 @@ export default function Antiflood({ s, t }) {
           { value: 'ban', label: t('action.ban') },
         ]} />
       {a.action === 'ban' && (
-        <div className="bg-white dark:bg-[#0a0a0a] border border-neutral-200 dark:border-neutral-800/60/60/60/60 rounded-2xl p-2 mb-4 shadow-sm w-full mt-3">
+        <div className="bg-white dark:bg-[#0a0a0a] border border-neutral-200 dark:border-neutral-800/60 rounded-2xl p-2 mb-4 shadow-sm w-full mt-3">
           <Row title={t('antiflood.banSeconds')}
             value={mins(a.ban_seconds) <= 0 ? t('dur.perm') : `${mins(a.ban_seconds)} ${t('common.minutes')}`}>
             <Stepper value={mins(a.ban_seconds)} min={0} max={7 * 1440} step={60}

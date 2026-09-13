@@ -32,7 +32,7 @@ export function OnboardingWizard() {
         {t('ob.desc.1')}
       </p>
       
-      <div className="w-full bg-white dark:bg-[#0a0a0a] border border-neutral-200 dark:border-neutral-800/60/60/60/60 rounded-2xl p-2 mb-8 shadow-sm text-left">
+      <div className="w-full bg-white dark:bg-[#0a0a0a] border border-neutral-200 dark:border-neutral-800/60 rounded-2xl p-2 mb-8 shadow-sm text-left">
         <Row title={t('ob.card.1')} desc={t('ob.card.1.sub')}>
           <Toggle checked={draft.antiflood.enabled} onChange={v => updateSection('antiflood', { enabled: v })} />
         </Row>
@@ -52,7 +52,7 @@ export function OnboardingWizard() {
         {t('ob.desc.2')}
       </p>
       
-      <div className="w-full bg-white dark:bg-[#0a0a0a] border border-neutral-200 dark:border-neutral-800/60/60/60/60 rounded-2xl p-2 mb-8 shadow-sm text-left flex flex-col gap-1">
+      <div className="w-full bg-white dark:bg-[#0a0a0a] border border-neutral-200 dark:border-neutral-800/60 rounded-2xl p-2 mb-8 shadow-sm text-left flex flex-col gap-1">
         <Row title={t('ob.card.2')} desc={t('ob.card.2.sub')}>
           <Toggle checked={draft.core.ai_mode !== 'off'} onChange={v => updateSection('core', { ai_mode: v ? 'quarantine' : 'off' })} />
         </Row>

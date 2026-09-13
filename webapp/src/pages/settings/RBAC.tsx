@@ -72,7 +72,7 @@ export default function RBAC({ chatId }) {
       animate={{ opacity: 1, y: 0 }}
       className="space-y-6"
     >
-      <div className="bg-white dark:bg-[#0a0a0a] border border-neutral-200 dark:border-neutral-800/60/60/60/60 rounded-2xl p-4 mb-4 shadow-sm w-full space-y-4">
+      <div className="bg-white dark:bg-[#0a0a0a] border border-neutral-200 dark:border-neutral-800/60 rounded-2xl p-4 mb-4 shadow-sm w-full space-y-4">
         
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-xl bg-primary/10 dark:bg-primary/20 flex items-center justify-center shrink-0">
@@ -91,7 +91,7 @@ export default function RBAC({ chatId }) {
             <span className="text-neutral-400 font-medium">@</span>
           </div>
           <input 
-            className="w-full pl-8 pr-4 py-3 bg-neutral-50 dark:bg-black border border-neutral-200 dark:border-neutral-800/60/60/60/60 rounded-xl focus:outline-none focus:border-primary/50 transition-colors font-medium text-[15px] shadow-inner"
+            className="w-full pl-8 pr-4 py-3 bg-neutral-50 dark:bg-black border border-neutral-200 dark:border-neutral-800/60 rounded-xl focus:outline-none focus:border-primary/50 transition-colors font-medium text-[15px] shadow-inner"
             placeholder={t('rbac_username_placeholder') || 'username'}
             value={usernameInput}
             onChange={(e) => setUsernameInput(e.target.value)}
@@ -113,7 +113,7 @@ export default function RBAC({ chatId }) {
         )}
       </div>
 
-      <div className="bg-white dark:bg-[#0a0a0a] border border-neutral-200 dark:border-neutral-800/60/60/60/60 rounded-2xl p-2 mb-4 shadow-sm w-full">
+      <div className="bg-white dark:bg-[#0a0a0a] border border-neutral-200 dark:border-neutral-800/60 rounded-2xl p-2 mb-4 shadow-sm w-full">
         <SectionLabel>{t('rbac_moderators_list') || 'МОДЕРАТОРЫ'}</SectionLabel>
         {mods.length === 0 ? (
           <div className="p-8 text-center flex flex-col items-center justify-center gap-2 text-neutral-400 dark:text-neutral-500">
