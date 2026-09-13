@@ -147,30 +147,11 @@ async def _act_on_verdict(message, bot, session, settings, verdict, t, *, flagge
             log.warning("autoban failed: %s", exc)
         return
 
-    card = t(
-        "AI_QUARANTINE_CARD",
-        name=message.from_user.full_name,
-        category=verdict.category,
-        score=verdict.score / 100,
-        reason=verdict.explanation,
-    )
-    markup = _decision_kb(row.id, t).as_markup()
+    
+    
 
     # 2. Send the quarantine card to the registered TMA moderators in PM
-    async def _notify_admins():
-        try:
-            from redqueen.db.repo import get_chat_moderators
-            mods = await get_chat_moderators(session, message.chat.id)
-            for mod, _ in mods:
-                try:
-                    await bot.send_message(mod.user_telegram_id, f"<b>Chat: {message.chat.title}</b>\n\n" + card, reply_markup=markup)
-                    await asyncio.sleep(0.1)  # Prevent FloodWait
-                except TelegramAPIError:
-                    pass  # Moderator hasn't started the bot in PM, ignore
-        except Exception as exc:
-            log.warning("Could not send quarantine card to moderators: %s", exc)
-            
-    asyncio.create_task(_notify_admins())
+    
 
 
 def _visual_source(message: Message):
