@@ -200,6 +200,9 @@ export const LOCALES = {
     'sec.filters.desc': 'Block links, forwards, bad words',
     'sec.modes': 'Restrictions',
     'sec.modes.desc': 'Night mode, read-only, slow mode',
+    'sec.triggers': 'Auto-Replies',
+    'sec.triggers.desc': 'Custom command triggers',
+
     'sec.raid': 'Anti-Raid',
     'sec.raid.desc': 'Lockdown on massive join spikes',
     'sec.warns': 'Warns',
@@ -478,6 +481,9 @@ export const LOCALES = {
     'sec.filters.desc': 'Блокировка ссылок, репостов, мата',
     'sec.modes': 'Ограничения',
     'sec.modes.desc': 'Ночной режим, только чтение, слоумод',
+    'sec.triggers': 'Авто-Ответы',
+    'sec.triggers.desc': 'Кастомные триггеры и команды',
+
     'sec.raid': 'Анти-Рейд',
     'sec.raid.desc': 'Блокировка при массовых вступлениях',
     'sec.warns': 'Варны',
@@ -756,6 +762,9 @@ export const LOCALES = {
     'sec.filters.desc': 'Блокування посилань, репостів, лайки',
     'sec.modes': 'Обмеження',
     'sec.modes.desc': 'Нічний режим, тільки читання, слоумод',
+    'sec.triggers': 'Авто-Відповіді',
+    'sec.triggers.desc': 'Кастомні тригери та команди',
+
     'sec.raid': 'Анти-Рейд',
     'sec.raid.desc': 'Блокування при масових вступах',
     'sec.warns': 'Варни',

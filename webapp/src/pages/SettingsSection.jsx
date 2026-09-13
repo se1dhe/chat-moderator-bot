@@ -6,6 +6,7 @@ import { useChatSettings } from '../context/ChatSettingsContext'
 import { Toggle, Row, Segmented, Stepper, Slider, Chips, Spinner } from '../components/ui'
 import { haptic, showAlert } from '../lib/telegram'
 import { api } from '../lib/api'
+import Triggers from './Triggers'
 
 const CATEGORIES = ['spam', 'scam', 'toxicity', 'nsfw', 'flood']
 

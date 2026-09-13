@@ -54,7 +54,7 @@ export function Dashboard() {
     {
       label: t('dash.content'),
       items: [
-        { key: "triggers", icon: ShieldCheck, title: "Auto-Replies", desc: "Custom command triggers", on: true },
+        { key: "triggers", icon: ShieldCheck, title: t('sec.triggers'), desc: t('sec.triggers.desc'), on: true },
         { key: "autocomment", icon: Filter, title: t('sec.autocomment'), desc: t('sec.autocomment.desc'), on: draft.auto_comment?.enabled, pro: true },
         { key: 'antiflood', icon: Gauge, title: t('sec.antiflood'), desc: t('sec.antiflood.desc'), on: draft.antiflood.enabled },
         { key: 'filters', icon: Filter, title: t('sec.filters'), desc: t('sec.filters.desc'), on: filtersOn },
