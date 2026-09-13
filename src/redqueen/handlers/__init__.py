@@ -14,7 +14,8 @@ from . import (
     modes,
     onboarding,
     payments,
-    raid,
+    defcon,
+    summary,
     welcome,
     triggers,
     settings,
@@ -34,7 +35,8 @@ def setup_routers(dp: Dispatcher) -> None:
     # modes/ai_review all observe the same message in turn (ai_review is the last,
     # catch-all stage).
     dp.include_router(captcha.router)
-    dp.include_router(raid.router)
+    dp.include_router(defcon.router)
+    dp.include_router(summary.router)
     dp.include_router(welcome.router)
     dp.include_router(triggers.router)
     dp.include_router(members.router)  # records the sender, then defers to the scanners

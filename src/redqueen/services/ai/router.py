@@ -85,6 +85,12 @@ class RouterProvider(AIProvider):
         provider = self._get_provider(chat_settings)
         return await provider.classify_image(image, caption=caption, lang=lang, chat_settings=chat_settings)
 
+    async def generate_text(self, prompt: str, chat_settings=None) -> str:
+        provider = self._get_provider(chat_settings)
+        if hasattr(provider, "generate_text"):
+            return await provider.generate_text(prompt, chat_settings=chat_settings)
+        return "Summary not supported."
+
     async def ensure_model(self) -> bool:
         if hasattr(self.ollama, "ensure_model"):
             return await self.ollama.ensure_model()

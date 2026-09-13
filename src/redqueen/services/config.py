@@ -45,6 +45,7 @@ DEFAULT_DATA: dict[str, Any] = {
         "text": "",
         "media_url": "",
     },
+    "log_channel_id": None,
     "onboarding": {
         "setup_completed": False,
         "welcome_message": "",
@@ -146,6 +147,7 @@ def full_view(settings: ChatSettings) -> dict[str, Any]:
         "defcon": {k: v for k, v in cfg["defcon"].items() if k != "active_until"}
         | {"active": bool(cfg["defcon"].get("active_until"))},
         "auto_comment": cfg["auto_comment"],
+        "log_channel_id": cfg.get("log_channel_id"),
         "onboarding": cfg["onboarding"],
         "exempt_user_ids": cfg["exempt_user_ids"],
     }
@@ -266,6 +268,11 @@ def apply_patch(settings: ChatSettings, patch: dict[str, Any]) -> dict[str, Any]
             "text": str(ac.get("text", cur["text"]))[:4000],
             "media_url": str(ac.get("media_url", cur["media_url"]))[:1000],
         }
+
+
+    if "log_channel_id" in patch:
+        val = patch["log_channel_id"]
+        cfg["log_channel_id"] = int(val) if val else None
 
     if "onboarding" in patch:
         ob, cur = patch["onboarding"], cfg["onboarding"]

@@ -325,11 +325,15 @@ async def on_decision(
         await query.answer(t("AI_VERDICT_NOT_FOUND"), show_alert=True)
         return
 
-    # Only admins may decide.
+    # Only admins or TMA moderators may decide.
     member = await bot.get_chat_member(verdict.chat_telegram_id, query.from_user.id)
-    if member.status not in {"administrator", "creator"}:
-        await query.answer(t("AI_ADMIN_REQUIRED"), show_alert=True)
-        return
+    is_admin = member.status in {"administrator", "creator"}
+    if not is_admin:
+        from redqueen.db.repo import is_chat_moderator
+        is_mod = await is_chat_moderator(session, verdict.chat_telegram_id, query.from_user.id)
+        if not is_mod:
+            await query.answer(t("AI_ADMIN_REQUIRED"), show_alert=True)
+            return
 
     await quarantine.decide(
         bot, session, verdict, actor_id=query.from_user.id, action=callback_data.action

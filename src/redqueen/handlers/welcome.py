@@ -4,7 +4,7 @@ import logging
 from aiogram import Router, F
 from aiogram.types import ChatMemberUpdated
 from aiogram.dispatcher.event.bases import SkipHandler
-from sqlalchemy import select
+from sqlalchemy import select, func
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from redqueen.db.models import ChatSettings, GlobalBan
@@ -39,20 +39,31 @@ async def on_user_join(event: ChatMemberUpdated, session: AsyncSession) -> None:
             admins = await event.chat.get_administrators()
             admin_ids = [a.user.id for a in admins]
             
-            # Check if user is in GlobalBans of any admin
+            # 1. Personal Network Ban (Current Admins)
             ban = await session.scalar(
                 select(GlobalBan).where(
                     GlobalBan.user_telegram_id == user.id,
                     GlobalBan.admin_telegram_id.in_(admin_ids)
                 ).limit(1)
             )
-            if ban:
-                log.info(f"User {user.id} banned globally by admin {ban.admin_telegram_id}")
+            
+            # 2. Network of Trust Ban (Cross-ecosystem)
+            not_bans = await session.scalar(
+                select(func.count(func.distinct(GlobalBan.admin_telegram_id))).where(
+                    GlobalBan.user_telegram_id == user.id,
+                    GlobalBan.admin_telegram_id.notin_(admin_ids)
+                )
+            ) or 0
+            
+            if ban or not_bans >= 3:
+                log.info(f"User {user.id} banned globally (Personal: {bool(ban)}, NoT: {not_bans})")
                 await event.chat.ban(user.id)
-                if ban.reason:
+                if ban and ban.reason:
                     msg = t(chat.lang, "GLOBAL_BANNED_REASON", name=user.full_name, reason=ban.reason)
-                else:
+                elif ban:
                     msg = t(chat.lang, "GLOBAL_BANNED", name=user.full_name)
+                else:
+                    msg = t(chat.lang, "NOT_BANNED", name=user.full_name, count=not_bans)
                 
                 try:
                     sent = await event.bot.send_message(event.chat.id, msg, parse_mode="HTML")

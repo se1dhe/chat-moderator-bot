@@ -42,5 +42,8 @@ class AIProvider(ABC):
         """Whether the provider is reachable/usable right now."""
         return True
 
+    async def generate_text(self, prompt: str, chat_settings=None) -> str:
+        return "Summary not supported on this provider."
+
     async def close(self) -> None:
         return None
