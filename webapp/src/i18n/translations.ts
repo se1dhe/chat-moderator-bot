@@ -3,6 +3,9 @@ export type Locales = 'en' | 'ru' | 'uk';
 
 export const LOCALES: Record<Locales, LocaleDict> = {
   en: {
+    'sec.rbac': 'Roles & Access',
+    'sec.rbac.desc': 'Panel access management',
+
     'rbac.title': 'Roles & Access',
     'rbac_fetch_error': 'Error loading moderators',
     'rbac_add_error': 'Error adding moderator',
