@@ -27,6 +27,7 @@ export function SettingsSection() {
     exempt: <Exempt s={s} t={t} />,
     autocomment: <AutoComment s={s} t={t} />,
     triggers: <Triggers chatId={s.chatId} t={t} />,
+    welcome: <Welcome s={s} t={t} />,
   }
   return <div className="content fade-in">{map[section] ?? null}</div>
 }
@@ -435,6 +436,26 @@ function AutoComment({ s, t }) {
           </p>
         </>
       )}
+    </>
+  )
+}
+
+function Welcome({ s, t }) {
+  const msg = s.draft.onboarding?.welcome_message || ''
+  return (
+    <>
+      <div className="section-label">{t('sec.welcome')}</div>
+      <div className="card card-pad" style={{ display: 'flex', flexDirection: 'column', gap: '0.8rem' }}>
+        <div className="row-desc">{t('welcome.desc')}</div>
+        <div style={{ fontWeight: 600, fontSize: '15px', marginTop: '0.5rem' }}>{t('welcome.text')}</div>
+        <textarea
+          className="input"
+          style={{ minHeight: '120px', resize: 'vertical' }}
+          value={msg}
+          placeholder={t('welcome.text.ph')}
+          onChange={(e) => s.updateSection('onboarding', { welcome_message: e.target.value })}
+        ></textarea>
+      </div>
     </>
   )
 }

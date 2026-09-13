@@ -53,7 +53,7 @@ async def ban(
     settings = await session.scalar(
         sa.select(repo.ChatSettings).where(repo.ChatSettings.chat_telegram_id == chat_id)
     )
-    if settings and settings.data.get("modes", {}).get("use_global_bans", False):
+    if settings and (settings.data or {}).get("modes", {}).get("use_global_bans", False):
         # Insert or update GlobalBan
         from redqueen.db.models import GlobalBan
         from sqlalchemy.dialects.postgresql import insert as pg_insert
