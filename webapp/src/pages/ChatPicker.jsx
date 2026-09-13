@@ -7,6 +7,7 @@ import { api } from '../lib/api'
 import { startParam, haptic } from '../lib/telegram'
 import { Preloader } from '../components/Preloader'
 import { GlobalOnboarding } from '../components/GlobalOnboarding'
+import { ThemeToggle } from '../components/ThemeToggle'
 
 const typeIcon = (type) => (type === 'channel' ? Megaphone : Users)
 
@@ -70,6 +71,7 @@ export function ChatPicker() {
         </div>
         <div className="header-spacer" />
         <button className="lang-toggle" onClick={() => { haptic('light'); setLang(cycle[lang]) }}>{lang}</button>
+        <ThemeToggle />
       </header>
 
       <div className="content no-nav">

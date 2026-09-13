@@ -6,12 +6,6 @@ export function initTelegram() {
   try {
     tg.ready()
     tg.expand()
-    // RedQueen keeps its own dark-red identity regardless of the client theme.
-    tg.setHeaderColor?.('#07070e')
-    tg.setBackgroundColor?.('#07070e')
-    if (tg.themeParams) {
-      tg.themeParams.bg_color = '#07070e';
-    }
     tg.disableVerticalSwipes?.()
   } catch { /* older clients */ }
 }

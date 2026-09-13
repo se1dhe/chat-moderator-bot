@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { useLang } from '../context/LangContext'
 import { ChatSettingsProvider, useChatSettings } from '../context/ChatSettingsContext'
 import { haptic } from '../lib/telegram'
+import { ThemeToggle } from './ThemeToggle'
 
 // Tiny in-flow autosave hint (no fixed bar → no scroll repaint glitch).
 function SaveHint() {
@@ -41,6 +42,7 @@ function Header() {
       <div className="header-spacer" />
       {section ? <SaveHint /> : null}
       <button className="lang-toggle" onClick={() => { haptic('light'); setLang(cycle[lang]) }}>{lang}</button>
+      <ThemeToggle />
     </header>
   )
 }
