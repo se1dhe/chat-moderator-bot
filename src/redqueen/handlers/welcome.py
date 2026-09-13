@@ -3,6 +3,7 @@ import asyncio
 import logging
 from aiogram import Router, F
 from aiogram.types import ChatMemberUpdated
+from aiogram.dispatcher.event.bases import SkipHandler
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -18,47 +19,49 @@ router = Router(name=__name__)
 async def on_user_join(event: ChatMemberUpdated, session: AsyncSession) -> None:
     user = event.new_chat_member.user
     if user.is_bot:
-        return
+        raise SkipHandler
         
     chat, _ = await get_or_create_chat(session, event.chat.id, event.chat.title)
     
     # Reload settings
     settings = await session.scalar(select(ChatSettings).where(ChatSettings.chat_telegram_id == event.chat.id))
     if not settings:
-        return
+        raise SkipHandler
         
     data = settings.data or {}
-    use_global_bans = data.get("use_global_bans", False)
-    welcome_message = data.get("welcome_message", "")
+    use_global_bans = data.get("modes", {}).get("use_global_bans", False)
+    welcome_message = data.get("onboarding", {}).get("welcome_message", "")
     
     # 1. Global Ban Check
     if use_global_bans:
         # Get chat admins
-        admins = await event.chat.get_administrators()
-        admin_ids = [a.user.id for a in admins]
-        
-        # Check if user is in GlobalBans of any admin
-        ban = await session.scalar(
-            select(GlobalBan).where(
-                GlobalBan.user_telegram_id == user.id,
-                GlobalBan.admin_telegram_id.in_(admin_ids)
-            ).limit(1)
-        )
-        if ban:
-            log.info(f"User {user.id} banned globally by admin {ban.admin_telegram_id}")
-            await event.chat.ban(user.id)
-            if ban.reason:
-                msg = t(chat.lang, "GLOBAL_BANNED_REASON", name=user.full_name, reason=ban.reason)
-            else:
-                msg = t(chat.lang, "GLOBAL_BANNED", name=user.full_name)
+        try:
+            admins = await event.chat.get_administrators()
+            admin_ids = [a.user.id for a in admins]
             
-            try:
-                sent = await event.bot.send_message(event.chat.id, msg, parse_mode="HTML")
-                # Auto delete after 1 minute
-                asyncio.create_task(delete_later(sent, 60))
-            except Exception:
-                pass
-            return  # Stop processing welcome if banned
+            # Check if user is in GlobalBans of any admin
+            ban = await session.scalar(
+                select(GlobalBan).where(
+                    GlobalBan.user_telegram_id == user.id,
+                    GlobalBan.admin_telegram_id.in_(admin_ids)
+                ).limit(1)
+            )
+            if ban:
+                log.info(f"User {user.id} banned globally by admin {ban.admin_telegram_id}")
+                await event.chat.ban(user.id)
+                if ban.reason:
+                    msg = t(chat.lang, "GLOBAL_BANNED_REASON", name=user.full_name, reason=ban.reason)
+                else:
+                    msg = t(chat.lang, "GLOBAL_BANNED", name=user.full_name)
+                
+                try:
+                    sent = await event.bot.send_message(event.chat.id, msg, parse_mode="HTML")
+                    asyncio.create_task(delete_later(sent, 60))
+                except Exception:
+                    pass
+                raise SkipHandler  # Stop processing welcome if banned
+        except Exception as e:
+            log.error(f"Error checking global ban: {e}")
 
     # 2. Welcome Message
     if welcome_message:
@@ -70,8 +73,10 @@ async def on_user_join(event: ChatMemberUpdated, session: AsyncSession) -> None:
             sent = await event.bot.send_message(event.chat.id, text, parse_mode="HTML")
             # Auto delete after 5 minutes to keep chat clean
             asyncio.create_task(delete_later(sent, 300))
-        except Exception:
-            pass
+        except Exception as e:
+            log.warning(f"Failed to send welcome message: {e}")
+
+    raise SkipHandler
 
 
 async def delete_later(message, delay: int):

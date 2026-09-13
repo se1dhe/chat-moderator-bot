@@ -3,6 +3,7 @@ import re
 import logging
 from aiogram import Router, F
 from aiogram.types import Message
+from aiogram.dispatcher.event.bases import SkipHandler
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -41,3 +42,4 @@ async def check_triggers(message: Message, session: AsyncSession) -> None:
                 log.warning(f"Failed to send trigger reply: {e}")
             break  # Stop checking other triggers to prevent spam
 
+    raise SkipHandler
