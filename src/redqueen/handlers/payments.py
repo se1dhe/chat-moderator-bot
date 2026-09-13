@@ -132,10 +132,14 @@ async def on_successful_payment(
             preset_id = parts[2]
             
             # Fetch settings and update
-            from ..db.models import ChatSettings
+            from ..db.models import ChatSettings, Chat
             from sqlalchemy import select
             
-            settings_obj = await session.scalar(select(ChatSettings).where(ChatSettings.chat_id == chat_id))
+            settings_obj = await session.scalar(
+                select(ChatSettings)
+                .join(Chat, Chat.id == ChatSettings.chat_id)
+                .where(Chat.telegram_id == chat_id)
+            )
             if settings_obj:
                 data = settings_obj.data or {}
                 purchased = data.get("purchased_presets", [])

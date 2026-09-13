@@ -17,9 +17,13 @@ async def billing_status(request: web.Request) -> web.Response:
     async with _session(request) as session:
         sub = await billing.get_subscription(session, cid)
         
-        from ..db.models import ChatSettings
+        from ..db.models import ChatSettings, Chat
         from sqlalchemy import select
-        settings_obj = await session.scalar(select(ChatSettings).where(ChatSettings.chat_id == cid))
+        settings_obj = await session.scalar(
+            select(ChatSettings)
+            .join(Chat, Chat.id == ChatSettings.chat_id)
+            .where(Chat.telegram_id == cid)
+        )
         purchased_presets = []
         if settings_obj and settings_obj.data:
             purchased_presets = settings_obj.data.get("purchased_presets", [])
@@ -126,11 +130,15 @@ async def cryptopay_webhook(request: web.Request) -> web.Response:
                 if len(parts) == 3:
                     _, cid, preset_id = parts
                     
-                    from ..db.models import ChatSettings
+                    from ..db.models import ChatSettings, Chat
                     from sqlalchemy import select
                     from sqlalchemy.orm.attributes import flag_modified
                     
-                    settings_obj = await session.scalar(select(ChatSettings).where(ChatSettings.chat_id == int(cid)))
+                    settings_obj = await session.scalar(
+                        select(ChatSettings)
+                        .join(Chat, Chat.id == ChatSettings.chat_id)
+                        .where(Chat.telegram_id == int(cid))
+                    )
                     if settings_obj:
                         data_json = settings_obj.data or {}
                         purchased = data_json.get("purchased_presets", [])

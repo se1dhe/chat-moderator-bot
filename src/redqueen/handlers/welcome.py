@@ -24,7 +24,7 @@ async def on_user_join(event: ChatMemberUpdated, session: AsyncSession) -> None:
     chat = await get_or_create_chat(session, event.chat.id, title=event.chat.title)
     
     # Reload settings
-    settings = await session.scalar(select(ChatSettings).where(ChatSettings.chat_telegram_id == event.chat.id))
+    settings = await session.scalar(select(ChatSettings).where(ChatSettings.chat_id == chat.id))
     if not settings:
         raise SkipHandler
         
