@@ -1,5 +1,6 @@
 /** @type {import('tailwindcss').Config} */
 export default {
+  darkMode: 'class',
   content: [
     "./index.html",
     "./src/**/*.{js,ts,jsx,tsx}",
@@ -7,45 +8,28 @@ export default {
   theme: {
     extend: {
       colors: {
-        tg: {
-          bg: 'var(--tg-theme-bg-color, #ffffff)',
-          text: 'var(--tg-theme-text-color, #000000)',
-          hint: 'var(--tg-theme-hint-color, #999999)',
-          link: 'var(--tg-theme-link-color, #2481cc)',
-          primary: 'var(--tg-theme-button-color, #2481cc)',
-          'primary-text': 'var(--tg-theme-button-text-color, #ffffff)',
-          secondary: 'var(--tg-theme-secondary-bg-color, #efeff3)',
-          card: 'var(--bg-card)',
-          elevated: 'var(--bg-elevated)'
-        },
         primary: {
-          DEFAULT: '#dc2626', // Red-600
-          light: '#f87171',   // Red-400
-          dark: '#991b1b',    // Red-800
+          DEFAULT: '#DC2626',
+          light: '#EF4444',
+          dark: '#991B1B',
         },
-        success: '#10b981', // Emerald-500
-        warning: '#f59e0b', // Amber-500
-        danger: '#ef4444',  // Red-500
+        neutral: {
+          50: '#fafafa',
+          100: '#f4f4f5',
+          200: '#e4e4e7',
+          300: '#d4d4d8',
+          400: '#a1a1aa',
+          500: '#71717a',
+          600: '#52525b',
+          700: '#3f3f46',
+          800: '#27272a',
+          900: '#18181b',
+          950: '#09090b',
+        }
       },
       fontFamily: {
-        sans: ['Inter', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
-        display: ['Rajdhani', 'sans-serif'],
+        sans: ['Inter', 'SF Pro Display', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
       },
-      animation: {
-        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
-        'fade-in': 'fadeIn 0.3s ease-out forwards',
-        'slide-up': 'slideUp 0.3s ease-out forwards',
-      },
-      keyframes: {
-        fadeIn: {
-          '0%': { opacity: '0' },
-          '100%': { opacity: '1' },
-        },
-        slideUp: {
-          '0%': { opacity: '0', transform: 'translateY(20px)' },
-          '100%': { opacity: '1', transform: 'translateY(0)' },
-        }
-      }
     },
   },
   plugins: [],
