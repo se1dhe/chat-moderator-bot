@@ -74,10 +74,7 @@ async def scan_message(
         try:
             # wait_for wrapper protects both the semaphore acquisition queue and the AI call.
             # If the queue is stuck (e.g. Ollama hung), this times out in 5 seconds and falls back to rule mode.
-            verdict = await asyncio.wait_for(
-                _classify_with_semaphore(ai_semaphore, ai_provider, text, context, lang, settings),
-                timeout=5.0
-            )
+            verdict = await _classify_with_semaphore(ai_semaphore, ai_provider, text, context, lang, settings)
         except asyncio.TimeoutError:
             log.warning(f"AI timeout for chat {message.chat.id}, falling back to rules")
             # fallback to rule provider directly
@@ -88,12 +85,20 @@ async def scan_message(
     await _act_on_verdict(message, bot, session, settings, verdict, t, flagged_text=text)
 
 async def _classify_with_semaphore(sem, provider, text, context, lang, settings):
+    # Wait for the semaphore without a timeout
     async with sem:
-        return await provider.classify_text(text, context=context, lang=lang, chat_settings=settings)
+        # Once acquired, the AI call itself is bounded by wait_for to prevent hanging
+        return await asyncio.wait_for(
+            provider.classify_text(text, context=context, lang=lang, chat_settings=settings),
+            timeout=5.0
+        )
 
 async def _classify_image_with_semaphore(sem, provider, image, caption, lang, settings):
     async with sem:
-        return await provider.classify_image(image, caption=caption, lang=lang, chat_settings=settings)
+        return await asyncio.wait_for(
+            provider.classify_image(image, caption=caption, lang=lang, chat_settings=settings),
+            timeout=5.0
+        )
 
 
 async def _act_on_verdict(message, bot, session, settings, verdict, t, *, flagged_text) -> None:
@@ -152,17 +157,21 @@ async def _act_on_verdict(message, bot, session, settings, verdict, t, *, flagge
     markup = _decision_kb(row.id, t).as_markup()
 
     # 2. Send the quarantine card to the admins in PM instead of spamming the group
-    try:
-        admins = await bot.get_chat_administrators(message.chat.id)
-        for admin in admins:
-            if admin.user.is_bot:
-                continue
-            try:
-                await bot.send_message(admin.user.id, f"<b>Chat: {message.chat.title}</b>\n\n" + card, reply_markup=markup)
-            except TelegramAPIError:
-                pass  # Admin hasn't started the bot in PM, ignore
-    except (TelegramAPIError, asyncio.TimeoutError) as exc:
-        log.warning("Could not fetch admins to send quarantine card: %s", exc)
+    async def _notify_admins():
+        try:
+            admins = await bot.get_chat_administrators(message.chat.id)
+            for admin in admins:
+                if admin.user.is_bot:
+                    continue
+                try:
+                    await bot.send_message(admin.user.id, f"<b>Chat: {message.chat.title}</b>\n\n" + card, reply_markup=markup)
+                    await asyncio.sleep(0.1)  # Prevent FloodWait
+                except TelegramAPIError:
+                    pass  # Admin hasn't started the bot in PM, ignore
+        except Exception as exc:
+            log.warning("Could not send quarantine card to admins: %s", exc)
+            
+    asyncio.create_task(_notify_admins())
 
 
 def _visual_source(message: Message):
@@ -212,10 +221,7 @@ async def scan_visual(
         raise SkipHandler from exc
 
     try:
-        verdict = await asyncio.wait_for(
-            _classify_image_with_semaphore(ai_semaphore, ai_provider, image, message.caption, lang, settings),
-            timeout=5.0
-        )
+        verdict = await _classify_image_with_semaphore(ai_semaphore, ai_provider, image, message.caption, lang, settings)
     except asyncio.TimeoutError:
         verdict = await ai_provider.fallback.classify_image(image, caption=message.caption, lang=lang) if hasattr(ai_provider, "fallback") else Verdict("ok", 50, "timeout")
 
@@ -259,10 +265,7 @@ async def scan_document(
     if not await ai_budget.allow(redis, chat_id=message.chat.id, limit=ai_cfg["max_per_minute"]):
         raise SkipHandler
     try:
-        verdict = await asyncio.wait_for(
-            _classify_with_semaphore(ai_semaphore, ai_provider, combined, None, lang, settings),
-            timeout=5.0
-        )
+        verdict = await _classify_with_semaphore(ai_semaphore, ai_provider, combined, None, lang, settings)
     except asyncio.TimeoutError:
         verdict = await ai_provider.fallback.classify_text(combined, lang=lang) if hasattr(ai_provider, "fallback") else Verdict("ok", 50, "timeout")
 
@@ -305,10 +308,7 @@ async def scan_voice(
     if not text:
         raise SkipHandler
     try:
-        verdict = await asyncio.wait_for(
-            _classify_with_semaphore(ai_semaphore, ai_provider, text, None, lang, settings),
-            timeout=5.0
-        )
+        verdict = await _classify_with_semaphore(ai_semaphore, ai_provider, text, None, lang, settings)
     except asyncio.TimeoutError:
         verdict = await ai_provider.fallback.classify_text(text, lang=lang) if hasattr(ai_provider, "fallback") else Verdict("ok", 50, "timeout")
 

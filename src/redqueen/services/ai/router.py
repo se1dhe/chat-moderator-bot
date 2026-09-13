@@ -16,6 +16,8 @@ class RouterProvider(AIProvider):
         # Fail fast if SECRET_KEY is invalid (BUG-3)
         self.fernet = Fernet(secret_key) if secret_key else None
         self._cache: dict[tuple, AIProvider] = {}
+        import aiohttp
+        self._shared_session: aiohttp.ClientSession | None = None
 
     def _decrypt_key(self, encrypted: str | None) -> str | None:
         if not encrypted or not self.fernet:
@@ -50,12 +52,16 @@ class RouterProvider(AIProvider):
             return provider
         
         provider = self.ollama
+        import aiohttp
+        if self._shared_session is None or self._shared_session.closed:
+            self._shared_session = aiohttp.ClientSession()
+            
         if provider_name == "openai":
-            provider = OpenAIProvider(api_key, model_name, self.fallback)
+            provider = OpenAIProvider(api_key, model_name, self.fallback, self._shared_session)
         elif provider_name == "gemini":
-            provider = GeminiProvider(api_key, model_name, self.fallback)
+            provider = GeminiProvider(api_key, model_name, self.fallback, self._shared_session)
         elif provider_name == "claude":
-            provider = ClaudeProvider(api_key, model_name, self.fallback)
+            provider = ClaudeProvider(api_key, model_name, self.fallback, self._shared_session)
             
         if len(self._cache) > 500:
             # Pop the oldest item (first item in dict)
@@ -86,7 +92,6 @@ class RouterProvider(AIProvider):
 
     async def close(self) -> None:
         await self.ollama.close()
-        for provider in self._cache.values():
-            if hasattr(provider, "close"):
-                await provider.close()
         self._cache.clear()
+        if self._shared_session and not self._shared_session.closed:
+            await self._shared_session.close()

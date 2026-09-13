@@ -14,6 +14,8 @@ import asyncio
 import aiohttp
 
 async def _send_webhook(url: str, payload: dict) -> None:
+    import asyncio
+    await asyncio.sleep(2.0)  # Wait for DB transaction to commit to prevent race conditions
     try:
         async with aiohttp.ClientSession() as http_session:
             await http_session.post(url, json=payload, timeout=5)
@@ -85,8 +87,9 @@ async def ban(
         from redqueen.db.models import GlobalBan
         from sqlalchemy.dialects.postgresql import insert as pg_insert
         
+        safe_actor = actor_id if actor_id is not None else 0
         stmt = pg_insert(GlobalBan).values(
-            admin_telegram_id=actor_id,
+            admin_telegram_id=safe_actor,
             user_telegram_id=user_id,
             reason=reason
         ).on_conflict_do_update(
@@ -147,7 +150,7 @@ async def mute(
 async def unmute(
     bot: Bot, session: AsyncSession, *, chat_id: int, user_id: int, actor_id: int
 ) -> None:
-    await bot.restrict_chat_member(chat_id, user_id, permissions=_UNMUTED_PERMISSIONS)
+    await bot.restrict_chat_member(chat_id, user_id, permissions=_UNMUTED_PERMISSIONS, use_independent_chat_permissions=False)
     await repo.log_action(
         session, chat_telegram_id=chat_id, user_telegram_id=user_id, actor_id=actor_id,
         action="unmute",

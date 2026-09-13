@@ -32,9 +32,13 @@ async def health(request: web.Request) -> web.Response:
     try:
         pool = request.app.get("db_pool") or request.app.get("engine")
         if pool:
-            # проверка БД
+            import sqlalchemy as sa
+            async with pool.connect() as conn:
+                await conn.execute(sa.text("SELECT 1"))
             checks["db"] = "ok"
-    except SQLAlchemyError:
+    except Exception as e:
+        import logging
+        logging.getLogger(__name__).warning("DB Healthcheck failed: %s", e)
         checks["db"] = "error"
         checks["status"] = "degraded"
     try:

@@ -14,11 +14,11 @@ _SYSTEM_PROMPT = (
 )
 
 class CloudAIProvider(AIProvider):
-    def __init__(self, api_key: str, model: str, fallback: AIProvider):
+    def __init__(self, api_key: str, model: str, fallback: AIProvider, session: aiohttp.ClientSession | None = None):
         self.api_key = api_key
         self.model = model
         self.fallback = fallback
-        self._session: aiohttp.ClientSession | None = None
+        self._session = session
 
     def _client(self) -> aiohttp.ClientSession:
         if self._session is None or self._session.closed:
@@ -26,9 +26,8 @@ class CloudAIProvider(AIProvider):
         return self._session
 
     async def close(self) -> None:
-        if self._session and not self._session.closed:
-            await self._session.close()
-            self._session = None
+        # Let the RouterProvider manage the shared session
+        pass
 
     @staticmethod
     def _parse_json(content: str) -> dict:

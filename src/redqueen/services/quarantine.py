@@ -39,7 +39,8 @@ async def decide(
     if action == "rule" and verdict.text:
         chat_settings = await repo.get_settings(session, verdict.chat_telegram_id)
         words = get_config(chat_settings)["filters"]["banned_words"]
-        snippet = verdict.text.strip().lower()[:60]
+        # Take up to 200 chars to ensure high specificity and avoid banning generic prefixes like "Hello"
+        snippet = verdict.text.strip().lower()[:200].strip()
         if snippet and snippet not in words:
             words.append(snippet)
             save_section(chat_settings, "filters", {"banned_words": words})
