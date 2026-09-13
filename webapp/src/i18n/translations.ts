@@ -3,6 +3,15 @@ export type Locales = 'en' | 'ru' | 'uk';
 
 export const LOCALES: Record<Locales, LocaleDict> = {
   en: {
+    'rbac.title': 'Roles & Access',
+    'rbac_fetch_error': 'Error loading moderators',
+    'rbac_add_error': 'Error adding moderator',
+    'rbac_remove_error': 'Error removing moderator',
+    'rbac_remove_confirm': 'Remove moderator?',
+    'rbac_username_placeholder': 'username or ID',
+    'rbac_moderators_list': 'MODERATORS',
+    'rbac_no_moderators': 'No moderators found.',
+
     'common.noMedia': 'No media',
     'common.mediaAttached': 'Media attached',
     'common.removeMedia': 'Remove media',
@@ -337,6 +346,15 @@ export const LOCALES: Record<Locales, LocaleDict> = {
   },
   
   ru: {
+    'rbac.title': 'Роли и Доступы',
+    'rbac_fetch_error': 'Ошибка загрузки модераторов',
+    'rbac_add_error': 'Ошибка добавления модератора',
+    'rbac_remove_error': 'Ошибка удаления модератора',
+    'rbac_remove_confirm': 'Удалить модератора?',
+    'rbac_username_placeholder': 'username или ID',
+    'rbac_moderators_list': 'МОДЕРАТОРЫ',
+    'rbac_no_moderators': 'Модераторы не добавлены.',
+
 
     'sec.rbac': 'Роли и Доступы',
     'sec.rbac.desc': 'Управление доступом к панели',

@@ -19,7 +19,7 @@ export default function RBAC({ chatId }) {
 
   const fetchMods = async () => {
     try {
-      const data = await api.get(`/api/chats/${chatId}/moderators`);
+      const data = await api.get(`/chats/${chatId}/moderators`);
       setMods(data);
     } catch (e) {
       console.error(e);
@@ -34,7 +34,7 @@ export default function RBAC({ chatId }) {
     setAdding(true);
     setError(null);
     try {
-      await api.post(`/api/chats/${chatId}/moderators`, {
+      await api.post(`/chats/${chatId}/moderators`, {
         username: usernameInput.trim().replace('@', '')
       });
       setUsernameInput('');
@@ -50,7 +50,7 @@ export default function RBAC({ chatId }) {
   const handleRemove = async (uid) => {
     if (!confirm(t('rbac_remove_confirm') || 'Are you sure?')) return;
     try {
-      await api.delete(`/api/chats/${chatId}/moderators/${uid}`);
+      await api.del(`/chats/${chatId}/moderators/${uid}`);
       fetchMods();
     } catch (e) {
       console.error(e);
