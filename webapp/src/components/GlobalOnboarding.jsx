@@ -24,19 +24,19 @@ export function GlobalOnboarding({ botUsername }) {
         <div className="w-16 h-16 bg-green-500/20 rounded-full flex items-center justify-center mb-6 mt-8 mx-auto">
           <Plus size={32} className="text-green-500" />
         </div>
-        <h2 className="text-2xl font-bold mb-4">{t('start.title') || 'Добавление бота'}</h2>
+        <h2 className="text-2xl font-bold mb-4">{t('start.title')}</h2>
         <p className="text-tg-hint mb-8 leading-relaxed">
-          {t('start.desc') || 'Выберите, куда добавить RedQueen, чтобы начать защиту. Бот автоматически настроится и появится в списке ваших чатов.'}
+          {t('start.desc')}
         </p>
 
         <button className="btn w-full flex items-center justify-center gap-2 mb-4 bg-gradient-to-r from-red-500 to-red-600 text-white border-0 shadow-lg shadow-red-500/20" onClick={addGroup}>
           <ShieldCheck size={20} />
-          {t('start.btn.group') || 'Добавить в Группу'}
+          {t('start.btn.group')}
         </button>
 
         <button className="btn w-full flex items-center justify-center gap-2 bg-tg-secondary border border-[var(--border)] text-tg-text" onClick={addChannel}>
           <Megaphone size={20} />
-          {t('start.btn.channel') || 'Добавить в Канал'}
+          {t('start.btn.channel')}
         </button>
       </div>
     </div>
