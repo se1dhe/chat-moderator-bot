@@ -225,8 +225,8 @@ export function ChatSettingsProvider({ chatId, children }: { chatId: number; chi
   const pro = !!billing?.pro;
   const value: ChatSettingsContextType = useMemo(() => ({
     chatId, saved, draft, saving, error, updateSection, setSection, reload: load,
-    billing, pro, loadBilling, openUpgrade,
-  }), [chatId, saved, draft, saving, error, updateSection, setSection, load, billing, pro, loadBilling, openUpgrade]);
+    billing, pro, badges, clearAuditBadge, loadBilling, openUpgrade, openPresetPayment,
+  }), [chatId, saved, draft, saving, error, updateSection, setSection, load, billing, pro, badges, clearAuditBadge, loadBilling, openUpgrade, openPresetPayment]);
 
   return (
     <Ctx.Provider value={value}>

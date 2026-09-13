@@ -9,6 +9,26 @@ export function PresetsGallery() {
 
   if (!draft) return null;
 
+  const isActive = (id: string) => {
+    const f = draft.filters;
+    const a = draft.antiflood;
+    const c = draft.captcha;
+    const d = draft.defcon;
+    const core = draft.core;
+    
+    switch (id) {
+      case 'basic':
+        return a.enabled && a.messages === 5 && !c.enabled && !f.block_links && !d.enabled && core.ai_mode === 'off';
+      case 'crypto':
+        return a.enabled && a.messages === 3 && c.enabled && f.block_links && d.enabled && d.action === 'strict' && core.ai_mode === 'autoban';
+      case 'corp':
+        return a.enabled && a.messages === 10 && !c.enabled && !f.block_links && d.enabled && d.action === 'read_only' && core.ai_mode === 'quarantine';
+      case 'chill':
+        return !a.enabled && !c.enabled && !f.block_links && !d.enabled && core.ai_mode === 'off';
+    }
+    return false;
+  };
+
   const presets = [
     {
       id: 'basic',
@@ -80,10 +100,11 @@ export function PresetsGallery() {
       <div className="flex gap-3 overflow-x-auto snap-x snap-mandatory pb-4 pt-1 -mx-4 px-4 no-scrollbar">
         {presets.map((p) => {
           const locked = p.pro && !(billing?.purchased_presets || []).includes(p.id);
+          const active = isActive(p.id);
           return (
             <div 
               key={p.id} 
-              className="snap-center shrink-0 w-[80%] max-w-[280px] bg-white dark:bg-[#0a0a0a] border border-neutral-200 dark:border-neutral-800/60 rounded-2xl p-4 shadow-sm flex flex-col justify-between"
+              className={`snap-center shrink-0 w-[80%] max-w-[280px] bg-white dark:bg-[#0a0a0a] border ${active ? 'border-primary dark:border-primary ring-1 ring-primary/30' : 'border-neutral-200 dark:border-neutral-800/60'} rounded-2xl p-4 shadow-sm flex flex-col justify-between transition-colors`}
             >
               <div className="flex flex-col gap-2 mb-3">
                 <div className={`w-10 h-10 rounded-xl flex items-center justify-center mb-1 ${p.color}`}>
@@ -97,20 +118,23 @@ export function PresetsGallery() {
                 className={`w-full py-2.5 rounded-xl text-[13px] font-bold flex items-center justify-center gap-1.5 transition-transform active:scale-95 ${
                   locked 
                     ? 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400' 
+                    : active 
+                    ? 'bg-primary/10 text-primary cursor-default'
                     : 'bg-neutral-100 dark:bg-neutral-800 text-neutral-900 dark:text-neutral-50 hover:bg-neutral-200 dark:hover:bg-neutral-700'
                 }`}
                 onClick={() => {
+                  if (active) return;
                   if (locked) {
                     haptic('warning');
                     openPresetPayment(p.id);
                   } else {
                     haptic('success');
                     p.apply();
-                    window.Telegram?.WebApp?.showAlert?.(t('common.saved') || "Applied!");
+                    window.Telegram?.WebApp?.showAlert?.(t('presets.applied_alert', { name: p.title }));
                   }
                 }}
               >
-                {locked ? <><Lock size={14} /> 150 ⭐️</> : <><Check size={14} /> {t('presets.apply')}</>}
+                {locked ? <><Lock size={14} /> 150 ⭐️</> : active ? <><Check size={14} /> {t('presets.active')}</> : <><Check size={14} /> {t('presets.apply')}</>}
               </button>
             </div>
           );
