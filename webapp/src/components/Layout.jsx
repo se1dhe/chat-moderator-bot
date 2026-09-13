@@ -3,7 +3,7 @@ import { LayoutGrid, Users, ShieldAlert, ScrollText, BarChart3, ChevronLeft, Shi
 import { motion, AnimatePresence } from 'framer-motion'
 import { useLang } from '../context/LangContext'
 import { ChatSettingsProvider, useChatSettings } from '../context/ChatSettingsContext'
-import { haptic } from '../lib/telegram'
+import { haptic, isTelegram } from '../lib/telegram'
 import { ThemeToggle } from './ThemeToggle'
 
 // Tiny in-flow autosave hint (no fixed bar → no scroll repaint glitch).
@@ -26,7 +26,7 @@ function Header() {
   const cycle = { en: 'ru', ru: 'uk', uk: 'en' }
   return (
     <header className="app-header">
-      {section ? (
+      {section && !isTelegram ? (
         <button className="header-back" onClick={() => { haptic('light'); navigate(-1) }}>
           <ChevronLeft size={20} />
         </button>
@@ -36,7 +36,7 @@ function Header() {
         </div>
       )}
       <div>
-        <div className="title">{t('app.title')}</div>
+        <div className="title" style={{ whiteSpace: 'nowrap' }}>{t('app.title')}</div>
         {!section && <div className="subtitle">{t('app.subtitle')}</div>}
       </div>
       <div className="header-spacer" />
