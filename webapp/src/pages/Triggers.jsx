@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Card, Input, Button, Toggle } from '../components/ui';
 import api from '../lib/api';
 
-export default function Triggers({ chatId }) {
+export default function Triggers({ chatId, t }) {
   const [triggers, setTriggers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [word, setWord] = useState('');
@@ -59,7 +59,7 @@ export default function Triggers({ chatId }) {
   return (
     <div className="space-y-6">
       <div className="space-y-2">
-        <h2 className="text-xl font-display font-bold">Auto-Replies (Triggers)</h2>
+        <h2 className="text-xl font-display font-bold">{t ? t("sec.triggers") : "Auto-Replies"}</h2>
         <p className="text-sm text-text-muted">Configure the bot to reply automatically to specific phrases or commands.</p>
       </div>
       
