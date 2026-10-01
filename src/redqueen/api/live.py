@@ -5,7 +5,6 @@ from aiohttp import web
 from sqlalchemy import text
 
 async def live_feed(request: web.Request) -> web.Response:
-    await get_user(request)
     
     allowed_origins = [o.strip() for o in os.environ.get("CORS_ORIGINS", "").split(",") if o.strip()]
     origin = request.headers.get("Origin", "")
